@@ -115,12 +115,20 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
     const resultSectionRef = useRef<HTMLDivElement | null>(null);
 
     const isLoggedIn = Boolean(auth.user);
+    const isVerified = Boolean(auth.user?.email_verified_at);
+    const showVerificationWarning = isLoggedIn && !isVerified;
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!isLoggedIn) {
             router.visit('/login');
+            return;
+        }
+
+        if (!isVerified) {
+            setError('Please verify your email address before submitting your response sheet.');
+            router.visit('/verify-email');
             return;
         }
 
@@ -197,7 +205,12 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
 
     return (
         <>
-            <Head title="XAT Score Calculator" />
+            <Head title="XAT Score Calculator 2025 | Accurate Sectional Marks & Percentile Predictor">
+                <meta
+                    name="description"
+                    content="Upload your XAT response sheet to unlock instant sectional analysis, penalty-aware scoring, and percentile projections. Review your performance history and prepare smarter for B-school shortlists."
+                />
+            </Head>
             <section className="bg-[#101C3E] py-8 text-white dark:bg-[#0A1024] lg:py-20">
                 <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                     <div className="max-w-2xl space-y-6">
@@ -228,23 +241,37 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             <Button
                                 type="submit"
                                 className="h-12 rounded-xl px-6"
-                                disabled={loading || !isLoggedIn}
+                                disabled={loading || !isLoggedIn || !isVerified}
                             >
                                 {loading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                         Calculating…
                                     </>
-                                ) : isLoggedIn ? (
-                                    'Submit'
-                                ) : (
+                                ) : !isLoggedIn ? (
                                     'Sign in to submit'
+                                ) : !isVerified ? (
+                                    'Verify your email'
+                                ) : (
+                                    'Submit'
                                 )}
                             </Button>
                         </form>
                         {error && (
                             <p className="text-sm font-medium text-red-200">
                                 {error}
+                            </p>
+                        )}
+                        {showVerificationWarning && (
+                            <p className="text-sm text-amber-100">
+                                Please verify your email address before submitting response sheets.{' '}
+                                <Link
+                                    href="/verify-email"
+                                    className="font-semibold underline-offset-4 hover:underline"
+                                >
+                                    Resend verification email
+                                </Link>
+                                .
                             </p>
                         )}
                         {!isLoggedIn && (

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminOverviewController;
 use App\Http\Controllers\CatScoreCalculatorController;
 use App\Http\Controllers\XatScoreCalculatorController;
 use App\Http\Resources\CatScoreCalculationResource;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('cat-score-calculator');
+    return redirect()->route('cat.score-calculator');
 })->name('home');
 
 Route::get('/cat-score-calculator', function (Request $request) {
@@ -28,7 +29,7 @@ Route::get('/cat-score-calculator', function (Request $request) {
     ]);
 })->name('cat.score-calculator');
 
-Route::middleware('auth')->post('/cat-score-calculator/calculate', [CatScoreCalculatorController::class, 'store'])->name('cat.score-calculator.calculate');
+Route::middleware(['auth', 'verified'])->post('/cat-score-calculator/calculate', [CatScoreCalculatorController::class, 'store'])->name('cat.score-calculator.calculate');
 
 Route::get('/xat-score-calculator', function (Request $request) {
     $latestCalculation = null;
@@ -46,13 +47,20 @@ Route::get('/xat-score-calculator', function (Request $request) {
     ]);
 })->name('xat.score-calculator');
 
-Route::middleware('auth')->post('/xat-score-calculator/calculate', [XatScoreCalculatorController::class, 'store'])->name('xat.score-calculator.calculate');
+Route::middleware(['auth', 'verified'])->post('/xat-score-calculator/calculate', [XatScoreCalculatorController::class, 'store'])->name('xat.score-calculator.calculate');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 });
+
+Route::middleware(['auth', 'verified'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('overview', AdminOverviewController::class)->name('overview');
+    });
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

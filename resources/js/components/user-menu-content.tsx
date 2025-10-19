@@ -12,7 +12,7 @@ import { edit as appearanceEdit } from '@/routes/appearance';
 import { edit as passwordEdit } from '@/routes/password';
 import { type User } from '@/types';
 import { Link, router } from '@inertiajs/react';
-import { LogOut, Settings, Shield, User as UserIcon, UserRoundPen } from 'lucide-react';
+import { LogOut, Settings, Shield, LayoutGrid, User as UserIcon, UserRoundPen } from 'lucide-react';
 
 interface UserMenuContentProps {
     user: User;
@@ -35,6 +35,20 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+                {user.is_admin && (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            className="block w-full cursor-pointer"
+                            href="/admin/overview"
+                            as="button"
+                            prefetch
+                            onClick={cleanup}
+                        >
+                            <LayoutGrid className="mr-2" />
+                            Admin Overview
+                        </Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                     <Link
                         className="block w-full cursor-pointer"

@@ -10,15 +10,31 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { scoreCalculator as catScoreCalculator } from '@/routes/cat';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 export function AppSidebar() {
+    const page = usePage<SharedData>();
     const logoHref = catScoreCalculator();
+    const url = page.url ?? '';
+    const authUser = page.props?.auth?.user;
+    const isAdminUser = Boolean(authUser?.is_admin);
 
-    const navItems: NavItem[] = [];
-    const navLabel = undefined;
+    let navItems: NavItem[] = [];
+    let navLabel: string | undefined;
+
+    if (isAdminUser) {
+        navItems = [
+            {
+                title: 'Overview',
+                href: '/admin/overview',
+                icon: LayoutGrid,
+            },
+        ];
+        navLabel = 'Admin';
+    }
 
     return (
         <Sidebar collapsible="icon" variant="inset">

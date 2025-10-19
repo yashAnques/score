@@ -49,8 +49,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl">
-                    <nav className="flex flex-row space-y-1 space-x-2">
+                <aside className="w-full max-w-xl lg:w-48">
+                    <nav className="flex lg:flex-col space-y-2 space-x-2">
                         {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
