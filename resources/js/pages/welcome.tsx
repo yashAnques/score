@@ -35,7 +35,7 @@ export default function Welcome() {
                 <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                     <div className="max-w-2xl space-y-6">
                         <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary dark:bg-primary/15 dark:text-primary-foreground">
-                            Cracku Prep Suite
+                            Our Prep Suite
                         </Badge>
                         <h1 className="text-4xl font-semibold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
                             Everything you need to analyse, plan, and dominate CAT 2025.

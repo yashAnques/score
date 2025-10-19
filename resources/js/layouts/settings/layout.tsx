@@ -49,15 +49,15 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
-                    <nav className="flex flex-col space-y-1 space-x-0">
+                <aside className="w-full max-w-xl">
+                    <nav className="flex flex-row space-y-1 space-x-2">
                         {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
-                                className={cn('w-full justify-start', {
+                                className={cn('w-full justify-center', {
                                     'bg-muted':
                                         currentPath ===
                                         (typeof item.href === 'string'

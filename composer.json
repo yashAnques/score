@@ -14,7 +14,8 @@
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.9"
+        "laravel/wayfinder": "^0.1.9",
+        "sunra/php-simple-html-dom-parser": "^1.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -30,7 +31,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Support/legacy-result-helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
