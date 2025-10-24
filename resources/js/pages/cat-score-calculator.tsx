@@ -8,8 +8,11 @@ import {
     AlertCircle,
     BarChart3,
     CheckCircle2,
+    Cpu,
     ListChecks,
     Loader2,
+    Bot,
+    Sparkles,
     ShieldCheck,
     Target,
     Trophy,
@@ -102,6 +105,24 @@ const assurances = [
         title: 'Auto-saved history',
         description:
             'Every calculation is stored on your account so you can revisit and download the scorecard anytime.',
+    },
+];
+
+const aiHighlights = [
+    {
+        icon: Sparkles,
+        title: 'LLM cleansing',
+        description: 'Sanitises the HTML sheet and extracts signals with zero manual tweaks.',
+    },
+    {
+        icon: Cpu,
+        title: 'Scoring engine',
+        description: 'Applies CAT rules & slot weights on a specialised inference pipeline.',
+    },
+    {
+        icon: Bot,
+        title: 'Confidence band',
+        description: 'Surfaces percentile confidence so you can trust the forecast.',
     },
 ];
 
@@ -257,22 +278,37 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                     content="Paste your official CAT response sheet to get precise VARC, DILR, and QA scores in seconds. Understand your predicted percentile, track past attempts, and plan interview prep with confidence."
                 />
             </Head>
-            <section className="bg-[#131C35] py-16 text-white dark:bg-[#090E1D] lg:py-20">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-                    <div className="max-w-2xl space-y-6">
-                        <Badge className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                             CAT Score Calculator 2025
-                        </Badge>
+            <section className="relative overflow-hidden bg-[#080B1A] py-16 text-white dark:bg-[#05060D] lg:py-20">
+                <div className="absolute inset-0" />
+                <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-sky-500/25 blur-[120px] md:h-80 md:w-80" />
+                <div className="absolute bottom-[-6rem] right-[-6rem] h-80 w-80 rounded-full bg-emerald-400/25 blur-[140px]" />
+                <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                    <div className="space-y-8">
                         <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-                            Upload your official CAT response sheet and let  reveal your exact sectional
-                            score in seconds.
+                            Hand your CAT response sheet to our <br /> AI co-pilot and watch precise scores materialise in seconds.
                         </h1>
                         <p className="text-base text-white/80 sm:text-lg">
-                            No estimations. No manual counting. Paste the HTML response link and let our trusted engine compute your VARC, DILR, QA, and overall marks using the official CAT marking scheme.
+                            Our multi-model pipeline parses your official HTML sheet, normalises slot-level scaling, and returns a verified scorecard you can trust before the results drop.
                         </p>
+                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                            {aiHighlights.map(({ icon: Icon, title, description }) => (
+                                <div
+                                    key={title}
+                                    className="group relative flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_0_25px_rgba(15,118,110,0.15)] transition hover:border-white/30 hover:bg-white/15"
+                                >
+                                    <div className="rounded-xl bg-yellow-400/15 p-2 text-yellow-200 dark:bg-yellow-400/80">
+                                        <Icon className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-white">{title}</p>
+                                        <p className="text-xs text-white/70">{description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                         <form
                             onSubmit={handleSubmit}
-                            className="flex flex-col gap-3 rounded-2xl bg-white/10 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:gap-4"
+                            className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_20px_60px_rgba(12,17,35,0.45)] backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4"
                         >
                             <Input
                                 value={responseLink}
@@ -280,11 +316,12 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                     setResponseLink(event.target.value ?? '')
                                 }
                                 placeholder="https://cdn.digialm.com/per/g06/.../response.html"
-                                className="h-12 flex-1 rounded-xl border-white/20 bg-white/90 text-[#131C35] placeholder:text-[#4B567E]"
+                                className="h-12 flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
                             />
                             <Button
                                 type="submit"
-                                className="h-12 rounded-xl px-6"
+                                variant="outline"
+                                className="h-12 min-w-[9rem] rounded-xl border-2 border-yellow-400 from-yellow-400/10 via-yellow-400/20 to-yellow-300/10 px-6 text-yellow-100 transition cursor-pointer hover:text-white hover:bg-transparent hover:scale-105"
                                 disabled={loading || !isLoggedIn || !isVerified}
                             >
                                 {loading ? (
@@ -302,7 +339,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                             </Button>
                         </form>
                         {error && (
-                            <p className="text-sm font-medium text-red-200">
+                            <p className="text-sm font-medium text-amber-200">
                                 {error}
                             </p>
                         )}
@@ -311,7 +348,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 You need an account to process response sheets.{' '}
                                 <Link
                                     href="/register"
-                                    className="font-semibold text-sky-300 hover:text-sky-200"
+                                    className="font-semibold text-yellow-200 hover:text-yellow-100"
                                 >
                                     Create one for free.
                                 </Link>
@@ -329,22 +366,6 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 .
                             </p>
                         )}
-                    </div>
-                    <div className="hidden w-full max-w-md lg:block">
-                        <div className="space-y-4">
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “Score got scaled down but actual percentile remained what we
-                                predicted initially. So can&apos;t really say.”
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “I pasted my sheet and had the full breakdown in under a minute.
-                                Super useful to double-check before challenging the key.”
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “Shows section-wise accuracy instantly. Helped me decide which mocks
-                                to revisit.”
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -387,7 +408,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 className="border border-primary/10 bg-background/80 shadow-none"
                             >
                                 <CardHeader className="space-y-2">
-                                    <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                                    <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary bg-yellow-400 dark:bg-yellow-400/80 text-xs font-medium">
                                         Step {index + 1}
                                     </Badge>
                                     <CardTitle className="text-lg font-semibold text-foreground">
@@ -493,7 +514,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 </p>
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                        <thead className="bg-slate-900 text-white">
+                                        <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                             <tr className="text-xs uppercase tracking-wide">
                                                 <th className="px-4 py-3 font-semibold">%ile</th>
                                                 <th className="px-4 py-3 font-semibold">Overall</th>
@@ -549,7 +570,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                        <thead className="bg-slate-100 text-foreground dark:bg-slate-900/60">
+                                        <thead className="bg-yellow-400 text-primary text-foreground dark:bg-yellow-400/80">
                                             <tr className="text-xs uppercase tracking-wide">
                                                 <th className="px-4 py-3 font-semibold"></th>
                                                 <th className="px-4 py-3 font-semibold">Slot-1</th>
@@ -664,6 +685,47 @@ type ScorecardProps = {
     headline: string | null;
 };
 
+function DetailItem({ label, value, isLink = false }: DetailItemProps) {
+    if (value === '—') {
+        return (
+            <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {label}
+                </p>
+                <p className="text-sm text-muted-foreground">—</p>
+            </div>
+        );
+    }
+
+    if (isLink) {
+        return (
+            <div className="space-y-1">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    {label}
+                </p>
+                <a
+                    href={value}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-primary underline-offset-2 hover:underline"
+                >
+                    View response sheet
+                </a>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-1">
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {label}
+            </p>
+            <p className="text-sm font-semibold text-foreground">{value}</p>
+        </div>
+    );
+}
+
+
 function Scorecard({ calculation, headline }: ScorecardProps) {
     const scoreSummary = calculation.overall;
     const details = calculation.details ?? null;
@@ -710,34 +772,29 @@ function Scorecard({ calculation, headline }: ScorecardProps) {
                         {headline} 🎉
                     </CardTitle>
                 )}
-                <p className="text-sm text-muted-foreground">
-                    {calculation.candidate_name ? (
-                        <>
-                            How did we help you on this journey?{' '}
-                            <Link
-                                href="https://wa.me/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="font-semibold text-primary hover:text-primary/80"
-                            >
-                                Share your story!
-                            </Link>{' '}
-                            <br />
-                            <br />
-                            Name: <p className='text-xl font-semibold text-foreground '>{calculation.candidate_name}</p>
-                            <br />
-                            {slotLabel &&
-                                <b>
-                                    Slot : {slotLabel}
-                                </b>
-                            }
-                            {testTime && `${testTime}`}
-                            {testCentre && `${testCentre}`}
-                        </>
-                    ) : (
-                        'We store each attempt securely so you can revisit or download it anytime.'
-                    )}
-                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <DetailItem
+                        label="Candidate Name"
+                        value={calculation.candidate_name ?? '—'}
+                    />
+                    <DetailItem
+                        label="Slot"
+                        value={slotLabel ?? '—'}
+                    />
+                    <DetailItem
+                        label="Test time"
+                        value={testTime ?? '—'}
+                    />
+                    <DetailItem
+                        label="Test center"
+                        value={testCentre ?? '—'}
+                    />
+                    <DetailItem
+                        label="Response Link"
+                        value={calculation.response_link ?? '—'}
+                        isLink
+                    />
+                </div>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -771,7 +828,7 @@ function Scorecard({ calculation, headline }: ScorecardProps) {
 
                 <div className="overflow-x-auto">
                     <table className="min-w-full overflow-hidden rounded-2xl border border-slate-200 text-sm dark:border-slate-800">
-                        <thead className="bg-[#112143] text-white dark:bg-[#162A52]">
+                        <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                             <tr>
                                 <th className="px-4 py-3 text-left font-semibold">Section</th>
                                 <th className="px-4 py-3 text-left font-semibold">Correct</th>
@@ -821,7 +878,7 @@ type SummaryTileProps = {
 function SummaryTile({ icon: Icon, label, value, helper }: SummaryTileProps) {
     return (
         <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 dark:border-slate-800 dark:bg-slate-900/70">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary min-w-[40px">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary min-w-[40px]">
                 <Icon className="h-5 w-5" />
             </div>
             <div className="space-y-1">
@@ -878,7 +935,7 @@ function SectionPerformanceChart({ sections }: SectionChartProps) {
                     ).toFixed(1)}%`;
                     const barColor =
                         section.score >= 0
-                            ? 'bg-primary'
+                            ? 'bg-yellow-400 dark:bg-yellow-400/80'
                             : 'bg-rose-500';
 
                     return (

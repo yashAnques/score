@@ -7,12 +7,15 @@ import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     CheckCircle2,
+    Cpu,
     ListChecks,
     Loader2,
+    Sparkles,
     ShieldCheck,
     Target,
     Trophy,
     XCircle,
+    Bot,
 } from 'lucide-react';
 import {
     type FormEvent,
@@ -211,24 +214,21 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                     content="Upload your XAT response sheet to unlock instant sectional analysis, penalty-aware scoring, and percentile projections. Review your performance history and prepare smarter for B-school shortlists."
                 />
             </Head>
-            <section className="bg-[#101C3E] py-8 text-white dark:bg-[#0A1024] lg:py-20">
-                <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-                    <div className="max-w-2xl space-y-6">
-                        <Badge className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-                            XAT Score Calculator 2025
-                        </Badge>
+            <section className="relative overflow-hidden bg-[#080B1A] py-16 text-white dark:bg-[#05060D] lg:py-20">
+                <div className="absolute inset-0" />
+                <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-sky-500/25 blur-[120px] md:h-80 md:w-80" />
+                <div className="absolute bottom-[-6rem] right-[-6rem] h-80 w-80 rounded-full bg-emerald-400/25 blur-[140px]" />
+                <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+                    <div className="space-y-8">
                         <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-                            Upload your official XAT response sheet and unlock your exact sectional
-                            performance.
+                            Plug your XAT response sheet into our <br /> AI co-pilot for penalty-aware scores in seconds.
                         </h1>
                         <p className="text-base text-white/80 sm:text-lg">
-                            No spreadsheets. No guesswork. Paste your link and we will benchmark you
-                            against the latest XAT scoring pattern, including the penalty for
-                            excessive unattempted questions.
+                            The same multi-model pipeline now calibrates XAT penalty rules, cleans your HTML sheet, and surfaces a verified scorecard before the official results.
                         </p>
                         <form
                             onSubmit={handleSubmit}
-                            className="flex flex-col gap-3 rounded-2xl bg-white/10 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:gap-4"
+                            className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_20px_60px_rgba(12,17,35,0.45)] backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4"
                         >
                             <Input
                                 value={responseLink}
@@ -236,11 +236,12 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                                     setResponseLink(event.target.value ?? '')
                                 }
                                 placeholder="https://cdn3.digialm.com/.../XAT25066291_..."
-                                className="h-12 flex-1 rounded-xl border-white/20 bg-white/90 text-[#0B142E] placeholder:text-[#4C5A89] p-3"
+                                className="h-12 flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
                             />
                             <Button
                                 type="submit"
-                                className="h-12 rounded-xl px-6"
+                                variant="outline"
+                                className="h-12 min-w-[9rem] rounded-xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/10 via-yellow-400/20 to-yellow-300/10 px-6 text-yellow-100 shadow-[0_0_35px_rgba(250,204,21,0.4)] transition hover:from-yellow-400/20 hover:to-yellow-300/20 hover:text-white cursor-pointer hover:scale-105"
                                 disabled={loading || !isLoggedIn || !isVerified}
                             >
                                 {loading ? (
@@ -258,8 +259,19 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             </Button>
                         </form>
                         {error && (
-                            <p className="text-sm font-medium text-red-200">
+                            <p className="text-sm font-medium text-amber-200">
                                 {error}
+                            </p>
+                        )}
+                        {!isLoggedIn && (
+                            <p className="text-sm text-white/70">
+                                You need an account to process response sheets.{' '}
+                                <Link
+                                    href="/register"
+                                    className="font-semibold text-yellow-200 hover:text-yellow-100"
+                                >
+                                    Create one for free.
+                                </Link>
                             </p>
                         )}
                         {showVerificationWarning && (
@@ -274,32 +286,6 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                                 .
                             </p>
                         )}
-                        {!isLoggedIn && (
-                            <p className="text-sm text-white/75">
-                                You need an account to process response sheets.{' '}
-                                <Link
-                                    href="/register"
-                                    className="font-semibold text-sky-300 hover:text-sky-200"
-                                >
-                                    Create one for free.
-                                </Link>
-                            </p>
-                        )}
-                    </div>
-                    <div className="hidden w-full max-w-md lg:block">
-                        <div className="space-y-4">
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “The DM section analysis was spot-on. Helped me plan retakes in a
-                                day.”
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “Penalty for unattempted questions was calculated exactly like the
-                                official answer key.”
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-white/10 p-4 text-sm text-white/80">
-                                “Loved the saved history — I can compare mocks whenever I want.”
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -341,7 +327,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                                 className="border border-primary/10 bg-background/80 shadow-none"
                             >
                                 <CardHeader className="space-y-2">
-                                    <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                                    <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary bg-yellow-400 dark:bg-yellow-400/80 text-xs font-medium">
                                         Step {index + 1}
                                     </Badge>
                                     <CardTitle className="text-lg font-semibold text-foreground">
@@ -407,7 +393,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                <thead className="bg-slate-900 text-white">
+                                <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
                                         <th className="px-4 py-3 font-semibold">Colleges</th>
                                         <th className="px-4 py-3 font-semibold">Fees</th>
@@ -463,7 +449,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             <h3 className="text-xl font-semibold text-foreground mb-2">VALR Analysis</h3>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-slate-900 text-white">
+                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                         <tr className="text-xs uppercase tracking-wide">
                                             <th className="px-4 py-3 font-semibold"> </th>
                                             <th className="px-4 py-3 font-semibold">Overall</th>
@@ -495,7 +481,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             <h3 className="text-xl font-semibold text-foreground mb-2">QADI Analysis</h3>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-slate-900 text-white">
+                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                         <tr className="text-xs uppercase tracking-wide">
                                             <th className="px-4 py-3 font-semibold"> </th>
                                             <th className="px-4 py-3 font-semibold">Overall</th>
@@ -528,7 +514,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             <h3 className="text-xl font-semibold text-foreground mb-2">DM Analysis</h3>
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-slate-900 text-white">
+                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                         <tr className="text-xs uppercase tracking-wide">
                                             <th className="px-4 py-3 font-semibold"> </th>
                                             <th className="px-4 py-3 font-semibold">Overall</th>
@@ -571,7 +557,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                <thead className="bg-slate-900 text-white">
+                                <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
                                         <th className="px-4 py-3 font-semibold">Sections</th>
                                         <th className="px-4 py-3 font-semibold">Number of Questions</th>
@@ -606,7 +592,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                         </h3>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                <thead className="bg-slate-900 text-white">
+                                <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
                                         <th className="px-4 py-3 font-semibold">Percentile</th>
                                         <th className="px-4 py-3 font-semibold">Scaled Score 2024</th>
@@ -652,7 +638,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                <thead className="bg-slate-900 text-white">
+                                <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
                                         <th className="px-4 py-3 font-semibold">Section</th>
                                         <th className="px-4 py-3 font-semibold">Number of Questions</th>
@@ -938,7 +924,7 @@ function SectionPerformanceChart({ sections }: SectionChartProps) {
                     ).toFixed(1)}%`;
                     const barColor =
                         section.score >= 0
-                            ? 'bg-primary'
+                            ? 'bg-yellow-400 dark:bg-yellow-400/80'
                             : 'bg-rose-500';
 
                     return (
