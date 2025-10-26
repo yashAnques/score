@@ -2,7 +2,7 @@
 
 use App\Models\City;
 use App\Models\State;
-use Sunra\PhpSimple\HtmlDomParser;
+use voku\helper\HtmlDomParser;
 
 function getStudentResult($url)
 {
@@ -982,12 +982,21 @@ function xatparseQuestion($question)
         if (dom_node_has_class($td, 'rightAns')) {
             $correct_option_index = $tk;
         }
-        if ($td->has_child()) {
+        if (dom_node_has_children($td)) {
             if (in_array(strtoupper($texts[$tk]), ["A.", "B.", "C.", "D.", "E.", "1.", "2.", "3.", "4.", "5."])) {
                 $images = $td->find('img');
-                if (! empty($images)) {
-                    $lastChild         = end($images);
-                    $texts[$tk]        = $lastChild->getAttribute('name');
+                $lastImage = null;
+
+                if (is_iterable($images)) {
+                    foreach ($images as $imageNode) {
+                        $lastImage = $imageNode;
+                    }
+                } elseif (is_object($images)) {
+                    $lastImage = $images;
+                }
+
+                if (is_object($lastImage) && method_exists($lastImage, 'getAttribute')) {
+                    $texts[$tk] = $lastImage->getAttribute('name');
                     $options_as_images = true;
                 }
             }
@@ -1381,7 +1390,7 @@ function iiftparseQuestion($question, $answer_sheet_name)
         }
 
         foreach ($td->find('b') as $b) {
-            if (! $b->has_child()) {
+            if (! dom_node_has_children($b)) {
                 $data[] = _t($b->plaintext);
             } else {
                 foreach ($b->find('font') as $font) {
@@ -1619,7 +1628,8 @@ if (! function_exists('curl_get_contents')) {
             return false;
         }
 
-    return $contents;
+        return $contents;
+    }
 }
 
 if (! function_exists('dom_node_has_class')) {
@@ -1640,4 +1650,28 @@ if (! function_exists('dom_node_has_class')) {
         return in_array($class, $classes, true);
     }
 }
+
+if (! function_exists('dom_node_has_children')) {
+    function dom_node_has_children($node): bool
+    {
+        if (! is_object($node) || ! method_exists($node, 'childNodes')) {
+            return false;
+        }
+
+        $children = $node->childNodes();
+
+        if ($children instanceof \Countable) {
+            return \count($children) > 0;
+        }
+
+        if ($children instanceof \Traversable) {
+            foreach ($children as $_) {
+                return true;
+            }
+
+            return false;
+        }
+
+        return $children !== null;
+    }
 }

@@ -29,7 +29,7 @@ Route::get('/cat-score-calculator', function (Request $request) {
     ]);
 })->name('cat.score-calculator');
 
-Route::middleware(['auth', 'verified'])->post('/cat-score-calculator/calculate', [CatScoreCalculatorController::class, 'store'])->name('cat.score-calculator.calculate');
+Route::middleware(['auth'])->post('/cat-score-calculator/calculate', [CatScoreCalculatorController::class, 'store'])->name('cat.score-calculator.calculate');
 
 Route::get('/xat-score-calculator', function (Request $request) {
     $latestCalculation = null;
@@ -47,15 +47,15 @@ Route::get('/xat-score-calculator', function (Request $request) {
     ]);
 })->name('xat.score-calculator');
 
-Route::middleware(['auth', 'verified'])->post('/xat-score-calculator/calculate', [XatScoreCalculatorController::class, 'store'])->name('xat.score-calculator.calculate');
+Route::middleware(['auth'])->post('/xat-score-calculator/calculate', [XatScoreCalculatorController::class, 'store'])->name('xat.score-calculator.calculate');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 });
 
-Route::middleware(['auth', 'verified'])
+Route::middleware(['auth'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {

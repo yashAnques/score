@@ -40,9 +40,10 @@ class CatScoreCalculatorController extends Controller
             'response_link' => $data['link'],
             'candidate_name' => data_get($details, 'Candidate Name') ?? data_get($details, 'Candidate_Name'),
             'slot' => data_get($details, 'slot') ?? data_get($details, 'Shift'),
-            'test_center' => data_get($details, 'Test Centre Name')
-                ?? data_get($details, 'Test Centre')
-                ?? data_get($details, 'Test Center'),
+            'test_center' => data_get($details, 'Test Center Name')
+                ?? data_get($details, 'Test Center')
+                ?? data_get($details, 'Test Center')
+                ?? data_get($details, 'Test_Center'),
             'total_score' => data_get($overall, 'totalScore'),
             'total_percentile' => null,
             'overall_percentile' => null,

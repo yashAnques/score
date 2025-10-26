@@ -22,11 +22,24 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface MarketingLink {
+    label: string | null;
+    text: string | null;
+    url: string | null;
+    meta?: Record<string, unknown> | null;
+}
+
+export interface MarketingLinksPayload {
+    nav: MarketingLink[];
+    whatsapp: MarketingLink | null;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    marketingLinks?: MarketingLinksPayload;
     [key: string]: unknown;
 }
 

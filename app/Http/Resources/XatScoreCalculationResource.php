@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\WhatsappLink;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -54,6 +55,12 @@ class XatScoreCalculationResource extends JsonResource
             'percentile' => data_get($summarySource, 'percentile') ?? $percentileText,
         ];
 
+        $whatsappLink = WhatsappLink::resolveFor(
+            WhatsappLink::TYPE_XAT,
+            $summary['percentile'],
+            data_get($summarySource, 'percentile_numeric')
+        );
+
         return [
             'id' => $this->id,
             'xat_id' => $this->xat_id,
@@ -80,6 +87,7 @@ class XatScoreCalculationResource extends JsonResource
                 ];
             })->values()->all(),
             'summary' => $summary,
+            'whatsapp_link' => $whatsappLink?->toInvitationPayload(),
             'user' => $this->whenLoaded('user', function () {
                 return [
                     'id' => $this->user->id,

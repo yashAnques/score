@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\WhatsappLink;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -21,6 +22,16 @@ class CatScoreCalculationResource extends JsonResource
         $overallSource = $extracted['overallStats'] ?? $payload['overallStats'] ?? [];
         $details = $payload['details'] ?? $extracted['details'] ?? null;
         $percentileText = $payload['percentile'] ?? null;
+
+        $percentileString = $percentileText
+            ?? data_get($overallSource, 'percentile')
+            ?? data_get($overallSource, 'totalPercentile')
+            ?? data_get($overallSource, 'total_percentile');
+
+        $numericFallback = data_get($overallSource, 'totalPercentile')
+            ?? data_get($overallSource, 'total_percentile');
+
+        $whatsappLink = WhatsappLink::resolveFor(WhatsappLink::TYPE_CAT, $percentileString, $numericFallback);
 
         return [
             'id' => $this->id,
@@ -58,6 +69,7 @@ class CatScoreCalculationResource extends JsonResource
                 'total_percentile' => data_get($overallSource, 'totalPercentile'),
                 'percentile' => data_get($overallSource, 'percentile') ?? $percentileText,
             ],
+            'whatsapp_link' => $whatsappLink?->toInvitationPayload(),
             'user' => $this->whenLoaded('user', function () {
                 return [
                     'id' => $this->user->id,

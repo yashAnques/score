@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import MarketingLayout from '@/layouts/marketing-layout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     BarChart3,
@@ -17,6 +17,8 @@ import {
     Target,
     Trophy,
     XCircle,
+    MessageCircle,
+    RefreshCcw,
 } from 'lucide-react';
 import {
     type ComponentType,
@@ -49,6 +51,16 @@ type CalculationOverall = {
     percentile?: number | string | null;
 };
 
+type WhatsappInvite = {
+    type?: string | null;
+    label?: string | null;
+    cta_text?: string | null;
+    description?: string | null;
+    url?: string | null;
+    min_percentile?: number | null;
+    max_percentile?: number | null;
+};
+
 type CalculationPayload = {
     id: number;
     candidate_name?: string;
@@ -63,6 +75,7 @@ type CalculationPayload = {
     percentile_text?: string | null;
     sections: CalculationSection[];
     overall: CalculationOverall;
+    whatsapp_link?: WhatsappInvite | null;
 };
 
 type PageProps = {
@@ -179,22 +192,39 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
         latestCalculation,
     );
     const resultSectionRef = useRef<HTMLDivElement | null>(null);
+    const responseInputRef = useRef<HTMLInputElement | null>(null);
 
     const isLoggedIn = Boolean(auth.user);
-    const isVerified = Boolean(auth.user?.email_verified_at);
-    const showVerificationWarning = isLoggedIn && !isVerified;
+
+    const focusResponseInput = () => {
+        const input = responseInputRef.current;
+        if (!input) {
+            return;
+        }
+
+        window.scrollTo({
+            top: Math.max(0, input.getBoundingClientRect().top + window.scrollY - 1400),
+            behavior: 'smooth',
+        });
+
+        window.setTimeout(() => {
+            input.focus({ preventScroll: true });
+            input.select();
+        }, 250);
+    };
+
+    const handleRecalculate = () => {
+        setResponseLink('');
+        focusResponseInput();
+    };
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!isLoggedIn) {
-            router.visit('/login');
-            return;
-        }
-
-        if (!isVerified) {
-            setError('Please verify your email address before submitting your response sheet.');
-            router.visit('/verify-email');
+            if (typeof window !== 'undefined') {
+                window.location.assign('https://bschoolbuzz.in/login?redirect_to=' + encodeURIComponent(window.location.href));
+            }
             return;
         }
 
@@ -283,14 +313,14 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-sky-500/25 blur-[120px] md:h-80 md:w-80" />
                 <div className="absolute bottom-[-6rem] right-[-6rem] h-80 w-80 rounded-full bg-emerald-400/25 blur-[140px]" />
                 <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-                    <div className="space-y-8">
-                        <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-                            Hand your CAT response sheet to our <br /> AI co-pilot and watch precise scores materialise in seconds.
+                    <div className="space-y-8 text-center text-left">
+                        <h1 className="text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
+                            Hand your CAT response sheet to our AI co-pilot and watch precise scores materialise in seconds.
                         </h1>
-                        <p className="text-base text-white/80 sm:text-lg">
+                        <p className="text-sm text-white/80 sm:text-base lg:text-lg">
                             Our multi-model pipeline parses your official HTML sheet, normalises slot-level scaling, and returns a verified scorecard you can trust before the results drop.
                         </p>
-                        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                             {aiHighlights.map(({ icon: Icon, title, description }) => (
                                 <div
                                     key={title}
@@ -311,18 +341,19 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                             className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_20px_60px_rgba(12,17,35,0.45)] backdrop-blur-sm sm:flex-row sm:items-center sm:gap-4"
                         >
                             <Input
+                                ref={responseInputRef}
                                 value={responseLink}
                                 onChange={(event) =>
                                     setResponseLink(event.target.value ?? '')
                                 }
                                 placeholder="https://cdn.digialm.com/per/g06/.../response.html"
-                                className="h-12 flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
+                                className="h-12 p-3 w-full flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
                             />
                             <Button
                                 type="submit"
                                 variant="outline"
-                                className="h-12 min-w-[9rem] rounded-xl border-2 border-yellow-400 from-yellow-400/10 via-yellow-400/20 to-yellow-300/10 px-6 text-yellow-100 transition cursor-pointer hover:text-white hover:bg-transparent hover:scale-105"
-                                disabled={loading || !isLoggedIn || !isVerified}
+                                className="h-12 w-full min-w-[9rem] rounded-xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-400/10 via-yellow-400/20 to-yellow-300/10 px-6 text-yellow-100 transition hover:text-white cursor-pointer sm:w-auto hover:bg-transparent hover:from-yellow-400/20 hover:to-yellow-300/20"
+                                disabled={loading}
                             >
                                 {loading ? (
                                     <>
@@ -331,8 +362,6 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                     </>
                                 ) : !isLoggedIn ? (
                                     'Sign in to submit'
-                                ) : !isVerified ? (
-                                    'Verify your email'
                                 ) : (
                                     'Submit'
                                 )}
@@ -354,18 +383,6 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 </Link>
                             </p>
                         )}
-                        {showVerificationWarning && (
-                            <p className="text-sm text-amber-100">
-                                Please verify your email address before submitting response sheets.{' '}
-                                <Link
-                                    href="/verify-email"
-                                    className="font-semibold underline-offset-4 hover:underline"
-                                >
-                                    Resend verification email
-                                </Link>
-                                .
-                            </p>
-                        )}
                     </div>
                 </div>
             </section>
@@ -375,7 +392,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
             >
                 {calculation ? (
-                    <Scorecard calculation={calculation} headline={headline} />
+                    <Scorecard calculation={calculation} headline={headline} onRecalculate={handleRecalculate} />
                 ) : (
                     <div className="rounded-3xl border border-dashed border-slate-200 bg-white/60 p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -389,8 +406,6 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 )}
             </section>
 
-
-
             <section className="bg-muted/40 py-16 dark:bg-muted/20">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl">
@@ -401,7 +416,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                             Three simple steps to get your verified CAT scores.
                         </h2>
                     </div>
-                    <div className="mt-10 grid gap-6 md:grid-cols-3">
+                    <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
                         {steps.map((step, index) => (
                             <Card
                                 key={step.title}
@@ -425,7 +440,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
             </section>
 
             <section className="bg-background">
-                <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+                <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mt-8">
                     <div className="max-w-3xl space-y-4">
                         <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
                             CAT 2025 Guide
@@ -439,7 +454,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                         </p>
                     </div>
 
-                    <div className="mt-10 grid gap-6 lg:grid-cols-3">
+                    <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
                         {guideSections.map((section) => (
                             <Card key={section.title} className="h-full border border-slate-200 shadow-none dark:border-slate-800">
                                 <CardHeader>
@@ -463,7 +478,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                         ))}
                     </div>
 
-                    <div className="mt-12 grid gap-8 lg:grid-cols-[2fr,1fr]">
+                    <div className="my-8 flex flex-col gap-8 xl:grid xl:grid-cols-[2fr,1fr]">
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
@@ -683,6 +698,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
 type ScorecardProps = {
     calculation: CalculationPayload;
     headline: string | null;
+    onRecalculate: () => void;
 };
 
 function DetailItem({ label, value, isLink = false }: DetailItemProps) {
@@ -726,7 +742,7 @@ function DetailItem({ label, value, isLink = false }: DetailItemProps) {
 }
 
 
-function Scorecard({ calculation, headline }: ScorecardProps) {
+function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
     const scoreSummary = calculation.overall;
     const details = calculation.details ?? null;
     const derivedSlot =
@@ -763,41 +779,133 @@ function Scorecard({ calculation, headline }: ScorecardProps) {
         unattempted: coerceNumber(section.unattempted),
         percentile: section.percentile ?? null,
     }));
+    const whatsappInvite = calculation.whatsapp_link ?? null;
+
+    const formatPercentileValue = (value: number) =>
+        Number.isInteger(value) ? value.toString() : value.toFixed(1);
+
+    const formattedRange = (() => {
+        if (!whatsappInvite) {
+            return null;
+        }
+
+        const minRaw = whatsappInvite.min_percentile ?? null;
+        const maxRaw = whatsappInvite.max_percentile ?? null;
+        const min = minRaw !== null ? formatPercentileValue(minRaw) : null;
+        const max = maxRaw !== null ? formatPercentileValue(maxRaw) : null;
+
+        if (min !== null && max !== null && maxRaw !== null && minRaw !== null && Math.abs(maxRaw - minRaw) > 0.01) {
+            return `${min}%tile - ${max}%tile`;
+        }
+
+        if (min !== null) {
+            return `${min}%tile`;
+        }
+
+        return null;
+    })();
+
+    const whatsappCtaText = (() => {
+        if (!whatsappInvite?.url) {
+            return null;
+        }
+
+        if (whatsappInvite.cta_text && whatsappInvite.cta_text.trim().length > 0) {
+            return whatsappInvite.cta_text;
+        }
+
+        if (whatsappInvite.type) {
+            const typeLabel = whatsappInvite.type.toUpperCase();
+            if (formattedRange) {
+                return `Join ${typeLabel} ${formattedRange} Group`;
+            }
+
+            return `Join ${typeLabel} WhatsApp Group`;
+        }
+
+        return 'Join WhatsApp Group';
+    })();
+
+    const whatsappLabel = (() => {
+        if (!whatsappInvite?.url) {
+            return null;
+        }
+
+        if (whatsappInvite.label && whatsappInvite.label.trim().length > 0) {
+            return whatsappInvite.label;
+        }
+
+        if (formattedRange) {
+            return `Percentile-matched community for ${formattedRange} aspirants.`;
+        }
+
+        return 'Join peers preparing with the same momentum.';
+    })();
 
     return (
         <Card className="border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
-            <CardHeader className="space-y-2">
-                {headline && (
-                    <CardTitle className="text-2xl font-semibold text-foreground">
-                        {headline} 🎉
-                    </CardTitle>
-                )}
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <DetailItem
-                        label="Candidate Name"
-                        value={calculation.candidate_name ?? '—'}
-                    />
-                    <DetailItem
-                        label="Slot"
-                        value={slotLabel ?? '—'}
-                    />
-                    <DetailItem
-                        label="Test time"
-                        value={testTime ?? '—'}
-                    />
-                    <DetailItem
-                        label="Test center"
-                        value={testCentre ?? '—'}
-                    />
-                    <DetailItem
-                        label="Response Link"
-                        value={calculation.response_link ?? '—'}
-                        isLink
-                    />
+            <CardHeader className="space-y-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-3">
+                        {headline && (
+                            <CardTitle className="text-2xl font-semibold text-foreground">
+                                {headline} 🎉
+                            </CardTitle>
+                        )}
+                    </div>
+                    <div className='flex gap-4'>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-fit rounded-full cursor-pointer"
+                            onClick={onRecalculate}
+                        >
+                            <RefreshCcw className="mr-2 h-4 w-4" />
+                            Recalculate
+                        </Button>
+
+                        {whatsappInvite?.url && whatsappCtaText && (
+                            <Button
+                                asChild
+                                size="sm"
+                                className="inline-flex items-center gap-2 rounded-full border bg-transparent text-primary transition hover:bg-transparent hover:scale-105 hover:rotate-1"
+                            >
+                                <a href={whatsappInvite.url} target="_blank" rel="noopener noreferrer">
+                                    <svg width="20" height="20" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
+                                    {whatsappCtaText}
+                                </a>
+                            </Button>
+                        )}
+                    </div>
+                </div>
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="grid w-full grid-cols-1 gap-4 rounded-2xl border border-slate-200 bg-slate-50/70 p-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800 dark:bg-slate-900/50">
+                        <DetailItem
+                            label="Candidate Name"
+                            value={calculation.candidate_name ?? '—'}
+                        />
+                        <DetailItem
+                            label="Slot"
+                            value={slotLabel ?? '—'}
+                        />
+                        <DetailItem
+                            label="Test time"
+                            value={testTime ?? '—'}
+                        />
+                        <DetailItem
+                            label="Test center"
+                            value={testCentre ?? '—'}
+                        />
+                        <DetailItem
+                            label="Response Link"
+                            value={calculation.response_link ?? '—'}
+                            isLink
+                        />
+                    </div>
                 </div>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <SummaryTile
                         icon={Target}
                         label="Total Score"
@@ -857,7 +965,7 @@ function Scorecard({ calculation, headline }: ScorecardProps) {
                         </tbody>
                     </table>
                 </div>
-                <div className="flex flex-col gap-3 text-sm text-muted-foreground lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                     <span>
                         Overall percentile: {formatValue(scoreSummary.percentile)} · Total score:{' '}
                         {formatValue(scoreSummary.total_score)}
@@ -878,14 +986,14 @@ type SummaryTileProps = {
 function SummaryTile({ icon: Icon, label, value, helper }: SummaryTileProps) {
     return (
         <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white/90 p-4 dark:border-slate-800 dark:bg-slate-900/70">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary min-w-[40px]">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-5 w-5" />
             </div>
             <div className="space-y-1">
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {label}
                 </p>
-                <p className="text-2xl font-semibold text-foreground">{value}</p>
+                <p className="text-xl font-semibold text-foreground sm:text-2xl">{value}</p>
                 {helper && <p className="text-xs text-muted-foreground">{helper}</p>}
             </div>
         </div>
