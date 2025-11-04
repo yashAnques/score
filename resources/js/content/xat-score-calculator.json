@@ -1,0 +1,161 @@
+{
+  "meta": {
+    "title": "XAT Score Calculator 2025 | Accurate Sectional Marks & Percentile Predictor",
+    "description": "Upload your XAT response sheet to unlock instant sectional analysis, penalty-aware scoring, and percentile projections. Review your performance history and prepare smarter for B-school shortlists."
+  },
+  "hero": {
+    "title": "Plug your XAT response sheet into our AI co-pilot for penalty-aware scores in seconds.",
+    "description": "The same multi-model pipeline now calibrates XAT penalty rules, cleans your HTML sheet, and surfaces a verified scorecard before the official results.",
+    "input_placeholder": "https://cdn3.digialm.com/.../XAT25066291_...",
+    "button_labels": {
+      "default": "Submit",
+      "login_required": "Sign in to submit",
+      "loading": "Calculating…"
+    },
+    "unauthenticated_notice": "You need an account to process response sheets.",
+    "unauthenticated_link_label": "Create one for free.",
+    "unauthenticated_link_url": "/register"
+  },
+  "empty_state": {
+    "title": "Paste your response sheet to see section-wise marks.",
+    "description": "Once you submit the link above, we will parse the official XAT key, apply penalty rules, and store a complete report for you here."
+  },
+  "how_it_works": {
+    "badge": "How it works",
+    "heading": "Three simple steps to get your verified XAT score.",
+    "steps": [
+      {
+        "title": "Grab your XAT response sheet",
+        "description": "Download the HTML response sheet from the official XAT portal and paste the secure link below."
+      },
+      {
+        "title": "Sign in & submit",
+        "description": "Only logged-in aspirants can process a sheet. We send it instantly to our scoring engine when you click submit."
+      },
+      {
+        "title": "Get section-wise marks instantly",
+        "description": "See accuracy, raw score, and calibrated percentiles across VALR, DM, and QA&DI in seconds."
+      }
+    ]
+  },
+  "assurances": {
+    "badge": "Why aspirants use us",
+    "heading": "Stress-free XAT score calculation for serious aspirants.",
+    "intro": "We stay updated with the official exam pattern so you can focus on analysis, not arithmetic. Every report highlights accuracy, negative marking, and percentile guidance.",
+    "items": [
+      {
+        "icon": "shield-check",
+        "title": "Official marking logic",
+        "description": "We follow the latest XAT answer key, including partial penalties for unattempted questions beyond the threshold."
+      },
+      {
+        "icon": "check-circle-2",
+        "title": "Section-aware parsing",
+        "description": "VALR, DM, and QA&DI responses are normalised before computing accuracy so you can trust every metric."
+      },
+      {
+        "icon": "trophy",
+        "title": "Auto-saved attempts",
+        "description": "Every calculation stays attached to your account so you can revisit performance reports anytime."
+      }
+    ]
+  },
+  "top_colleges": {
+    "title": "Top Colleges Accepting XAT 2024 Score",
+    "intro": "The following institutes have considered XAT 2024 scores for their 2024-26 admission cycle. Use this snapshot of fees and placement statistics to gauge where your score could take you.",
+    "headers": ["Colleges", "Fees", "Avg CTC", "Highest CTC"],
+    "rows": [
+      ["Xavier Labour Research Institute, Jamshedpur", "24.8 Lakhs", "32.7 LPA", "78.2 LPA"],
+      ["Xavier Labour Research Institute, Delhi", "23.6 Lakhs", "32.7 LPA", "78.2 LPA"],
+      ["Xavier Institute of Management, Bhubaneshwar", "20.91 Lakhs", "20.03 LPA", "71.50 LPA"],
+      ["Institute of Management Technology, Ghaziabad", "19.53 Lakhs", "17.35 LPA", "65.6 LPA"],
+      ["International Management Institute, New Delhi", "20.19 Lakhs", "17.01 LPA", "50 LPA"],
+      ["Mudra Institute of Communications, Ahmedabad", "21 Lakhs", "20.09 LPA", "36 LPA"],
+      ["Institute of Rural Management Anand, Gujarat", "16.09 Lakhs", "15.50 LPA", "26.50 LPA"],
+      ["Goa Institute of Management, Goa", "18.31 Lakhs", "14.87 LPA", "55 LPA"],
+      ["T.A.Pai Management Institute, Manipal", "16.5 Lakhs", "15.3 LPA", "22.7 LPA"],
+      ["Fore School of Management, New Delhi", "16.9 Lakhs", "14.5 LPA", "30 LPA"],
+      ["Great Lakes Institute of Management, Chennai", "19.95 Lakhs", "18.1 LPA", "34 LPA"],
+      ["Graduate School of Business, Sri City", "14.56 Lakhs", "13.50 LPA", "22.9 LPA"]
+    ]
+  },
+  "exam_pattern": {
+    "title": "XAT 2025 Exam Pattern",
+    "intro": "The pattern for XAT 2025 mirrors XAT 2024 in both structure and difficulty. Candidates faced 175 minutes for the main test plus an additional 10 minutes for the General Knowledge section.",
+    "headers": ["Sections", "Number of Questions", "Time"],
+    "rows": [
+      ["Verbal Ability & Logical Reasoning (VALR)", "26", "—"],
+      ["Decision Making (DM)", "21", "175 Minutes"],
+      ["Quantitative Aptitude & Data Interpretation (QADI)", "28", "—"],
+      ["General Knowledge", "20", "10 Minutes"]
+    ],
+    "score_vs_percentile": {
+      "title": "XAT Score vs Percentile Comparison (2024-2022)",
+      "headers": ["Percentile", "Scaled Score 2024", "Scaled Score 2023", "Score 2022"],
+      "rows": [
+        ["99", "33.5", "45+", "40+"],
+        ["98", "32", "43+", "39+"],
+        ["97", "29.10", "41+", "37+"],
+        ["95", "26", "39+", "34+"],
+        ["90", "23", "35+", "30+"],
+        ["80", "18.20", "30+", "23+"]
+      ]
+    }
+  },
+  "analysis": {
+    "title": "XAT 2024 Analysis",
+    "intro": "XAT 2024 was similar in difficulty to XAT 2023, with moderate paper difficulty overall. Sectional variation, however, continues to play a major role in percentile outcomes.",
+    "headers": ["Section", "Number of Questions", "Level of Difficulty"],
+    "rows": [
+      ["Verbal Ability and Logical Reasoning (VALR)", "26", "Moderate - Difficult"],
+      ["Decision Making (DM)", "21", "Moderate - Difficult"],
+      ["Quantitative Aptitude & Data Interpretation (QADI)", "28", "Moderate"],
+      ["General Knowledge (GK)", "25", "Easy - Moderate"],
+      ["Overall", "100", "Moderate"]
+    ],
+    "essay_topics": [
+      "Tech predictions are no longer accurate and need to acknowledge the uncertainty in the future.",
+      "Stringent regulations for social media is the only way to mitigate or prevent the spread of fake news.",
+      "Things that are least important shouldn't affect things that are most important."
+    ]
+  },
+  "toppers": {
+    "title": "XAT 2025 Toppers List Analysis",
+    "intro": [
+      "Based on the response sheets collected for XAT 2024, we analysed score trends to understand difficulty levels across slots. In total, we reviewed 53,863 responses. The statistics below summarise the mean, median, and maximum scores across all slots—useful indicators of slot difficulty.",
+      "We've also plotted score-versus-percentile curves for all slots. In those graphs, a slot that lies below another indicates a comparatively easier paper: a lower raw score in that slot yields a higher percentile relative to tougher slots."
+    ],
+    "sections": [
+      {
+        "title": "VALR Analysis",
+        "headers": ["", "Overall"],
+        "rows": [
+          ["Mean", "5.39"],
+          ["Median", "5.01"],
+          ["Max Score", "21.22"],
+          ["Total Responses", "53,863"]
+        ]
+      },
+      {
+        "title": "QADI Analysis",
+        "headers": ["", "Overall"],
+        "rows": [
+          ["Mean", "4.96"],
+          ["Median", "4.5"],
+          ["Max Score", "25.5"],
+          ["Total Responses", "53,863"]
+        ]
+      },
+      {
+        "title": "DM Analysis",
+        "headers": ["", "Overall"],
+        "rows": [
+          ["Mean", "6.86"],
+          ["Median", "6.91"],
+          ["Max Score", "19.44"],
+          ["Total Responses", "53,863"]
+        ]
+      }
+    ]
+  }
+}

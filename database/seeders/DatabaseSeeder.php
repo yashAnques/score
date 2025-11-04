@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SettingSeeder::class,
             WhatsappLinkSeeder::class,
+            ContentSeeder::class,
         ]);
     }
 }

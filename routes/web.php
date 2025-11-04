@@ -5,6 +5,7 @@ use App\Http\Controllers\CatScoreCalculatorController;
 use App\Http\Controllers\XatScoreCalculatorController;
 use App\Http\Resources\CatScoreCalculationResource;
 use App\Http\Resources\XatScoreCalculationResource;
+use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,8 +25,13 @@ Route::get('/cat-score-calculator', function (Request $request) {
         }
     }
 
+    $pageContent = Content::query()
+        ->where('page', 'cat-score-calculator')
+        ->value('content');
+
     return Inertia::render('cat-score-calculator', [
         'latestCalculation' => $latestCalculation,
+        'pageContent' => $pageContent,
     ]);
 })->name('cat.score-calculator');
 
@@ -42,8 +48,13 @@ Route::get('/xat-score-calculator', function (Request $request) {
         }
     }
 
+    $pageContent = Content::query()
+        ->where('page', 'xat-score-calculator')
+        ->value('content');
+
     return Inertia::render('xat-score-calculator', [
         'latestCalculation' => $latestCalculation,
+        'pageContent' => $pageContent,
     ]);
 })->name('xat.score-calculator');
 

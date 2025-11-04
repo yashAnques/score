@@ -1,3 +1,4 @@
+import defaultContent from '@/content/xat-score-calculator.json';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,16 +8,12 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     CheckCircle2,
-    Cpu,
     ListChecks,
     Loader2,
-    Sparkles,
     ShieldCheck,
     Target,
     Trophy,
     XCircle,
-    Bot,
-    MessageCircle,
     RefreshCcw,
 } from 'lucide-react';
 import {
@@ -73,53 +70,137 @@ type CalculationPayload = {
     whatsapp_link?: WhatsappInvite | null;
 };
 
-type PageProps = {
-    latestCalculation: CalculationPayload | null;
+type XatPageContent = {
+    meta: {
+        title: string;
+        description: string;
+    };
+    hero: {
+        title: string;
+        description: string;
+        input_placeholder: string;
+        button_labels: {
+            default: string;
+            login_required: string;
+            loading: string;
+        };
+        unauthenticated_notice: string;
+        unauthenticated_link_label: string;
+        unauthenticated_link_url: string;
+    };
+    empty_state: {
+        title: string;
+        description: string;
+    };
+    how_it_works: {
+        badge: string;
+        heading: string;
+        steps: Array<{ title: string; description: string }>;
+    };
+    assurances: {
+        badge: string;
+        heading: string;
+        intro: string;
+        items: Array<{ icon: string; title: string; description: string }>;
+    };
+    top_colleges: {
+        title: string;
+        intro: string;
+        headers: string[];
+        rows: string[][];
+    };
+    exam_pattern: {
+        title: string;
+        intro: string;
+        headers: string[];
+        rows: string[][];
+        score_vs_percentile: {
+            title: string;
+            headers: string[];
+            rows: string[][];
+        };
+    };
+    analysis: {
+        title: string;
+        intro: string;
+        headers: string[];
+        rows: string[][];
+        essay_topics?: string[];
+    };
+    toppers: {
+        title: string;
+        intro: string[];
+        sections: Array<{
+            title: string;
+            headers: string[];
+            rows: string[][];
+        }>;
+    };
 };
 
-const steps = [
-    {
-        title: 'Grab your XAT response sheet',
-        description:
-            'Download the HTML response sheet from the official XAT portal and paste the secure link below.',
-    },
-    {
-        title: 'Sign in & submit',
-        description:
-            'Only logged-in aspirants can process a sheet. We send it instantly to our scoring engine when you click submit.',
-    },
-    {
-        title: 'Get section-wise marks instantly',
-        description:
-            'See accuracy, raw score, and calibrated percentiles across VALR, DM, and QA&DI in seconds.',
-    },
-];
+type PageProps = {
+    latestCalculation: CalculationPayload | null;
+    pageContent?: Partial<XatPageContent> | null;
+};
 
-const assurances = [
-    {
-        icon: ShieldCheck,
-        title: 'Official marking logic',
-        description:
-            'We follow the latest XAT answer key, including partial penalties for unattempted questions beyond the threshold.',
-    },
-    {
-        icon: CheckCircle2,
-        title: 'Section-aware parsing',
-        description:
-            'VALR, DM, and QA&DI responses are normalised before computing accuracy so you can trust every metric.',
-    },
-    {
-        icon: Trophy,
-        title: 'Auto-saved attempts',
-        description:
-            'Every calculation stays attached to your account so you can revisit performance reports anytime.',
-    },
-];
+const DEFAULT_CONTENT = defaultContent as XatPageContent;
 
-export default function XatScoreCalculator({ latestCalculation }: PageProps) {
+const ASSURANCE_ICON_MAP: Record<string, typeof ShieldCheck> = {
+    'shield-check': ShieldCheck,
+    'check-circle-2': CheckCircle2,
+    trophy: Trophy,
+};
+
+const mergeContent = (
+    base: XatPageContent,
+    override?: Partial<XatPageContent> | null,
+): XatPageContent => {
+    if (!override) {
+        return base;
+    }
+
+    const clone = JSON.parse(JSON.stringify(base)) as XatPageContent;
+
+    const deepMerge = (target: Record<string, unknown>, source: Record<string, unknown>) => {
+        Object.entries(source).forEach(([key, value]) => {
+            if (value === undefined) {
+                return;
+            }
+
+            if (Array.isArray(value)) {
+                target[key] = value;
+
+                return;
+            }
+
+            if (value !== null && typeof value === 'object') {
+                const current = (target[key] ?? {}) as Record<string, unknown>;
+
+                target[key] = deepMerge(current, value as Record<string, unknown>);
+
+                return;
+            }
+
+            target[key] = value;
+        });
+
+        return target;
+    };
+
+    return deepMerge(clone as unknown as Record<string, unknown>, override as Record<string, unknown>) as XatPageContent;
+};
+
+export default function XatScoreCalculator({
+    latestCalculation,
+    pageContent,
+}: PageProps) {
     const {
         props: { auth },
     } = usePage<SharedData>();
+    const content = useMemo(
+        () => mergeContent(DEFAULT_CONTENT, pageContent ?? undefined),
+        [pageContent],
+    );
     const [responseLink, setResponseLink] = useState(
         latestCalculation?.response_link ?? '',
     );
@@ -238,11 +319,8 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
 
     return (
         <>
-            <Head title="XAT Score Calculator 2025 | Accurate Sectional Marks & Percentile Predictor">
-                <meta
-                    name="description"
-                    content="Upload your XAT response sheet to unlock instant sectional analysis, penalty-aware scoring, and percentile projections. Review your performance history and prepare smarter for B-school shortlists."
-                />
+            <Head title={content.meta.title}>
+                <meta name="description" content={content.meta.description} />
             </Head>
             <section className="relative overflow-hidden bg-[#080B1A] py-16 text-white dark:bg-[#05060D] lg:py-20">
                 <div className="absolute" />
@@ -251,10 +329,10 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                     <div className="space-y-8">
                         <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-                            Plug your XAT response sheet into our AI co-pilot for penalty-aware scores in seconds.
+                            {content.hero.title}
                         </h1>
                         <p className="text-base text-white/80 sm:text-lg">
-                            The same multi-model pipeline now calibrates XAT penalty rules, cleans your HTML sheet, and surfaces a verified scorecard before the official results.
+                            {content.hero.description}
                         </p>
                         <form
                             onSubmit={handleSubmit}
@@ -266,7 +344,7 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                                 onChange={(event) =>
                                     setResponseLink(event.target.value ?? '')
                                 }
-                                placeholder="https://cdn3.digialm.com/.../XAT25066291_..."
+                                placeholder={content.hero.input_placeholder}
                                 className="h-12 p-3 flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
                             />
                             <Button
@@ -278,12 +356,12 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                                 {loading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Calculating…
+                                        {content.hero.button_labels.loading}
                                     </>
                                 ) : !isLoggedIn ? (
-                                    'Sign in to submit'
+                                    content.hero.button_labels.login_required
                                 ) : (
-                                    'Submit'
+                                    content.hero.button_labels.default
                                 )}
                             </Button>
                         </form>
@@ -294,12 +372,12 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                         )}
                         {!isLoggedIn && (
                             <p className="text-sm text-white/70">
-                                You need an account to process response sheets.{' '}
+                                {content.hero.unauthenticated_notice}{' '}
                                 <Link
-                                    href="/register"
+                                    href={content.hero.unauthenticated_link_url}
                                     className="font-semibold text-yellow-200 hover:text-yellow-100"
                                 >
-                                    Create one for free.
+                                    {content.hero.unauthenticated_link_label}
                                 </Link>
                             </p>
                         )}
@@ -316,11 +394,10 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 ) : (
                     <div className="rounded-3xl border border-dashed border-slate-200 bg-white/60 p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
-                            Paste your XAT response sheet to see your personalised scorecard.
+                            {content.empty_state.title}
                         </h2>
                         <p className="mt-3 text-sm text-muted-foreground">
-                            Once you submit the link above, we will parse the official key, apply
-                            XAT&apos;s scoring rules, and store the report for you here.
+                            {content.empty_state.description}
                         </p>
                     </div>
                 )}
@@ -331,14 +408,14 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl">
                         <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-                            How it works
+                            {content.how_it_works.badge}
                         </p>
                         <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            Three simple steps to get your verified XAT score.
+                            {content.how_it_works.heading}
                         </h2>
                     </div>
                     <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
-                        {steps.map((step, index) => (
+                        {(content.how_it_works.steps ?? []).map((step, index) => (
                             <Card
                                 key={step.title}
                                 className="border border-primary/10 bg-background/80 shadow-none"
@@ -364,37 +441,39 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mt-8">
                     <div className="max-w-3xl space-y-4">
                         <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                            Why aspirants use us
+                            {content.assurances.badge}
                         </Badge>
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            Stress-free XAT score calculation for serious aspirants.
+                            {content.assurances.heading}
                         </h2>
                         <p className="text-sm text-muted-foreground sm:text-base">
-                            We stay updated with the official exam pattern so you can focus on
-                            analysis, not arithmetic. Every report highlights accuracy, negative
-                            marking, and percentile guidance.
+                            {content.assurances.intro}
                         </p>
                     </div>
 
                     <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        {assurances.map((assurance) => (
-                            <Card
-                                key={assurance.title}
-                                className="h-full border border-slate-200 shadow-none dark:border-slate-800"
-                            >
-                                <CardHeader className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                        <assurance.icon className="h-5 w-5" />
-                                    </div>
-                                    <CardTitle className="text-lg font-semibold text-foreground">
-                                        {assurance.title}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="text-sm text-muted-foreground">
-                                    {assurance.description}
-                                </CardContent>
-                            </Card>
-                        ))}
+                        {(content.assurances.items ?? []).map((assurance) => {
+                            const Icon = ASSURANCE_ICON_MAP[assurance.icon] ?? ShieldCheck;
+
+                            return (
+                                <Card
+                                    key={assurance.title}
+                                    className="h-full border border-slate-200 shadow-none dark:border-slate-800"
+                                >
+                                    <CardHeader className="flex items-center gap-3">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <CardTitle className="text-lg font-semibold text-foreground">
+                                            {assurance.title}
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="text-sm text-muted-foreground">
+                                        {assurance.description}
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -403,36 +482,24 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl space-y-10 px-4 sm:px-6 lg:px-8">
                     <div className="space-y-4">
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            Top Colleges Accepting XAT 2024 Score
+                            {content.top_colleges.title}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                            The following institutes have considered XAT 2024 scores for their 2024-26 admission cycle. Use this snapshot of fees and placement statistics to gauge where your score could take you.
+                            {content.top_colleges.intro}
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                 <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
-                                        <th className="px-4 py-3 font-semibold">Colleges</th>
-                                        <th className="px-4 py-3 font-semibold">Fees</th>
-                                        <th className="px-4 py-3 font-semibold">Avg CTC</th>
-                                        <th className="px-4 py-3 font-semibold">Highest CTC</th>
+                                        {content.top_colleges.headers.map((header) => (
+                                            <th key={header} className="px-4 py-3 font-semibold">
+                                                {header}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                    {[
-                                        ['Xavier Labour Research Institute, Jamshedpur', '24.8 Lakhs', '32.7 LPA', '78.2 LPA'],
-                                        ['Xavier Labour Research Institute, Delhi', '23.6 Lakhs', '32.7 LPA', '78.2 LPA'],
-                                        ['Xavier Institute of Management, Bhubaneshwar', '20.91 Lakhs', '20.03 LPA', '71.50 LPA'],
-                                        ['Institute of Management Technology, Ghaziabad', '19.53 Lakhs', '17.35 LPA', '65.6 LPA'],
-                                        ['International Management Institute, New Delhi', '20.19 Lakhs', '17.01 LPA', '50 LPA'],
-                                        ['Mudra Institute of Communications, Ahmedabad', '21 Lakhs', '20.09 LPA', '36 LPA'],
-                                        ['Institute of Rural Management Anand, Gujarat', '16.09 Lakhs', '15.50 LPA', '26.50 LPA'],
-                                        ['Goa Institute of Management, Goa', '18.31 Lakhs', '14.87 LPA', '55 LPA'],
-                                        ['T.A.Pai Management Institute, Manipal', '16.5 Lakhs', '15.3 LPA', '22.7 LPA'],
-                                        ['Fore School of Management, New Delhi', '16.9 Lakhs', '14.5 LPA', '30 LPA'],
-                                        ['Great Lakes Institute of Management, Chennai', '19.95 Lakhs', '18.1 LPA', '34 LPA'],
-                                        ['Graduate School of Business, Sri City', '14.56 Lakhs', '13.50 LPA', '22.9 LPA'],
-                                    ].map((row, rowIndex) => (
+                                    {(content.top_colleges.rows ?? []).map((row, rowIndex) => (
                                         <tr key={`xat-colleges-${rowIndex}`} className="border-t border-slate-200 dark:border-slate-800">
                                             {row.map((cell, cellIndex) => (
                                                 <td
@@ -454,111 +521,50 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl space-y-10 px-4 sm:px-6 lg:px-8">
                     <div className="space-y-4">
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            XAT 2025 Toppers List Analysis
+                            {content.toppers.title}
                         </h2>
-                        <p className="text-sm text-muted-foreground">
-                            Based on the response sheets collected for XAT 2024, we analysed score trends to understand difficulty levels across slots. In total, we reviewed <span className="font-semibold text-foreground">53,863</span> responses. The statistics below summarise the mean, median, and maximum scores across all slots—useful indicators of slot difficulty.
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                            We&lsquo;ve also plotted score-versus-percentile curves for all slots. In those graphs, a slot that lies below another indicates a comparatively easier paper: a lower raw score in that slot yields a higher percentile relative to tougher slots.
-                        </p>
-                        <div className='py-3'>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">VALR Analysis</h3>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
-                                        <tr className="text-xs uppercase tracking-wide">
-                                            <th className="px-4 py-3 font-semibold"> </th>
-                                            <th className="px-4 py-3 font-semibold">Overall</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                        {[
-                                            ['Mean', '5.39'],
-                                            ['Median', '5.01'],
-                                            ['Max Score', '21.22'],
-                                            ['Total Responses', '53,863'],
-                                        ].map((row, index) => (
-                                            <tr key={`xat-topper-${index}`} className="border-t border-slate-200 dark:border-slate-800">
-                                                {row.map((cell, cellIndex) => (
-                                                    <td
-                                                        key={`xat-topper-${index}-${cellIndex}`}
-                                                        className={`px-4 py-3 ${cellIndex === 0 ? 'font-semibold text-foreground' : ''}`}
-                                                    >
-                                                        {cell}
-                                                    </td>
+                        {(content.toppers.intro ?? []).map((paragraph, index) => (
+                            <p key={index} className="text-sm text-muted-foreground">
+                                {paragraph}
+                            </p>
+                        ))}
+                        {(content.toppers.sections ?? []).map((section, sectionIndex) => (
+                            <div key={section.title} className="py-3">
+                                <h3 className="mb-2 text-xl font-semibold text-foreground">
+                                    {section.title}
+                                </h3>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
+                                        <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
+                                            <tr className="text-xs uppercase tracking-wide">
+                                                {section.headers.map((header, headerIndex) => (
+                                                    <th key={`${sectionIndex}-${headerIndex}`} className="px-4 py-3 font-semibold">
+                                                        {header}
+                                                    </th>
                                                 ))}
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                                            {(section.rows ?? []).map((row, rowIndex) => (
+                                                <tr
+                                                    key={`topper-${sectionIndex}-${rowIndex}`}
+                                                    className="border-t border-slate-200 dark:border-slate-800"
+                                                >
+                                                    {row.map((cell, cellIndex) => (
+                                                        <td
+                                                            key={`topper-${sectionIndex}-${rowIndex}-${cellIndex}`}
+                                                            className={`px-4 py-3 ${cellIndex === 0 ? 'font-semibold text-foreground' : ''}`}
+                                                        >
+                                                            {cell}
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                        <div className='py-3'>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">QADI Analysis</h3>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
-                                        <tr className="text-xs uppercase tracking-wide">
-                                            <th className="px-4 py-3 font-semibold"> </th>
-                                            <th className="px-4 py-3 font-semibold">Overall</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                        {[
-                                            ['Mean', '4.96'],
-                                            ['Median', '4.5'],
-                                            ['Max Score', '25.5'],
-                                            ['Total Responses', '53,863'],
-                                        ].map((row, index) => (
-                                            <tr key={`xat-topper-${index}`} className="border-t border-slate-200 dark:border-slate-800">
-                                                {row.map((cell, cellIndex) => (
-                                                    <td
-                                                        key={`xat-topper-${index}-${cellIndex}`}
-                                                        className={`px-4 py-3 ${cellIndex === 0 ? 'font-semibold text-foreground' : ''}`}
-                                                    >
-                                                        {cell}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-
-                        </div>
-                        <div className='py-3'>
-                            <h3 className="text-xl font-semibold text-foreground mb-2">DM Analysis</h3>
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
-                                    <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
-                                        <tr className="text-xs uppercase tracking-wide">
-                                            <th className="px-4 py-3 font-semibold"> </th>
-                                            <th className="px-4 py-3 font-semibold">Overall</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                        {[
-                                            ['Mean', '6.86'],
-                                            ['Median', '6.91'],
-                                            ['Max Score', '19.44'],
-                                            ['Total Responses', '53,863'],
-                                        ].map((row, index) => (
-                                            <tr key={`xat-topper-${index}`} className="border-t border-slate-200 dark:border-slate-800">
-                                                {row.map((cell, cellIndex) => (
-                                                    <td
-                                                        key={`xat-topper-${index}-${cellIndex}`}
-                                                        className={`px-4 py-3 ${cellIndex === 0 ? 'font-semibold text-foreground' : ''}`}
-                                                    >
-                                                        {cell}
-                                                    </td>
-                                                ))}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </section>
@@ -567,27 +573,24 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl space-y-10 px-4 sm:px-6 lg:px-8">
                     <div className="space-y-4">
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            XAT 2025 Exam Pattern
+                            {content.exam_pattern.title}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                            The pattern for XAT 2025 mirrors XAT 2024 in both structure and difficulty. Candidates faced 175 minutes for the main test plus an additional 10 minutes for the General Knowledge section.
+                            {content.exam_pattern.intro}
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                 <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
-                                        <th className="px-4 py-3 font-semibold">Sections</th>
-                                        <th className="px-4 py-3 font-semibold">Number of Questions</th>
-                                        <th className="px-4 py-3 font-semibold">Time</th>
+                                        {content.exam_pattern.headers.map((header) => (
+                                            <th key={header} className="px-4 py-3 font-semibold">
+                                                {header}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                    {[
-                                        ['Verbal Ability & Logical Reasoning (VALR)', '26', ''],
-                                        ['Decision Making (DM)', '21', '175 Minutes'],
-                                        ['Quantitative Aptitude & Data Interpretation (QADI)', '28', ''],
-                                        ['General Knowledge', '20', '10 Minutes'],
-                                    ].map((row, rowIndex) => (
+                                    {(content.exam_pattern.rows ?? []).map((row, rowIndex) => (
                                         <tr key={`xat-pattern-${rowIndex}`} className="border-t border-slate-200 dark:border-slate-800">
                                             {row.map((cell, cellIndex) => (
                                                 <td
@@ -605,27 +608,23 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                     </div>
                     <div className="space-y-4">
                         <h3 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                            XAT Score vs Percentile Comparison (2024-2022)
+                            {content.exam_pattern.score_vs_percentile.title}
                         </h3>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                 <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
-                                        <th className="px-4 py-3 font-semibold">Percentile</th>
-                                        <th className="px-4 py-3 font-semibold">Scaled Score 2024</th>
-                                        <th className="px-4 py-3 font-semibold">Scaled Score 2023</th>
-                                        <th className="px-4 py-3 font-semibold">Score 2022</th>
+                                        {content.exam_pattern.score_vs_percentile.headers.map(
+                                            (header) => (
+                                                <th key={header} className="px-4 py-3 font-semibold">
+                                                    {header}
+                                                </th>
+                                            ),
+                                        )}
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                    {[
-                                        ['99', '33.5', '45+', '40+'],
-                                        ['98', '32', '43+', '39+'],
-                                        ['97', '29.10', '41+', '37+'],
-                                        ['95', '26', '39+', '34+'],
-                                        ['90', '23', '35+', '30+'],
-                                        ['80', '18.20', '30+', '23+'],
-                                    ].map((row, rowIndex) => (
+                                    {(content.exam_pattern.score_vs_percentile.rows ?? []).map((row, rowIndex) => (
                                         <tr key={`xat-comparison-${rowIndex}`} className="border-t border-slate-200 dark:border-slate-800">
                                             {row.map((cell, cellIndex) => (
                                                 <td
@@ -648,28 +647,24 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl space-y-8 px-4 sm:px-6 lg:px-8">
                     <div className="space-y-4">
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            XAT 2024 Analysis
+                            {content.analysis.title}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                            XAT 2024 was similar in difficulty to XAT 2023, with moderate paper difficulty overall. Sectional variation, however, continues to play a major role in percentile outcomes.
+                            {content.analysis.intro}
                         </p>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                 <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                     <tr className="text-xs uppercase tracking-wide">
-                                        <th className="px-4 py-3 font-semibold">Section</th>
-                                        <th className="px-4 py-3 font-semibold">Number of Questions</th>
-                                        <th className="px-4 py-3 font-semibold">Level of Difficulty</th>
+                                        {content.analysis.headers.map((header) => (
+                                            <th key={header} className="px-4 py-3 font-semibold">
+                                                {header}
+                                            </th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                    {[
-                                        ['Verbal Ability and Logical Reasoning (VALR)', '26', 'Moderate - Difficult'],
-                                        ['Decision Making (DM)', '21', 'Moderate - Difficult'],
-                                        ['Quantitative Aptitude & Data Interpretation (QADI)', '28', 'Moderate'],
-                                        ['General Knowledge (GK)', '25', 'Easy - Moderate'],
-                                        ['Overall', '100', 'Moderate'],
-                                    ].map((row, rowIndex) => (
+                                    {(content.analysis.rows ?? []).map((row, rowIndex) => (
                                         <tr key={`xat-analysis-${rowIndex}`} className="border-t border-slate-200 dark:border-slate-800">
                                             {row.map((cell, cellIndex) => (
                                                 <td
@@ -685,17 +680,19 @@ export default function XatScoreCalculator({ latestCalculation }: PageProps) {
                             </table>
                         </div>
                     </div>
-                    <div className="space-y-3">
-                        <h3 className="text-xl font-semibold text-foreground">Essay Topics</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Candidates encountered the following essay prompts in XAT 2024:
-                        </p>
-                        <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-                            <li>Tech predictions are no longer accurate and need to acknowledge the uncertainty in the future.</li>
-                            <li>Stringent regulations for social media is the only way to mitigate or prevent the spread of fake news.</li>
-                            <li>Things that are least important shouldn&apos;t affect things that are most important.</li>
-                        </ul>
-                    </div>
+                    {content.analysis.essay_topics && content.analysis.essay_topics.length > 0 && (
+                        <div className="space-y-3">
+                            <h3 className="text-xl font-semibold text-foreground">Essay Topics</h3>
+                            <p className="text-sm text-muted-foreground">
+                                Candidates encountered the following essay prompts in XAT 2024:
+                            </p>
+                            <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+                                {content.analysis.essay_topics.map((topic, index) => (
+                                    <li key={index}>{topic}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </section>
 

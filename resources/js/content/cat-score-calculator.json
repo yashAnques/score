@@ -1,0 +1,205 @@
+{
+  "meta": {
+    "title": "CAT Score Calculator 2025 | Instant Sectional Scores & Percentile Insights",
+    "description": "Paste your official CAT response sheet to get precise VARC, DILR, and QA scores in seconds. Understand your predicted percentile, track past attempts, and plan interview prep with confidence."
+  },
+  "hero": {
+    "title": "Hand your CAT response sheet to our AI co-pilot and watch precise scores materialise in seconds.",
+    "description": "Our multi-model pipeline parses your official HTML sheet, normalises slot-level scaling, and returns a verified scorecard you can trust before the results drop.",
+    "highlights": [
+      {
+        "icon": "sparkles",
+        "title": "LLM cleansing",
+        "description": "Sanitises the HTML sheet and extracts signals with zero manual tweaks."
+      },
+      {
+        "icon": "cpu",
+        "title": "Scoring engine",
+        "description": "Applies CAT rules & slot weights on a specialised inference pipeline."
+      },
+      {
+        "icon": "bot",
+        "title": "Confidence band",
+        "description": "Surfaces percentile confidence so you can trust the forecast."
+      }
+    ],
+    "input_placeholder": "https://cdn.digialm.com/per/g06/.../response.html",
+    "button_labels": {
+      "default": "Submit",
+      "login_required": "Sign in to submit",
+      "loading": "Calculating…"
+    },
+    "unauthenticated_notice": "You need an account to process response sheets.",
+    "unauthenticated_link_label": "Create one for free.",
+    "unauthenticated_link_url": "/register"
+  },
+  "empty_state": {
+    "title": "Paste your response sheet to see section-wise marks.",
+    "description": "Once you submit the link above, we will parse the official CAT answer key and store a complete report for you here."
+  },
+  "how_it_works": {
+    "badge": "How it works",
+    "heading": "Three simple steps to get your verified CAT scores.",
+    "steps": [
+      {
+        "title": "Paste your CAT response sheet link",
+        "description": "Download the HTML response sheet from the official CAT portal and paste the link in the box above."
+      },
+      {
+        "title": "Sign in & submit",
+        "description": "Only logged-in users can process a sheet. We send it securely to our scoring engine the moment you click submit."
+      },
+      {
+        "title": "Get section-wise marks instantly",
+        "description": "See correct vs incorrect counts, sectional scores, and the combined total in a clean scorecard."
+      }
+    ]
+  },
+  "guide": {
+    "badge": "CAT 2025 Guide",
+    "heading": "CAT 2025 score calculator walkthrough",
+    "intro": "Understand how our engine interprets your response sheet, predicts your percentile, and helps you plan the journey from raw scores to IIM calls.",
+    "sections": [
+      {
+        "title": "What is CAT Score Calculator?",
+        "description": "CAT score calculator is a simple tool that helps you estimate raw scores and predict percentiles long before the official results arrive. It evaluates your performance across VARC, DILR, and QA, then estimates your overall score and chances of receiving calls from leading IIMs by analysing historical trends."
+      },
+      {
+        "title": "How does CAT Score Calculator work?",
+        "description": "CAT score calculator applies the official scoring pattern and benchmarks your performance against past exams to forecast a realistic percentile so you can plan early.",
+        "bullets": [
+          "Correct answers earn +3 marks each.",
+          "Incorrect answers for MCQs incur a -1 penalty.",
+          "Unattempted questions do not affect your score.",
+          "TITA questions never receive negative marking."
+        ]
+      },
+      {
+        "title": "How to Use CAT Score Calculator 2025",
+        "description": "Follow these steps to capture accurate results, convert them into a percentile prediction, and prepare for post-exam processes confidently.",
+        "bullets": [
+          "Access the calculator for CAT 2025.",
+          "Copy the response sheet URL from the official IIM portal and paste it into the calculator.",
+          "Review the estimated raw score generated from your responses.",
+          "Use the percentile predictor to convert that score into an expected percentile.",
+          "Compare your percentile with recent cut-offs for IIMs and other B-schools.",
+          "Begin interview and GD preparation—or plan backup options—based on your projected percentile."
+        ]
+      }
+    ],
+    "how_to_use": {
+      "title": "How to use our calculator",
+      "description": "Follow these steps to make sure the predicted score mirrors your official CAT evaluation.",
+      "steps": [
+        "Open your CAT response sheet on the official portal and copy the URL.",
+        "Paste the link into CAT score calculator.",
+        "Submit the sheet to generate your section-wise raw score instantly.",
+        "Review the predicted percentile to understand where you stand for IIM shortlists.",
+        "Plan interview prep, alternative colleges, or a retake strategy based on the forecast."
+      ]
+    },
+    "highlight_card": {
+      "title": "CAT 2025 Score Calculator From Response Sheet",
+      "paragraphs": [
+        "Our CAT Score Calculator 2025 helps you predict your score and anticipate your percentile before the official results arrive. With real-time insights, you can gauge your standing among other candidates and understand your likelihood of receiving interview calls from top IIMs.",
+        "This guide walks you through reviewing your CAT 2025 response sheet, using the calculator effectively, and interpreting your predicted percentile so you can plan your IIM applications with confidence.",
+        "Together with the percentile predictor, it remains one of the most effective ways to stay ahead of the official results and act on your MBA goals without losing time."
+      ]
+    }
+  },
+  "insights": {
+    "score_vs_percentile": {
+      "title": "CAT Score vs Percentile 2024",
+      "paragraphs": [
+        "One of the most common questions CAT aspirants ask is how their CAT raw score translates into a percentile. While your score reflects the number of questions answered correctly, your percentile measures how you performed relative to other candidates.",
+        "Using historical data, our percentile predictor can give you a reasonable estimate of your percentile based on your raw score. Here's a quick reference for CAT Score vs Percentile 2024."
+      ],
+      "table": {
+        "headers": ["%ile", "Overall", "VARC", "LRDI", "Quant"],
+        "rows": [
+          ["99.95%", "129.67", "53.95", "52.51", "48.15"],
+          ["99.90%", "123.86", "51.20", "50.32", "45.27"],
+          ["99.50%", "105.00", "44.50", "41.38", "36.87"],
+          ["99.00%", "96.35", "40.58", "37.60", "33.11"],
+          ["98.00%", "86.91", "36.42", "33.98", "28.83"],
+          ["97.00%", "81.51", "34.00", "31.28", "26.69"],
+          ["95.00%", "73.46", "30.18", "28.06", "23.48"],
+          ["90.00%", "60.70", "24.55", "23.08", "18.07"],
+          ["85.00%", "52.63", "20.80", "19.81", "14.92"],
+          ["80.00%", "46.57", "17.95", "17.46", "12.43"],
+          ["75.00%", "41.61", "15.62", "15.45", "10.64"],
+          ["70.00%", "38.11", "14.15", "14.28", "9.57"],
+          ["65.00%", "35.09", "13.00", "13.22", "8.50"],
+          ["60.00%", "32.51", "11.45", "12.16", "7.42"],
+          ["55.00%", "30.24", "10.42", "11.10", "6.79"],
+          ["50.00%", "28.27", "9.85", "10.07", "5.88"],
+          ["40.00%", "22.94", "7.50", "8.05", "4.22"],
+          ["30.00%", "18.65", "5.60", "6.86", "3.03"],
+          ["20.00%", "14.79", "3.70", "5.02", "1.84"]
+        ]
+      },
+      "footer": "These figures are based on trends from previous years, and while they offer a reliable estimation, the actual percentile for 2025 might vary with the exam's difficulty and the overall performance of candidates. Our CAT Score Calculator 2025 blends sophisticated algorithms with historical data to deliver an accurate percentile prediction so you can stay one step ahead."
+    },
+    "slot_difficulty": {
+      "title": "CAT 2024 Slotwise Difficulty Analysis",
+      "table": {
+        "headers": ["", "Slot-1", "Slot-2", "Slot-3"],
+        "rows": [
+          ["VARC", "Moderate", "Moderate", "Moderate - Difficult"],
+          ["DILR", "Easy - Moderate", "Moderate", "Moderate"],
+          ["QA", "Moderate", "Moderate", "Moderate"]
+        ]
+      },
+      "paragraphs": [
+        "VARC (Verbal Ability and Reading Comprehension) remained consistent across slots with four reading comprehension passages and eight verbal ability questions. The “Odd One Out” format returned, and the difficulty level was comparable to CAT 2022.",
+        "DILR (Data Interpretation and Logical Reasoning) offered manageable sets in each slot, including two approachable sets. Slot 3’s QA (Quantitative Ability), however, was considered the toughest—longer passages, trickier questions, and more complex calculations made it noticeably time-consuming. Overall, Slot 3 demanded the highest effort."
+      ]
+    },
+    "predictor": {
+      "title": "How Does Our CAT Percentile Predictor Work?",
+      "paragraphs": [
+        "Our CAT percentile predictor uses advanced data models to estimate your percentile based on the raw scores you provide. By analysing thousands of past test-takers, we deliver a dependable forecast of your percentile so you can anticipate interview opportunities with confidence."
+      ],
+      "ordered_list_title": "Here's how the predictor works:",
+      "ordered_list": [
+        "Input section-wise scores: Enter your VARC, DILR, and QA raw scores.",
+        "Weightage across sections: Every section contributes equally to your final percentile, so a balanced performance matters.",
+        "Historical comparison: Your score is benchmarked against previous exam data to estimate your relative standing.",
+        "Estimated percentile: Once processed, you receive an accurate percentile projection to plan your next steps."
+      ],
+      "footer_paragraphs": [
+        {
+          "text": "With this insight, you'll quickly understand your standing and can prepare for the next phase of the admissions process."
+        },
+        {
+          "text": "CAT Score Prediction: Estimating Your Final Percentile",
+          "variant": "heading"
+        },
+        {
+          "text": "While the score calculator captures your raw performance, your final percentile depends on several factors:"
+        },
+        {
+          "text": "Combining the percentile predictor with the score calculator helps you create a realistic view of your final results—whether you're polishing interviews, planning a retake, or exploring alternative programmes."
+        }
+      ],
+      "unordered_list": [
+        "Overall performance of all candidates: If the CAT exam in 2025 is tougher, even a lower raw score can translate into a high percentile.",
+        "Sectional cutoffs: Each section has its own difficulty level and cutoff expectations, affecting your sectional percentile.",
+        "Score normalization: Scores are normalized across different exam slots so everyone competes on an even footing."
+      ]
+    },
+    "response_sheet": {
+      "title": "CAT Response Sheet 2025",
+      "paragraphs": [
+        "Your CAT response sheet 2025 combines your marked answers with the official key released by IIMs—usually within two to three days of the exam. Reviewing it helps you spot strengths, understand mistakes, and calculate an accurate raw score before results day.",
+        "To make the most of our calculator:"
+      ],
+      "list": [
+        "Cross-check each response against the official answer key.",
+        "Count correct and incorrect attempts for every section.",
+        "Feed those details into the score calculator for an instant estimate."
+      ],
+      "footer": "Analysing your response sheet with these steps gives you a clear picture of your performance—whether you're gearing up for interviews, planning another attempt, or mapping out alternative programmes."
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import defaultContent from '@/content/cat-score-calculator.json';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,18 +8,15 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {
     AlertCircle,
     BarChart3,
+    Bot,
     CheckCircle2,
     Cpu,
     ListChecks,
     Loader2,
-    Bot,
-    Sparkles,
-    ShieldCheck,
-    Target,
-    Trophy,
-    XCircle,
-    MessageCircle,
     RefreshCcw,
+    Sparkles,
+    Target,
+    XCircle,
 } from 'lucide-react';
 import {
     type ComponentType,
@@ -78,111 +76,145 @@ type CalculationPayload = {
     whatsapp_link?: WhatsappInvite | null;
 };
 
-type PageProps = {
-    latestCalculation: CalculationPayload | null;
+type CatPageContent = {
+    meta: {
+        title: string;
+        description: string;
+    };
+    hero: {
+        title: string;
+        description: string;
+        highlights: Array<{ icon: string; title: string; description: string }>;
+        input_placeholder: string;
+        button_labels: {
+            default: string;
+            login_required: string;
+            loading: string;
+        };
+        unauthenticated_notice: string;
+        unauthenticated_link_label: string;
+        unauthenticated_link_url: string;
+    };
+    empty_state: {
+        title: string;
+        description: string;
+    };
+    how_it_works: {
+        badge: string;
+        heading: string;
+        steps: Array<{ title: string; description: string }>;
+    };
+    guide: {
+        badge: string;
+        heading: string;
+        intro: string;
+        sections: Array<{
+            title: string;
+            description: string;
+            bullets?: string[];
+        }>;
+        how_to_use: {
+            title: string;
+            description: string;
+            steps: string[];
+        };
+        highlight_card: {
+            title: string;
+            paragraphs: string[];
+        };
+    };
+    insights: {
+        score_vs_percentile: {
+            title: string;
+            paragraphs: string[];
+            table: { headers: string[]; rows: string[][] };
+            footer: string;
+        };
+        slot_difficulty: {
+            title: string;
+            table: { headers: string[]; rows: string[][] };
+            paragraphs: string[];
+        };
+        predictor: {
+            title: string;
+            paragraphs: string[];
+            ordered_list_title: string;
+            ordered_list: string[];
+            footer_paragraphs: Array<{ text: string; variant?: 'heading' | 'default' }>;
+            unordered_list: string[];
+        };
+        response_sheet: {
+            title: string;
+            paragraphs: string[];
+            list: string[];
+            footer: string;
+        };
+    };
 };
 
-const steps = [
-    {
-        title: 'Paste your CAT response sheet link',
-        description:
-            'Download the HTML response sheet from the official CAT portal and paste the link in the box above.',
-    },
-    {
-        title: 'Sign in & submit',
-        description:
-            'Only logged-in users can process a sheet. We send it securely to our scoring engine the moment you click submit.',
-    },
-    {
-        title: 'Get section-wise marks instantly',
-        description:
-            'See correct vs incorrect counts, sectional scores, and the combined total in a clean scorecard.',
-    },
-];
+type PageProps = {
+    latestCalculation: CalculationPayload | null;
+    pageContent?: Partial<CatPageContent> | null;
+};
 
-const assurances = [
-    {
-        icon: ShieldCheck,
-        title: 'Official marking scheme',
-        description:
-            'We follow the current CAT pattern ( +3 / -1 / 0 ) and handle type-in-the-answer questions accurately.',
-    },
-    {
-        icon: CheckCircle2,
-        title: 'Slot-aware parsing',
-        description:
-            'Response sheets from every slot are normalised before we compute the totals to avoid mismatches.',
-    },
-    {
-        icon: Trophy,
-        title: 'Auto-saved history',
-        description:
-            'Every calculation is stored on your account so you can revisit and download the scorecard anytime.',
-    },
-];
+const DEFAULT_CONTENT = defaultContent as CatPageContent;
 
-const aiHighlights = [
-    {
-        icon: Sparkles,
-        title: 'LLM cleansing',
-        description: 'Sanitises the HTML sheet and extracts signals with zero manual tweaks.',
-    },
-    {
-        icon: Cpu,
-        title: 'Scoring engine',
-        description: 'Applies CAT rules & slot weights on a specialised inference pipeline.',
-    },
-    {
-        icon: Bot,
-        title: 'Confidence band',
-        description: 'Surfaces percentile confidence so you can trust the forecast.',
-    },
-];
+const HERO_ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
+    sparkles: Sparkles,
+    cpu: Cpu,
+    bot: Bot,
+};
 
-const guideSections = [
-    {
-        title: 'What is CAT Score Calculator?',
-        description:
-            "CAT score calculator is a simple tool that helps you estimate raw scores and predict percentiles long before the official results arrive. It evaluates your performance across VARC, DILR, and QA, then estimates your overall score and chances of receiving calls from leading IIMs by analysing historical trends.",
-    },
-    {
-        title: 'How does CAT Score Calculator work?',
-        description:
-            "CAT score calculator applies the official scoring pattern and benchmarks your performance against past exams to forecast a realistic percentile so you can plan early.",
-        bullets: [
-            'Correct answers earn +3 marks each.',
-            'Incorrect answers for MCQs incur a -1 penalty.',
-            'Unattempted questions do not affect your score.',
-            'TITA questions never receive negative marking.',
-        ],
-    },
-    {
-        title: 'How to Use CAT Score Calculator 2025',
-        description:
-            "Follow these steps to capture accurate results, convert them into a percentile prediction, and prepare for post-exam processes confidently.",
-        bullets: [
-            'Access the calculator for CAT 2025.',
-            'Copy the response sheet URL from the official IIM portal and paste it into the calculator.',
-            'Review the estimated raw score generated from your responses.',
-            'Use the percentile predictor to convert that score into an expected percentile.',
-            'Compare your percentile with recent cut-offs for IIMs and other B-schools.',
-            'Begin interview and GD preparation—or plan backup options—based on your projected percentile.',
-        ],
-    },
-];
+const mergeContent = (
+    base: CatPageContent,
+    override?: Partial<CatPageContent> | null,
+): CatPageContent => {
+    if (!override) {
+        return base;
+    }
 
-const usageSteps = [
-    'Open your CAT response sheet on the official portal and copy the URL.',
-    'Paste the link into CAT score calculator.',
-    'Submit the sheet to generate your section-wise raw score instantly.',
-    'Review the predicted percentile to understand where you stand for IIM shortlists.',
-    'Plan interview prep, alternative colleges, or a retake strategy based on the forecast.',
-];
+    const clone = JSON.parse(JSON.stringify(base)) as CatPageContent;
 
-export default function CatScoreCalculator({ latestCalculation }: PageProps) {
+    const deepMerge = (target: Record<string, unknown>, source: Record<string, unknown>) => {
+        Object.entries(source).forEach(([key, value]) => {
+            if (value === undefined) {
+                return;
+            }
+
+            if (Array.isArray(value)) {
+                target[key] = value;
+
+                return;
+            }
+
+            if (value !== null && typeof value === 'object') {
+                const current = (target[key] ?? {}) as Record<string, unknown>;
+
+                target[key] = deepMerge(current, value as Record<string, unknown>);
+
+                return;
+            }
+
+            target[key] = value;
+        });
+
+        return target;
+    };
+
+    return deepMerge(clone as unknown as Record<string, unknown>, override as Record<string, unknown>) as CatPageContent;
+};
+
+export default function CatScoreCalculator({
+    latestCalculation,
+    pageContent,
+}: PageProps) {
     const {
         props: { auth },
     } = usePage<SharedData>();
+    const content = useMemo(
+        () => mergeContent(DEFAULT_CONTENT, pageContent ?? undefined),
+        [pageContent],
+    );
     const [responseLink, setResponseLink] = useState(
         latestCalculation?.response_link ?? '',
     );
@@ -302,11 +334,8 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
 
     return (
         <>
-            <Head title="CAT Score Calculator 2025 | Instant Sectional Scores & Percentile Insights">
-                <meta
-                    name="description"
-                    content="Paste your official CAT response sheet to get precise VARC, DILR, and QA scores in seconds. Understand your predicted percentile, track past attempts, and plan interview prep with confidence."
-                />
+            <Head title={content.meta.title}>
+                <meta name="description" content={content.meta.description} />
             </Head>
             <section className="relative overflow-hidden bg-[#080B1A] py-16 text-white dark:bg-[#05060D] lg:py-20">
                 <div className="absolute inset-0" />
@@ -315,26 +344,32 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
                     <div className="space-y-8 text-center text-left">
                         <h1 className="text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
-                            Hand your CAT response sheet to our AI co-pilot and watch precise scores materialise in seconds.
+                            {content.hero.title}
                         </h1>
                         <p className="text-sm text-white/80 sm:text-base lg:text-lg">
-                            Our multi-model pipeline parses your official HTML sheet, normalises slot-level scaling, and returns a verified scorecard you can trust before the results drop.
+                            {content.hero.description}
                         </p>
                         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                            {aiHighlights.map(({ icon: Icon, title, description }) => (
-                                <div
-                                    key={title}
-                                    className="group relative flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_0_25px_rgba(15,118,110,0.15)] transition hover:border-white/30 hover:bg-white/15"
-                                >
-                                    <div className="rounded-xl bg-yellow-400/15 p-2 text-yellow-200 dark:bg-yellow-400/80">
-                                        <Icon className="h-5 w-5" />
+                            {(content.hero.highlights ?? []).map(({ icon, title, description }) => {
+                                const Icon = HERO_ICON_MAP[icon] ?? Sparkles;
+
+                                return (
+                                    <div
+                                        key={title}
+                                        className="group relative flex items-start gap-3 rounded-2xl border border-white/10 bg-white/10 p-4 shadow-[0_0_25px_rgba(15,118,110,0.15)] transition hover:border-white/30 hover:bg-white/15"
+                                    >
+                                        <div className="rounded-xl bg-yellow-400/15 p-2 text-yellow-200 dark:bg-yellow-400/80">
+                                            <Icon className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-semibold text-white">
+                                                {title}
+                                            </p>
+                                            <p className="text-xs text-white/70">{description}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-white">{title}</p>
-                                        <p className="text-xs text-white/70">{description}</p>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                         <form
                             onSubmit={handleSubmit}
@@ -346,7 +381,7 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 onChange={(event) =>
                                     setResponseLink(event.target.value ?? '')
                                 }
-                                placeholder="https://cdn.digialm.com/per/g06/.../response.html"
+                                placeholder={content.hero.input_placeholder}
                                 className="h-12 p-3 w-full flex-1 rounded-xl border-white/20 bg-white/90 text-slate-900 placeholder:text-slate-500 focus-visible:ring-yellow-400/30"
                             />
                             <Button
@@ -358,12 +393,12 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                 {loading ? (
                                     <>
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Calculating…
+                                        {content.hero.button_labels.loading}
                                     </>
                                 ) : !isLoggedIn ? (
-                                    'Sign in to submit'
+                                    content.hero.button_labels.login_required
                                 ) : (
-                                    'Submit'
+                                    content.hero.button_labels.default
                                 )}
                             </Button>
                         </form>
@@ -374,12 +409,12 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                         )}
                         {!isLoggedIn && (
                             <p className="text-sm text-white/70">
-                                You need an account to process response sheets.{' '}
+                                {content.hero.unauthenticated_notice}{' '}
                                 <Link
-                                    href="/register"
+                                    href={content.hero.unauthenticated_link_url}
                                     className="font-semibold text-yellow-200 hover:text-yellow-100"
                                 >
-                                    Create one for free.
+                                    {content.hero.unauthenticated_link_label}
                                 </Link>
                             </p>
                         )}
@@ -396,11 +431,10 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 ) : (
                     <div className="rounded-3xl border border-dashed border-slate-200 bg-white/60 p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
-                            Paste your response sheet to see section-wise marks.
+                            {content.empty_state.title}
                         </h2>
                         <p className="mt-3 text-sm text-muted-foreground">
-                            Once you submit the link above, we will parse the official CAT answer
-                            key and store a complete report for you here.
+                            {content.empty_state.description}
                         </p>
                     </div>
                 )}
@@ -410,14 +444,14 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
                     <div className="max-w-2xl">
                         <p className="text-sm font-semibold uppercase tracking-wide text-primary">
-                            How it works
+                            {content.how_it_works.badge}
                         </p>
                         <h2 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            Three simple steps to get your verified CAT scores.
+                            {content.how_it_works.heading}
                         </h2>
                     </div>
                     <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-                        {steps.map((step, index) => (
+                        {(content.how_it_works.steps ?? []).map((step, index) => (
                             <Card
                                 key={step.title}
                                 className="border border-primary/10 bg-background/80 shadow-none"
@@ -443,19 +477,18 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 mt-8">
                     <div className="max-w-3xl space-y-4">
                         <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                            CAT 2025 Guide
+                            {content.guide.badge}
                         </Badge>
                         <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                            CAT 2025 score calculator walkthrough
+                            {content.guide.heading}
                         </h2>
                         <p className="text-sm text-muted-foreground sm:text-base">
-                            Understand how  interprets your response sheet, predicts your percentile,
-                            and helps you plan the journey from raw scores to IIM calls.
+                            {content.guide.intro}
                         </p>
                     </div>
 
                     <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                        {guideSections.map((section) => (
+                        {(content.guide.sections ?? []).map((section) => (
                             <Card key={section.title} className="h-full border border-slate-200 shadow-none dark:border-slate-800">
                                 <CardHeader>
                                     <CardTitle className="text-lg font-semibold text-foreground">
@@ -482,15 +515,13 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    How to use our calculator
+                                    {content.guide.how_to_use.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
-                                <p>
-                                    Follow these steps to make sure the predicted score mirrors your official CAT evaluation.
-                                </p>
+                                <p>{content.guide.how_to_use.description}</p>
                                 <ol className="list-decimal space-y-2 pl-5">
-                                    {usageSteps.map((step) => (
+                                    {(content.guide.how_to_use.steps ?? []).map((step) => (
                                         <li key={step}>{step}</li>
                                     ))}
                                 </ol>
@@ -499,67 +530,45 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                         <Card className="border border-primary/20 bg-primary/5 shadow-none dark:border-primary/40 dark:bg-primary/10">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    CAT 2025 Score Calculator From Response Sheet
+                                    {content.guide.highlight_card.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-foreground">
-                                <p>
-                                    Our CAT Score Calculator 2025 helps you predict your score and anticipate your percentile before the official results arrive. With real-time insights, you can gauge your standing among other candidates and understand your likelihood of receiving interview calls from top IIMs.
-                                </p>
-                                <p>
-                                    This guide walks you through reviewing your CAT 2025 response sheet, using the calculator effectively, and interpreting your predicted percentile so you can plan your IIM applications with confidence.
-                                </p>
-                                <p>
-                                    Together with the percentile predictor, it remains one of the most effective ways to stay ahead of the official results and act on your MBA goals without losing time.
-                                </p>
+                                {(content.guide.highlight_card.paragraphs ?? []).map((paragraph, index) => (
+                                    <p key={index}>{paragraph}</p>
+                                ))}
                             </CardContent>
                         </Card>
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800 lg:col-span-2">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    CAT Score vs Percentile 2024
+                                    {content.insights.score_vs_percentile.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
-                                <p>
-                                    One of the most common questions CAT aspirants ask is how their CAT raw score translates into a percentile. While your score reflects the number of questions answered correctly, your percentile measures how you performed relative to other candidates.
-                                </p>
-                                <p>
-                                    Using historical data, our percentile predictor can give you a reasonable estimate of your percentile based on your raw score. Here&apos;s a quick reference for CAT Score vs Percentile 2024.
-                                </p>
+                                {(content.insights.score_vs_percentile.paragraphs ?? []).map(
+                                    (paragraph, index) => (
+                                        <p key={index}>{paragraph}</p>
+                                    ),
+                                )}
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                         <thead className="bg-yellow-400 text-primary dark:bg-yellow-400/80">
                                             <tr className="text-xs uppercase tracking-wide">
-                                                <th className="px-4 py-3 font-semibold">%ile</th>
-                                                <th className="px-4 py-3 font-semibold">Overall</th>
-                                                <th className="px-4 py-3 font-semibold">VARC</th>
-                                                <th className="px-4 py-3 font-semibold">LRDI</th>
-                                                <th className="px-4 py-3 font-semibold">Quant</th>
+                                                {content.insights.score_vs_percentile.table.headers.map(
+                                                    (header) => (
+                                                        <th
+                                                            key={header}
+                                                            className="px-4 py-3 font-semibold"
+                                                        >
+                                                            {header}
+                                                        </th>
+                                                    ),
+                                                )}
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                            {[
-                                                ['99.95%', '129.67', '53.95', '52.51', '48.15'],
-                                                ['99.90%', '123.86', '51.20', '50.32', '45.27'],
-                                                ['99.50%', '105.00', '44.50', '41.38', '36.87'],
-                                                ['99.00%', '96.35', '40.58', '37.60', '33.11'],
-                                                ['98.00%', '86.91', '36.42', '33.98', '28.83'],
-                                                ['97.00%', '81.51', '34.00', '31.28', '26.69'],
-                                                ['95.00%', '73.46', '30.18', '28.06', '23.48'],
-                                                ['90.00%', '60.70', '24.55', '23.08', '18.07'],
-                                                ['85.00%', '52.63', '20.80', '19.81', '14.92'],
-                                                ['80.00%', '46.57', '17.95', '17.46', '12.43'],
-                                                ['75.00%', '41.61', '15.62', '15.45', '10.64'],
-                                                ['70.00%', '38.11', '14.15', '14.28', '9.57'],
-                                                ['65.00%', '35.09', '13.00', '13.22', '8.50'],
-                                                ['60.00%', '32.51', '11.45', '12.16', '7.42'],
-                                                ['55.00%', '30.24', '10.42', '11.10', '6.79'],
-                                                ['50.00%', '28.27', '9.85', '10.07', '5.88'],
-                                                ['40.00%', '22.94', '7.50', '8.05', '4.22'],
-                                                ['30.00%', '18.65', '5.60', '6.86', '3.03'],
-                                                ['20.00%', '14.79', '3.70', '5.02', '1.84'],
-                                            ].map((row, rowIndex) => (
+                                            {(content.insights.score_vs_percentile.table.rows ?? []).map((row, rowIndex) => (
                                                 <tr key={rowIndex} className="border-t border-slate-200 dark:border-slate-800">
                                                     {row.map((cell, cellIndex) => (
                                                         <td key={`${rowIndex}-${cellIndex}`} className="px-4 py-3">
@@ -572,14 +581,14 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                     </table>
                                 </div>
                                 <p className="text-sm text-muted-foreground">
-                                    These figures are based on trends from previous years, and while they offer a reliable estimation, the actual percentile for 2025 might vary with the exam&apos;s difficulty and the overall performance of candidates. Our CAT Score Calculator 2025 blends sophisticated algorithms with historical data to deliver an accurate percentile prediction so you can stay one step ahead.
+                                    {content.insights.score_vs_percentile.footer}
                                 </p>
                             </CardContent>
                         </Card>
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800 lg:col-span-2">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    CAT 2024 Slotwise Difficulty Analysis
+                                    {content.insights.slot_difficulty.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
@@ -587,18 +596,20 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                     <table className="min-w-full divide-y divide-slate-200 overflow-hidden rounded-xl border border-slate-200 text-left text-sm dark:divide-slate-800 dark:border-slate-800">
                                         <thead className="bg-yellow-400 text-primary text-foreground dark:bg-yellow-400/80">
                                             <tr className="text-xs uppercase tracking-wide">
-                                                <th className="px-4 py-3 font-semibold"></th>
-                                                <th className="px-4 py-3 font-semibold">Slot-1</th>
-                                                <th className="px-4 py-3 font-semibold">Slot-2</th>
-                                                <th className="px-4 py-3 font-semibold">Slot-3</th>
+                                                {content.insights.slot_difficulty.table.headers.map(
+                                                    (header, index) => (
+                                                        <th
+                                                            key={`${header}-${index}`}
+                                                            className="px-4 py-3 font-semibold"
+                                                        >
+                                                            {header}
+                                                        </th>
+                                                    ),
+                                                )}
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
-                                            {[
-                                                ['VARC', 'Moderate', 'Moderate', 'Moderate - Difficult'],
-                                                ['DILR', 'Easy - Moderate', 'Moderate', 'Moderate'],
-                                                ['QA', 'Moderate', 'Moderate', 'Moderate'],
-                                            ].map((row, rowIndex) => (
+                                            {(content.insights.slot_difficulty.table.rows ?? []).map((row, rowIndex) => (
                                                 <tr key={`slotwise-${rowIndex}`} className="border-t border-slate-200 dark:border-slate-800">
                                                     {row.map((cell, cellIndex) => (
                                                         <td
@@ -613,79 +624,78 @@ export default function CatScoreCalculator({ latestCalculation }: PageProps) {
                                         </tbody>
                                     </table>
                                 </div>
-                                <p>
-                                    VARC (Verbal Ability and Reading Comprehension) remained consistent across slots with four reading comprehension passages and eight verbal ability questions. The “Odd One Out” format returned, and the difficulty level was comparable to CAT 2022.
-                                </p>
-                                <p>
-                                    DILR (Data Interpretation and Logical Reasoning) offered manageable sets in each slot, including two approachable sets. Slot 3’s QA (Quantitative Ability), however, was considered the toughest—longer passages, trickier questions, and more complex calculations made it noticeably time-consuming. Overall, Slot 3 demanded the highest effort.
-                                </p>
+                                {(content.insights.slot_difficulty.paragraphs ?? []).map((paragraph, index) => (
+                                    <p key={index}>{paragraph}</p>
+                                ))}
                             </CardContent>
                         </Card>
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800 lg:col-span-2">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    How Does Our CAT Percentile Predictor Work?
+                                    {content.insights.predictor.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
-                                <p>
-                                    Our CAT percentile predictor uses advanced data models to estimate your percentile based on the raw scores you provide. By analysing thousands of past test-takers, we deliver a dependable forecast of your percentile so you can anticipate interview opportunities with confidence.
-                                </p>
+                                {(content.insights.predictor.paragraphs ?? []).map(
+                                    (paragraph, index) => (
+                                        <p key={index}>{paragraph}</p>
+                                    ),
+                                )}
                                 <div>
-                                    <p className="font-medium text-foreground">Here&apos;s how the predictor works:</p>
+                                    <p className="font-medium text-foreground">
+                                        {content.insights.predictor.ordered_list_title}
+                                    </p>
                                     <ol className="mt-2 list-decimal space-y-2 pl-5">
-                                        <li>Input section-wise scores: Enter your VARC, DILR, and QA raw scores.</li>
-                                        <li>Weightage across sections: Every section contributes equally to your final percentile, so a balanced performance matters.</li>
-                                        <li>Historical comparison: Your score is benchmarked against previous exam data to estimate your relative standing.</li>
-                                        <li>Estimated percentile: Once processed, you receive an accurate percentile projection to plan your next steps.</li>
+                                        {(content.insights.predictor.ordered_list ?? []).map(
+                                            (item, index) => (
+                                                <li key={index}>{item}</li>
+                                            ),
+                                        )}
                                     </ol>
                                 </div>
-                                <p>
-                                    With this insight, you&apos;ll quickly understand your standing and can prepare for the next phase of the admissions process.
-                                </p>
-                                <p className="font-medium text-foreground">
-                                    CAT Score Prediction: Estimating Your Final Percentile
-                                </p>
-                                <p>
-                                    While the score calculator captures your raw performance, your final percentile depends on several factors:
-                                </p>
+                                {(content.insights.predictor.footer_paragraphs ?? []).map(
+                                    ({ text, variant }, index) => (
+                                        <p
+                                            key={index}
+                                            className={
+                                                variant === 'heading'
+                                                    ? 'font-medium text-foreground'
+                                                    : undefined
+                                            }
+                                        >
+                                            {text}
+                                        </p>
+                                    ),
+                                )}
                                 <ul className="list-disc space-y-2 pl-5">
-                                    <li>
-                                        Overall performance of all candidates: If the CAT exam in 2025 is tougher, even a lower raw score can translate into a high percentile.
-                                    </li>
-                                    <li>
-                                        Sectional cutoffs: Each section has its own difficulty level and cutoff expectations, affecting your sectional percentile.
-                                    </li>
-                                    <li>
-                                        Score normalization: Scores are normalized across different exam slots so everyone competes on an even footing.
-                                    </li>
+                                    {(content.insights.predictor.unordered_list ?? []).map(
+                                        (item, index) => (
+                                            <li key={index}>{item}</li>
+                                        ),
+                                    )}
                                 </ul>
-                                <p>
-                                    Combining the percentile predictor with the score calculator helps you create a realistic view of your final results—whether you&apos;re polishing interviews, planning a retake, or exploring alternative programmes.
-                                </p>
                             </CardContent>
                         </Card>
                         <Card className="border border-slate-200 shadow-none dark:border-slate-800 lg:col-span-2">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
-                                    CAT Response Sheet 2025
+                                    {content.insights.response_sheet.title}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4 text-sm text-muted-foreground">
-                                <p>
-                                    Your CAT response sheet 2025 combines your marked answers with the official key released by IIMs—usually within two to three days of the exam. Reviewing it helps you spot strengths, understand mistakes, and calculate an accurate raw score before results day.
-                                </p>
-                                <p>
-                                    To make the most of our calculator:
-                                </p>
+                                {(content.insights.response_sheet.paragraphs ?? []).map(
+                                    (paragraph, index) => (
+                                        <p key={index}>{paragraph}</p>
+                                    ),
+                                )}
                                 <ul className="list-disc space-y-2 pl-5">
-                                    <li>Cross-check each response against the official answer key.</li>
-                                    <li>Count correct and incorrect attempts for every section.</li>
-                                    <li>Feed those details into the score calculator for an instant estimate.</li>
+                                    {(content.insights.response_sheet.list ?? []).map(
+                                        (item, index) => (
+                                            <li key={index}>{item}</li>
+                                        ),
+                                    )}
                                 </ul>
-                                <p>
-                                    Analysing your response sheet with these steps gives you a clear picture of your performance—whether you&apos;re gearing up for interviews, planning another attempt, or mapping out alternative programmes.
-                                </p>
+                                <p>{content.insights.response_sheet.footer}</p>
                             </CardContent>
                         </Card>
                     </div>

@@ -1,4 +1,5 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { ScrollProgressBar } from '@/components/scroll-progress-bar';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
@@ -12,9 +13,17 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
 
     if (variant === 'header') {
         return (
-            <div className="flex min-h-screen w-full flex-col">{children}</div>
+            <div className="flex min-h-screen w-full flex-col">
+                <ScrollProgressBar />
+                {children}
+            </div>
         );
     }
 
-    return <SidebarProvider defaultOpen={isOpen}>{children}</SidebarProvider>;
+    return (
+        <SidebarProvider defaultOpen={isOpen}>
+            <ScrollProgressBar />
+            {children}
+        </SidebarProvider>
+    );
 }
