@@ -1,5 +1,6 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
 import { ScrollProgressBar } from '@/components/scroll-progress-bar';
+import { PhoneNumberDialog } from '@/components/phone-number-dialog';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 
@@ -15,6 +16,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
         return (
             <div className="flex min-h-screen w-full flex-col">
                 <ScrollProgressBar />
+                <PhoneNumberDialog />
                 {children}
             </div>
         );
@@ -23,6 +25,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
     return (
         <SidebarProvider defaultOpen={isOpen}>
             <ScrollProgressBar />
+            <PhoneNumberDialog />
             {children}
         </SidebarProvider>
     );

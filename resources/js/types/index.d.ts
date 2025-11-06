@@ -32,6 +32,15 @@ export interface MarketingLink {
 export interface MarketingLinksPayload {
     nav: MarketingLink[];
     whatsapp: MarketingLink | null;
+    otp?: OtpSettings;
+    navigationLayout?: 'horizontal' | 'vertical';
+}
+
+export interface OtpSettings {
+    enabled: boolean;
+    msg91_api_key: string;
+    msg91_sender_id: string;
+    msg91_template_id: string;
 }
 
 export interface SharedData {
@@ -40,6 +49,7 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     marketingLinks?: MarketingLinksPayload;
+    otpSettings?: OtpSettings;
     [key: string]: unknown;
 }
 
@@ -47,6 +57,8 @@ export interface User {
     id: number;
     name: string;
     email: string;
+    phone_number?: string | null;
+    phone_verified_at?: string | null;
     avatar?: string;
     is_admin?: boolean;
     email_verified_at: string | null;

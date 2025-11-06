@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             '/cat-score-calculator/calculate',
             '/xat-score-calculator/calculate',
+            '/profile/phone',
+            'courses/*'
         ]);
 
         $middleware->web(append: [

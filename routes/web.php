@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\Admin\AdminOverviewController;
 use App\Http\Controllers\CatScoreCalculatorController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseOrderController;
+use App\Http\Controllers\PhoneNumberController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\XatScoreCalculatorController;
 use App\Http\Resources\CatScoreCalculationResource;
 use App\Http\Resources\XatScoreCalculationResource;
@@ -60,7 +64,19 @@ Route::get('/xat-score-calculator', function (Request $request) {
 
 Route::middleware(['auth'])->post('/xat-score-calculator/calculate', [XatScoreCalculatorController::class, 'store'])->name('xat.score-calculator.calculate');
 
+Route::get('/courses', [CourseController::class, 'index'])->name('courses.index');
+Route::post('/courses/orders', [CourseOrderController::class, 'store'])->name('courses.orders.store');
+Route::post('/courses/orders/verify', [CourseOrderController::class, 'verify'])->name('courses.orders.verify');
+Route::get('/courses/purchase/success', [CourseController::class, 'success'])->name('courses.purchase.success');
+
+Route::get('/pdfs', [PdfController::class, 'index'])->name('pdfs.index');
+Route::get('/pdfs/{pdf}/download', [PdfController::class, 'download'])->name('pdfs.download');
+
 Route::middleware(['auth'])->group(function () {
+    Route::post('/profile/phone', [PhoneNumberController::class, 'store'])->name('profile.phone.store');
+    Route::post('/profile/phone/send-otp', [PhoneNumberController::class, 'sendOtp'])->name('profile.phone.send-otp');
+    Route::post('/profile/phone/verify-otp', [PhoneNumberController::class, 'verifyOtp'])->name('profile.phone.verify-otp');
+
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');

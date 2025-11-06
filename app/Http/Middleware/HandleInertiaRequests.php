@@ -43,7 +43,11 @@ class HandleInertiaRequests extends Middleware
         $keys = [
             'cat_nav_link',
             'xat_nav_link',
+            'courses_nav_link',
+            'pdfs_nav_link',
             'navbar_whatsapp_link',
+            'otp_verification',
+            'navigation_layout',
         ];
 
         $settings = Setting::query()
@@ -78,7 +82,21 @@ class HandleInertiaRequests extends Middleware
             'meta' => [],
         ];
 
-        $navLinks = array_values(array_filter([$cat, $xat], static function (?array $item) {
+        $courses = $format($settings->get('courses_nav_link')) ?? [
+            'label' => 'Courses',
+            'text' => 'Courses',
+            'url' => '/courses',
+            'meta' => [],
+        ];
+
+        $pdfs = $format($settings->get('pdfs_nav_link')) ?? [
+            'label' => 'PDFs',
+            'text' => 'PDFs',
+            'url' => '/pdfs',
+            'meta' => [],
+        ];
+
+        $navLinks = array_values(array_filter([$cat, $xat, $courses, $pdfs], static function (?array $item) {
             return $item !== null && filled($item['url']);
         }));
 
@@ -92,6 +110,13 @@ class HandleInertiaRequests extends Middleware
                     'cta_subtitle' => 'Join our official CAT WhatsApp group for daily updates.',
                 ],
             ],
+            'otp' => $settings->get('otp_verification')?->meta ?? [
+                'enabled' => false,
+                'msg91_api_key' => '',
+                'msg91_sender_id' => '',
+                'msg91_template_id' => '',
+            ],
+            'navigationLayout' => $settings->get('navigation_layout')?->text ?? 'horizontal',
         ];
 
         return [
@@ -103,6 +128,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'marketingLinks' => $settingsPayload,
+            'otpSettings' => $settingsPayload['otp'],
         ];
     }
 }

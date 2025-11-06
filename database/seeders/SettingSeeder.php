@@ -26,12 +26,42 @@ class SettingSeeder extends Seeder
                 'url' => '/xat-score-calculator',
             ],
             [
+                'key' => 'courses_nav_link',
+                'label' => 'Courses',
+                'text' => 'Courses',
+                'url' => '/courses',
+            ],
+            [
+                'key' => 'pdfs_nav_link',
+                'label' => 'PDFs',
+                'text' => 'PDFs',
+                'url' => '/pdfs',
+            ],
+            [
                 'key' => 'navbar_whatsapp_link',
                 'label' => 'Join WhatsApp Group',
                 'text' => '+91 63032 39042',
                 'url' => 'https://wa.me/916303239042',
                 'meta' => [
                     'cta_subtitle' => 'Join our official WhatsApp group for daily updates.',
+                ],
+            ],
+            [
+                'key' => 'otp_verification',
+                'label' => 'OTP Verification Settings',
+                'meta' => [
+                    'enabled' => false,
+                    'msg91_api_key' => '',
+                    'msg91_sender_id' => '',
+                    'msg91_template_id' => '',
+                ],
+            ],
+            [
+                'key' => 'navigation_layout',
+                'label' => 'Marketing Navigation Layout',
+                'text' => 'horizontal',
+                'meta' => [
+                    'options' => ['horizontal', 'vertical'],
                 ],
             ],
         ];

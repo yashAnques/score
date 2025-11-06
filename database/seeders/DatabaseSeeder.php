@@ -28,6 +28,8 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             WhatsappLinkSeeder::class,
             ContentSeeder::class,
+            CourseSeeder::class,
+            PdfSeeder::class,
         ]);
     }
 }

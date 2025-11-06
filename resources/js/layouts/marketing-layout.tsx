@@ -1,5 +1,7 @@
 import AppearanceToggleDropdown from '@/components/appearance-dropdown';
 import AppLogo from '@/components/app-logo';
+import AppLogoIcon from '@/components/app-logo-icon';
+import { PhoneNumberDialog } from '@/components/phone-number-dialog';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -12,9 +14,24 @@ import { edit as passwordEdit } from '@/routes/password';
 import { MarketingLinksPayload, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
 import clsx from 'clsx';
-import { Menu, X, MoveLeft, User, UserPlus, CircleUserRound } from 'lucide-react';
+import {
+    Menu,
+    X,
+    MoveLeft,
+    User,
+    UserPlus,
+    CircleUserRound,
+    BarChart3,
+    Target,
+    GraduationCap,
+    FileText,
+    LayoutDashboard,
+    PanelLeftClose,
+    PanelLeftOpen,
+} from 'lucide-react';
 import { ScrollProgressBar } from '@/components/scroll-progress-bar';
-import { type ReactNode, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import type { LucideIcon } from 'lucide-react';
 
 type MarketingLayoutProps = {
     children: ReactNode;
@@ -24,6 +41,7 @@ type NavItem = {
     label: string;
     href: string;
     external?: boolean;
+    icon?: LucideIcon | null;
 };
 
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
@@ -31,7 +49,9 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         props: { auth, marketingLinks },
         url,
     } = usePage<SharedData>();
+    const normalizedUrl = useMemo(() => url.replace(/[#?].*$/, ''), [url]);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     const isAuthenticated = Boolean(auth?.user);
     const user = auth?.user ?? null;
@@ -39,12 +59,55 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
 
     const marketingLinksPayload = marketingLinks as MarketingLinksPayload | undefined;
     const navLinks = marketingLinksPayload?.nav ?? [];
+    const navigationLayout = marketingLinksPayload?.navigationLayout ?? 'horizontal';
+    const isVerticalLayout = navigationLayout === 'vertical';
+    const resolveNavIcon = useCallback((label: string, href: string): LucideIcon | null => {
+        const normalized = `${label} ${href}`.toLowerCase();
+
+        if (normalized.includes('cat')) {
+            return BarChart3;
+        }
+
+        if (normalized.includes('xat')) {
+            return Target;
+        }
+
+        if (normalized.includes('course')) {
+            return GraduationCap;
+        }
+
+        if (normalized.includes('pdf')) {
+            return FileText;
+        }
+
+        if (normalized === '/' || normalized.includes('home')) {
+            return LayoutDashboard;
+        }
+
+        return null;
+    }, []);
+
     const processedNavLinks: NavItem[] = useMemo(() => {
-        return [
+        const fallback = [
             { label: 'CAT Score Calculator', href: '/cat-score-calculator' },
             { label: 'XAT Score Calculator', href: '/xat-score-calculator' },
+            { label: 'Courses', href: '/courses' },
+            { label: 'PDFs', href: '/pdfs' },
         ];
-    }, [navLinks]);
+
+        const source = navLinks.length
+            ? navLinks.filter((link) => !!link?.url).map((link) => ({
+                  label: link?.label ?? link?.text ?? 'Explore',
+                  href: link?.url ?? '#',
+                  external: link?.url ? link.url.startsWith('http://') || link.url.startsWith('https://') : false,
+              }))
+            : fallback;
+
+        return source.map((item) => ({
+            ...item,
+            icon: resolveNavIcon(item.label, item.href),
+        }));
+    }, [navLinks, resolveNavIcon]);
 
     const whatsappLink = marketingLinksPayload?.whatsapp ?? null;
     const whatsappUrl = whatsappLink?.url ?? 'https://wa.me/';
@@ -73,12 +136,49 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
 
     const navItems = useMemo(() => [...processedNavLinks], [processedNavLinks]);
 
-    const renderNavLink = (item: NavItem, onClick?: () => void) => {
+    const renderNavLink = (
+        item: NavItem,
+        onClick?: () => void,
+        variant: 'horizontal' | 'vertical' | 'vertical-collapsed' = 'horizontal',
+    ) => {
+        const normalizedHref = item.href.replace(/[#?].*$/, '');
         const isActive =
             !item.external &&
-            (item.href === '/'
-                ? url === '/'
-                : url === item.href || url.startsWith(`${item.href}/`));
+            (normalizedHref === '/'
+                ? normalizedUrl === '/'
+                : normalizedUrl === normalizedHref || normalizedUrl.startsWith(`${normalizedHref}/`));
+
+        const Icon = item.icon;
+
+        const horizontalClasses = clsx(
+            'px-3 py-2 text-sm font-medium transition-colors',
+            'inline-flex items-center gap-2 rounded-lg',
+            isActive
+                ? 'text-primary font-semibold bg-primary/10 hover:bg-primary/20'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/10',
+        );
+
+        const verticalClasses = clsx(
+            'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+            isActive
+                ? 'bg-primary/10 text-primary shadow-sm shadow-primary/10'
+                : 'text-muted-foreground hover:bg-primary/10 hover:text-primary',
+        );
+
+        const verticalCollapsedClasses = clsx(
+            'flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors',
+            isActive ? 'bg-primary/10 text-primary shadow-sm shadow-primary/20' : 'hover:bg-primary/10 hover:text-primary',
+        );
+
+        const linkClasses =
+            variant === 'horizontal'
+                ? horizontalClasses
+                : variant === 'vertical'
+                  ? verticalClasses
+                  : verticalCollapsedClasses;
+
+        const labelMarkup =
+            variant === 'vertical-collapsed' ? <span className="sr-only">{item.label}</span> : <span>{item.label}</span>;
 
         if (item.external || item.href.startsWith('http')) {
             return (
@@ -87,13 +187,12 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                     href={item.href}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
-                    className={clsx(
-                        'px-3 py-2 text-sm font-medium transition-colors',
-                        'text-muted-foreground hover:text-primary',
-                    )}
+                    className={linkClasses}
                     onClick={onClick}
+                    aria-label={variant === 'vertical-collapsed' ? item.label : undefined}
                 >
-                    {item.label}
+                    {Icon ? <Icon className={clsx('h-4 w-4', variant === 'vertical-collapsed' && 'h-5 w-5')} /> : null}
+                    {labelMarkup}
                 </a>
             );
         }
@@ -102,26 +201,299 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
             <Link
                 key={item.label}
                 href={item.href}
-                className={clsx(
-                    'px-3 py-2 text-sm font-medium transition-colors',
-                    isActive
-                        ? 'text-primary font-semibold'
-                        : 'text-muted-foreground hover:text-primary',
-                )}
+                className={linkClasses}
                 onClick={onClick}
+                aria-label={variant === 'vertical-collapsed' ? item.label : undefined}
             >
-                {item.label}
+                {Icon ? <Icon className={clsx('h-4 w-4', variant === 'vertical-collapsed' && 'h-5 w-5')} /> : null}
+                {labelMarkup}
             </Link>
         );
     };
 
+    if (isVerticalLayout) {
+        const verticalVariant = sidebarCollapsed ? 'vertical-collapsed' : 'vertical';
+
+        return (
+            <div className="flex min-h-screen bg-background text-foreground">
+                <ScrollProgressBar />
+                <PhoneNumberDialog />
+
+                <aside
+                    className={clsx(
+                        'relative hidden shrink-0 flex-col border-r border-border/60 bg-background/95 py-8 shadow-sm shadow-border/40 transition-all duration-200 lg:flex',
+                        sidebarCollapsed ? 'w-20 px-3' : 'w-72 px-6',
+                    )}
+                >
+                    <div
+                        className={clsx(
+                            'flex items-start justify-between gap-2 relative',
+                            sidebarCollapsed ? 'flex-col items-center gap-4' : 'items-center',
+                        )}
+                    >
+                        <div
+                            className={clsx(
+                                'flex items-center gap-3',
+                                sidebarCollapsed ? 'flex-col gap-2 text-center' : 'justify-start',
+                            )}
+                        >
+                            <a
+                                href="https://bschoolbuzz.in/"
+                                className={clsx(
+                                    'inline-flex items-center justify-center rounded-lg border border-border/60 p-2 text-muted-foreground transition hover:border-primary hover:text-primary',
+                                    sidebarCollapsed ? 'h-10 w-10' : 'hidden sm:flex',
+                                )}
+                                aria-label="Back to BschoolBuzz"
+                            >
+                                <MoveLeft className="h-4 w-4" />
+                            </a>
+                            <a
+                                href="https://bschoolbuzz.in/"
+                                className={clsx(
+                                    'flex items-center gap-3 text-lg font-semibold text-primary transition hover:text-primary/80',
+                                    sidebarCollapsed && 'flex-col gap-2 text-xs',
+                                )}
+                            >
+                                <AppLogoIcon className={clsx('h-10 w-10', sidebarCollapsed && 'h-9 w-9')} />
+                                {!sidebarCollapsed ? (
+                                    <span className="tracking-wide text-primary">BschoolBuzz</span>
+                                ) : (
+                                    <span className="text-[10px] font-semibold uppercase tracking-[0.4em] text-primary/80">
+                                        BB
+                                    </span>
+                                )}
+                            </a>
+                        </div>
+                        <button
+                            type="button"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted-foreground transition hover:border-primary hover:text-primary absolute -right-10 -top-5 z-1000 bg-yellow-400"
+                            onClick={() => setSidebarCollapsed((prev) => !prev)}
+                            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                        >
+                            {sidebarCollapsed ? (
+                                <PanelLeftOpen className="h-4 w-4 text-white" />
+                            ) : (
+                                <PanelLeftClose className="h-4 w-4 text-white" />
+                            )}
+                        </button>
+                    </div>
+
+                    {/* {!sidebarCollapsed ? (
+                        <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+                            Unlock score calculators, premium courses, and mentor-crafted resources.
+                        </p>
+                    ) : null} */}
+
+                    <nav className={clsx('mt-8 flex flex-1 flex-col gap-1', sidebarCollapsed && 'items-center')}>
+                        {navItems.map((item) => renderNavLink(item, undefined, verticalVariant))}
+                    </nav>
+
+                    <div
+                        className={clsx(
+                            'mt-10 border-t border-border/60 pt-6',
+                            sidebarCollapsed && 'mt-auto flex flex-col items-center gap-3 border-none pt-3',
+                        )}
+                    >
+                        {isAuthenticated && user ? (
+                            <div
+                                className={clsx(
+                                    'flex items-center gap-3 rounded-lg border border-border/60 bg-primary/5 px-3 py-3',
+                                    sidebarCollapsed && 'flex-col gap-2 px-2 py-2 text-center',
+                                )}
+                            >
+                                <Avatar className={clsx('h-10 w-10', sidebarCollapsed && 'h-9 w-9')}>
+                                    <AvatarImage src={user.avatar} alt={user.name} />
+                                    <AvatarFallback className="bg-primary/10 text-primary">
+                                        {getInitials(user.name)}
+                                    </AvatarFallback>
+                                </Avatar>
+                                {!sidebarCollapsed ? (
+                                    <div className="flex flex-1 flex-col">
+                                        <span className="text-sm font-semibold text-primary">{user.name}</span>
+                                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                                    </div>
+                                ) : null}
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className={clsx('h-8 w-8', sidebarCollapsed && 'h-7 w-7')}
+                                    onClick={() => router.post(logout.url())}
+                                    aria-label="Logout"
+                                >
+                                    <MoveLeft className={clsx('h-4 w-4', sidebarCollapsed && 'h-3.5 w-3.5')} />
+                                </Button>
+                            </div>
+                        ) : (
+                            <div
+                                className={clsx(
+                                    'flex flex-col gap-3',
+                                    sidebarCollapsed && 'items-center text-center text-xs',
+                                )}
+                            >
+                                {!sidebarCollapsed ? (
+                                    <p className="text-sm text-muted-foreground">
+                                        Sign in to save your scores, resume purchases, and unlock premium PDFs.
+                                    </p>
+                                ) : null}
+                                <div className={clsx('flex flex-col gap-2', sidebarCollapsed && 'w-full items-center')}>
+                                    <a
+                                        href={
+                                            'https://bschoolbuzz.in/login?redirect_to=' +
+                                            encodeURIComponent(window.location.href)
+                                        }
+                                        className={clsx(
+                                            'inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10',
+                                            sidebarCollapsed && 'w-full px-2 py-2 text-xs',
+                                        )}
+                                    >
+                                        <CircleUserRound className="h-4 w-4" />
+                                        {!sidebarCollapsed ? 'Login' : null}
+                                    </a>
+                                    <a
+                                        href={
+                                            'https://bschoolbuzz.in/signup?redirect_to=' +
+                                            encodeURIComponent(window.location.href)
+                                        }
+                                        className={clsx(
+                                            'inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90',
+                                            sidebarCollapsed && 'w-full px-2 py-2 text-xs',
+                                        )}
+                                    >
+                                        <UserPlus className="h-4 w-4" />
+                                        {!sidebarCollapsed ? 'Create Account' : null}
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </aside>
+
+                <div className="flex flex-1 flex-col">
+                    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/95 shadow-sm shadow-border/40 lg:hidden">
+                        <div className="flex h-16 items-center justify-between px-4">
+                            <button
+                                type="button"
+                                className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/60 text-muted-foreground transition hover:border-primary hover:text-primary"
+                                onClick={() => setMobileNavOpen(true)}
+                                aria-label="Open navigation"
+                            >
+                                <Menu className="h-5 w-5" />
+                            </button>
+                            <Link href="/" className="flex items-center gap-2">
+                                <AppLogo className="h-9 w-auto" />
+                            </Link>
+                            {isAuthenticated && user ? (
+                                <Link
+                                    href="http://bschoolbuzz.in/profile"
+                                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60"
+                                    aria-label="View profile"
+                                >
+                                    <Avatar className="h-8 w-8">
+                                        <AvatarImage src={user.avatar} alt={user.name} />
+                                        <AvatarFallback className="bg-primary/10 text-primary">
+                                            {getInitials(user.name)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Link>
+                            ) : (
+                                <a
+                                    href={'https://bschoolbuzz.in/login?redirect_to=' + encodeURIComponent(window.location.href)}
+                                    className="text-sm font-semibold text-primary transition hover:text-primary/80"
+                                >
+                                    Login
+                                </a>
+                            )}
+                        </div>
+                    </header>
+
+                    {mobileNavOpen ? (
+                        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm lg:hidden">
+                            <div className="absolute inset-y-0 left-0 w-72 max-w-[80vw] bg-background shadow-2xl shadow-black/40">
+                                <div className="flex items-center justify-between border-b border-border/60 px-4 py-4">
+                                    <Link href="/" className="flex items-center gap-2">
+                                        <AppLogoIcon className="h-9 w-9" />
+                                        <span className="text-lg font-semibold text-primary">BschoolBuzz</span>
+                                    </Link>
+                                    <button
+                                        type="button"
+                                        className="rounded-lg border border-border/60 p-2 text-muted-foreground transition hover:border-primary hover:text-primary"
+                                        onClick={() => setMobileNavOpen(false)}
+                                        aria-label="Close navigation"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                                <nav className="flex flex-col gap-1 px-3 py-4">
+                                    {navItems.map((item) =>
+                                        renderNavLink(item, () => setMobileNavOpen(false), 'vertical'),
+                                    )}
+                                </nav>
+                                <div className="border-t border-border/60 px-4 py-4">
+                                    {isAuthenticated && user ? (
+                                        <div className="flex items-center gap-3">
+                                            <Avatar className="h-10 w-10">
+                                                <AvatarImage src={user.avatar} alt={user.name} />
+                                                <AvatarFallback className="bg-primary/10 text-primary">
+                                                    {getInitials(user.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="flex flex-1 flex-col">
+                                                <span className="text-sm font-semibold text-primary">{user.name}</span>
+                                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                className="inline-flex h-9 items-center rounded-lg border border-border/60 px-3 text-sm font-semibold text-muted-foreground transition hover:border-primary hover:text-primary"
+                                                onClick={() => {
+                                                    setMobileNavOpen(false);
+                                                    router.post(logout.url());
+                                                }}
+                                            >
+                                                Logout
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col gap-2">
+                                            <a
+                                                href={
+                                                    'https://bschoolbuzz.in/login?redirect_to=' +
+                                                    encodeURIComponent(window.location.href)
+                                                }
+                                                className="inline-flex items-center justify-center rounded-lg border border-primary/40 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
+                                            >
+                                                Login
+                                            </a>
+                                            <a
+                                                href={
+                                                    'https://bschoolbuzz.in/signup?redirect_to=' +
+                                                    encodeURIComponent(window.location.href)
+                                                }
+                                                className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
+                                            >
+                                                Sign Up
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ) : null}
+
+                    <main className="flex-1">{children}</main>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex min-h-screen flex-col bg-background text-foreground">
             <ScrollProgressBar />
+            <PhoneNumberDialog />
             <header className="sticky top-0 z-40 bg-background shadow-sm shadow-border/40">
-                <div className="flex h-20 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
+                <div className="flex h-20 w-full items-center justify-between px-0 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-2 cursor-pointer">
-                        <a href="https://bschoolbuzz.in/">
+                        <a href="https://bschoolbuzz.in/" className="hidden sm:block">
                             <MoveLeft />
                         </a>
                         <a href="https://bschoolbuzz.in/" className="flex items-center gap-2">
@@ -135,7 +507,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
                         >
-                            <svg width="20" height="20" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
+                            <svg width="20" height="20" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
                             {whatsappNumber}
                         </a> */}
                         {isAuthenticated && user ? (
@@ -211,7 +583,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
                         >
-                            <svg width="20" height="20" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
+                            <svg width="20" height="20" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
                         </a> */}
                         <AppearanceToggleDropdown />
                         <Button
@@ -244,27 +616,29 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     setMobileNavOpen(false),
                                 ),
                             )}
-                            <div className="mt-4 space-y-3">
+                            <div className="space-y-3">
                                 {isAuthenticated && user ? (
                                     <div className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3">
-                                        <div className="flex items-center gap-3">
-                                            <Avatar className="h-10 w-10">
-                                                <AvatarImage src={user.avatar} alt={user.name} />
-                                                <AvatarFallback className="bg-primary/10 text-primary">
-                                                    {getInitials(user.name)}
-                                                </AvatarFallback>
-                                            </Avatar>
-                                            <div className="text-sm">
-                                                <p className="font-semibold text-foreground">
-                                                    {user.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {user.email}
-                                                </p>
+                                        <a href="http://bschoolbuzz.in/">
+                                            <div className="flex items-center gap-3 mb-0">
+                                                <Avatar className="h-10 w-10">
+                                                    <AvatarImage src={user.avatar} alt={user.name} />
+                                                    <AvatarFallback className="bg-primary/10 text-primary">
+                                                        {getInitials(user.name)}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="text-sm">
+                                                    <p className="font-semibold text-foreground">
+                                                        {user.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {user.email}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </a>
                                         <div className="flex flex-col gap-2">
-                                            {userMenuLinks.map((item) => (
+                                            {/* {userMenuLinks.map((item) => (
                                                 <Link
                                                     key={item.label}
                                                     href={item.href}
@@ -275,8 +649,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                                 >
                                                     {item.label}
                                                 </Link>
-                                            ))}
-                                            <button
+                                            ))} */}
+                                            {/* <button
                                                 type="button"
                                                 className="rounded-md px-2 py-1 text-left text-sm font-semibold text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
                                                 onClick={() => {
@@ -285,7 +659,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                                 }}
                                             >
                                                 Log out
-                                            </button>
+                                            </button> */}
                                         </div>
                                     </div>
                                 ) : (
@@ -520,7 +894,7 @@ function AnnouncementBar({ whatsappUrl, whatsappSubtitle, whatsappCta }: Announc
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                 >
-                    <svg width="18" height="18" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
+                    <svg width="18" height="18" viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#ffffff"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>Whatsapp-color</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Icons" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd"> <g id="Color-" transform="translate(-700.000000, -360.000000)" fill="#67C15E"> <path d="M723.993033,360 C710.762252,360 700,370.765287 700,383.999801 C700,389.248451 701.692661,394.116025 704.570026,398.066947 L701.579605,406.983798 L710.804449,404.035539 C714.598605,406.546975 719.126434,408 724.006967,408 C737.237748,408 748,397.234315 748,384.000199 C748,370.765685 737.237748,360.000398 724.006967,360.000398 L723.993033,360.000398 L723.993033,360 Z M717.29285,372.190836 C716.827488,371.07628 716.474784,371.034071 715.769774,371.005401 C715.529728,370.991464 715.262214,370.977527 714.96564,370.977527 C714.04845,370.977527 713.089462,371.245514 712.511043,371.838033 C711.806033,372.557577 710.056843,374.23638 710.056843,377.679202 C710.056843,381.122023 712.567571,384.451756 712.905944,384.917648 C713.258648,385.382743 717.800808,392.55031 724.853297,395.471492 C730.368379,397.757149 732.00491,397.545307 733.260074,397.27732 C735.093658,396.882308 737.393002,395.527239 737.971421,393.891043 C738.54984,392.25405 738.54984,390.857171 738.380255,390.560912 C738.211068,390.264652 737.745308,390.095816 737.040298,389.742615 C736.335288,389.389811 732.90737,387.696673 732.25849,387.470894 C731.623543,387.231179 731.017259,387.315995 730.537963,387.99333 C729.860819,388.938653 729.198006,389.89831 728.661785,390.476494 C728.238619,390.928051 727.547144,390.984595 726.969123,390.744481 C726.193254,390.420348 724.021298,389.657798 721.340985,387.273388 C719.267356,385.42535 717.856938,383.125756 717.448104,382.434484 C717.038871,381.729275 717.405907,381.319529 717.729948,380.938852 C718.082653,380.501232 718.421026,380.191036 718.77373,379.781688 C719.126434,379.372738 719.323884,379.160897 719.549599,378.681068 C719.789645,378.215575 719.62006,377.735746 719.450874,377.382942 C719.281687,377.030139 717.871269,373.587317 717.29285,372.190836 Z" id="Whatsapp"> </path> </g> </g> </g></svg>
                     {whatsappCta}
                 </a>
             </div>
