@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '/cat-score-calculator/calculate',
             '/xat-score-calculator/calculate',
             '/profile/phone',
-            'courses/*'
+            'courses/*',
+            'interviews/*'
         ]);
 
         $middleware->web(append: [

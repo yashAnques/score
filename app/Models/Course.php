@@ -24,6 +24,7 @@ class Course extends Model
         'cta_url',
         'original_price',
         'sale_price',
+        'interview_credits',
         'description_points',
         'is_active',
         'display_order',
@@ -39,6 +40,7 @@ class Course extends Model
         'is_active' => 'boolean',
         'original_price' => 'decimal:2',
         'sale_price' => 'decimal:2',
+        'interview_credits' => 'integer',
         'display_order' => 'integer',
     ];
 

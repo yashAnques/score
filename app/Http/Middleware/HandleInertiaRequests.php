@@ -44,6 +44,7 @@ class HandleInertiaRequests extends Middleware
             'cat_nav_link',
             'xat_nav_link',
             'courses_nav_link',
+            'interviews_nav_link',
             'pdfs_nav_link',
             'navbar_whatsapp_link',
             'otp_verification',
@@ -89,6 +90,13 @@ class HandleInertiaRequests extends Middleware
             'meta' => [],
         ];
 
+        $interviews = $format($settings->get('interviews_nav_link')) ?? [
+            'label' => 'AI Interviews',
+            'text' => 'Interviews',
+            'url' => '/interviews',
+            'meta' => [],
+        ];
+
         $pdfs = $format($settings->get('pdfs_nav_link')) ?? [
             'label' => 'PDFs',
             'text' => 'PDFs',
@@ -96,7 +104,7 @@ class HandleInertiaRequests extends Middleware
             'meta' => [],
         ];
 
-        $navLinks = array_values(array_filter([$cat, $xat, $courses, $pdfs], static function (?array $item) {
+        $navLinks = array_values(array_filter([$cat, $xat, $courses, $interviews, $pdfs], static function (?array $item) {
             return $item !== null && filled($item['url']);
         }));
 

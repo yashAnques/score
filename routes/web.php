@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminOverviewController;
 use App\Http\Controllers\CatScoreCalculatorController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseOrderController;
+use App\Http\Controllers\InterviewController;
 use App\Http\Controllers\PhoneNumberController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\XatScoreCalculatorController;
@@ -76,6 +77,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/phone', [PhoneNumberController::class, 'store'])->name('profile.phone.store');
     Route::post('/profile/phone/send-otp', [PhoneNumberController::class, 'sendOtp'])->name('profile.phone.send-otp');
     Route::post('/profile/phone/verify-otp', [PhoneNumberController::class, 'verifyOtp'])->name('profile.phone.verify-otp');
+
+    Route::get('/interviews', [InterviewController::class, 'index'])->name('interviews.index');
+    Route::get('/interviews/credits', [\App\Http\Controllers\InterviewCreditController::class, 'index'])->name('interviews.credits.index');
+    Route::get('/interviews/slots', [\App\Http\Controllers\InterviewSlotController::class, 'index'])->name('interviews.slots.index');
+    Route::get('/interviews/sessions', [\App\Http\Controllers\InterviewSessionController::class, 'index'])->name('interviews.sessions.index');
+    Route::post('/interviews/sessions', [\App\Http\Controllers\InterviewSessionController::class, 'store'])->name('interviews.sessions.store');
+    Route::post('/interviews/sessions/{session}/start', [\App\Http\Controllers\InterviewSessionController::class, 'start'])->name('interviews.sessions.start');
+    Route::post('/interviews/sessions/{session}/questions/next', [\App\Http\Controllers\InterviewSessionController::class, 'nextQuestion'])->name('interviews.sessions.questions.next');
+    Route::post('/interviews/sessions/{session}/questions/{question}/answer', [\App\Http\Controllers\InterviewSessionController::class, 'submitAnswer'])->name('interviews.sessions.questions.answer');
+    Route::post('/interviews/sessions/{session}/complete', [\App\Http\Controllers\InterviewSessionController::class, 'complete'])->name('interviews.sessions.complete');
+    Route::post('/interviews/sessions/{session}/cancel', [\App\Http\Controllers\InterviewSessionController::class, 'cancel'])->name('interviews.sessions.cancel');
+    Route::post('/interviews/sessions/{session}/recordings/chunks', [\App\Http\Controllers\InterviewRecordingController::class, 'store'])->name('interviews.sessions.recordings.store');
 
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

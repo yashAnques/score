@@ -32,6 +32,12 @@ class SettingSeeder extends Seeder
                 'url' => '/courses',
             ],
             [
+                'key' => 'interviews_nav_link',
+                'label' => 'AI Interviews',
+                'text' => 'Interviews',
+                'url' => '/interviews',
+            ],
+            [
                 'key' => 'pdfs_nav_link',
                 'label' => 'PDFs',
                 'text' => 'PDFs',

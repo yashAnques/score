@@ -14,6 +14,7 @@ return [
     */
 
     'default' => env('FILESYSTEM_DISK', 'local'),
+    'interview_disk' => env('INTERVIEW_STORAGE_DISK', env('FILESYSTEM_DISK', 'local')),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -56,6 +57,19 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'spaces' => [
+            'driver' => 's3',
+            'key' => env('DIGITALOCEAN_SPACES_KEY'),
+            'secret' => env('DIGITALOCEAN_SPACES_SECRET'),
+            'region' => env('DIGITALOCEAN_SPACES_REGION', 'sgp1'),
+            'bucket' => env('DIGITALOCEAN_SPACES_BUCKET'),
+            'endpoint' => env('DIGITALOCEAN_SPACES_ENDPOINT'),
+            'url' => env('DIGITALOCEAN_SPACES_URL'),
+            'use_path_style_endpoint' => env('DIGITALOCEAN_SPACES_PATH_STYLE', false),
             'throw' => false,
             'report' => false,
         ],

@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             ContentSeeder::class,
             CourseSeeder::class,
             PdfSeeder::class,
+            InterviewSetupSeeder::class,
         ]);
     }
 }

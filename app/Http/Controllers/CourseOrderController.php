@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\CoursePurchase;
 use App\Models\Order;
 use App\Models\User;
+use App\Services\InterviewCreditService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -187,6 +188,19 @@ class CourseOrderController extends Controller
                     'access_starts_at' => Carbon::now(),
                 ],
             );
+
+            if ($order->course && $order->course->interview_credits > 0 && $order->user) {
+                app(InterviewCreditService::class)->creditCoursePurchase(
+                    $order->user,
+                    $order->course,
+                    null,
+                    [
+                        'order_id' => $order->id,
+                        'order_uuid' => $order->uuid,
+                        'purchase_id' => $purchase->id,
+                    ]
+                );
+            }
 
             Mail::to($order->customer_email)->send(new CoursePurchasedMail($order, $purchase));
         }

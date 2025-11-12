@@ -28,6 +28,7 @@ import {
     LayoutDashboard,
     PanelLeftClose,
     PanelLeftOpen,
+    Video,
 } from 'lucide-react';
 import { ScrollProgressBar } from '@/components/scroll-progress-bar';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
@@ -74,6 +75,10 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
 
         if (normalized.includes('course')) {
             return GraduationCap;
+        }
+
+        if (normalized.includes('interview')) {
+            return Video;
         }
 
         if (normalized.includes('pdf')) {
