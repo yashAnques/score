@@ -188,6 +188,97 @@ class InterviewRecordingService
 
         $session->forceFill([
             'recording_manifest_path' => $finalPath,
+            'meta' => array_merge($session->meta ?? [], [
+                'recording_disk' => $disk,
+            ]),
+        ])->save();
+
+        return $finalPath;
+    }
+
+    public function processFullRecording(
+        InterviewSession $session,
+        string $disk,
+        string $sourcePath,
+        int $durationSeconds
+    ): string {
+        $tempDir = storage_path('app/interview-recordings/'.$session->uuid.'/'.Str::uuid());
+        File::makeDirectory($tempDir, 0755, true, true);
+
+        $extension = pathinfo($sourcePath, PATHINFO_EXTENSION) ?: 'webm';
+        $localSource = $tempDir.'/source.'.($extension ?: 'webm');
+        $stream = Storage::disk($disk)->readStream($sourcePath);
+        if ($stream === false) {
+            File::deleteDirectory($tempDir);
+            throw new RuntimeException('Unable to read uploaded recording.');
+        }
+
+        $localHandle = fopen($localSource, 'w+b');
+        if ($localHandle === false) {
+            File::deleteDirectory($tempDir);
+            throw new RuntimeException('Unable to persist uploaded recording.');
+        }
+
+        stream_copy_to_stream($stream, $localHandle);
+        fclose($stream);
+        fclose($localHandle);
+
+        $outputPath = $tempDir.'/recording.mp4';
+        $process = new Process([
+            'ffmpeg',
+            '-y',
+            '-i',
+            $localSource,
+            '-c:v',
+            'libx264',
+            '-preset',
+            'veryfast',
+            '-c:a',
+            'aac',
+            '-movflags',
+            '+faststart',
+            $outputPath,
+        ]);
+        $process->setTimeout(null);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            File::deleteDirectory($tempDir);
+            throw new RuntimeException('Unable to process recording: '.$process->getErrorOutput());
+        }
+
+        $finalPath = sprintf(
+            'interviews/%s/%s/full/recording-%s.mp4',
+            $session->user_id,
+            $session->uuid,
+            now()->format('YmdHis'),
+        );
+
+        $outputStream = fopen($outputPath, 'rb');
+        if ($outputStream === false) {
+            File::deleteDirectory($tempDir);
+            throw new RuntimeException('Unable to read processed recording.');
+        }
+
+        $written = Storage::disk($disk)->writeStream($finalPath, $outputStream, [
+            'visibility' => 'private',
+            'MetadataDirective' => 'REPLACE',
+        ]);
+        fclose($outputStream);
+
+        Storage::disk($disk)->delete($sourcePath);
+        File::deleteDirectory($tempDir);
+
+        if ($written === false) {
+            throw new RuntimeException('Unable to store processed recording.');
+        }
+
+        $session->forceFill([
+            'recording_manifest_path' => $finalPath,
+            'meta' => array_merge($session->meta ?? [], [
+                'recording_duration_seconds' => $durationSeconds,
+                'recording_disk' => $disk,
+            ]),
         ])->save();
 
         return $finalPath;

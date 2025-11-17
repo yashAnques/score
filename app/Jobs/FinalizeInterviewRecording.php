@@ -24,11 +24,11 @@ class FinalizeInterviewRecording implements ShouldQueue
 
     public function handle(InterviewRecordingService $recordingService): void
     {
-        $session = InterviewSession::query()->find($this->sessionId);
-        if (!$session) {
-            return;
-        }
+        // $session = InterviewSession::query()->find($this->sessionId);
+        // if (!$session) {
+        //     return;
+        // }
 
-        $recordingService->finalizeRecording($session);
+        // $recordingService->finalizeRecording($session);
     }
 }

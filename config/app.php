@@ -97,6 +97,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'bschool_url' => env('VITE_BSCHOOL_BASE_URL', 'https://bschoolbuzz.in'),
+
     'key' => env('APP_KEY'),
 
     'previous_keys' => [

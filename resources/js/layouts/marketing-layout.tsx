@@ -13,6 +13,7 @@ import { edit as appearanceEdit } from '@/routes/appearance';
 import { edit as passwordEdit } from '@/routes/password';
 import { MarketingLinksPayload, SharedData } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
+import { BSCHOOL_BASE_URL, buildBschoolUrl } from '@/lib/bschool';
 import clsx from 'clsx';
 import {
     Menu,
@@ -146,9 +147,13 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         onClick?: () => void,
         variant: 'horizontal' | 'vertical' | 'vertical-collapsed' = 'horizontal',
     ) => {
-        const normalizedHref = item.href.replace(/[#?].*$/, '');
+        const needsLogin = !isAuthenticated && (item.href.toLowerCase().includes('interview'));
+        const computedHref = needsLogin
+            ? buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.origin)}/interviews`)
+            : item.href;
+        const normalizedHref = computedHref.replace(/[#?].*$/, '');
         const isActive =
-            !item.external &&
+            !item.external && !needsLogin &&
             (normalizedHref === '/'
                 ? normalizedUrl === '/'
                 : normalizedUrl === normalizedHref || normalizedUrl.startsWith(`${normalizedHref}/`));
@@ -185,11 +190,13 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         const labelMarkup =
             variant === 'vertical-collapsed' ? <span className="sr-only">{item.label}</span> : <span>{item.label}</span>;
 
-        if (item.external || item.href.startsWith('http')) {
+        const isExternal = needsLogin || item.external || computedHref.startsWith('http');
+
+        if (isExternal) {
             return (
                 <a
                     key={item.label}
-                    href={item.href}
+                    href={computedHref}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={linkClasses}
@@ -205,7 +212,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         return (
             <Link
                 key={item.label}
-                href={item.href}
+                href={computedHref}
                 className={linkClasses}
                 onClick={onClick}
                 aria-label={variant === 'vertical-collapsed' ? item.label : undefined}
@@ -243,7 +250,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             )}
                         >
                             <a
-                                href="https://bschoolbuzz.in/"
+                                href={buildBschoolUrl("/")}
                                 className={clsx(
                                     'inline-flex items-center justify-center rounded-lg border border-border/60 p-2 text-muted-foreground transition hover:border-primary hover:text-primary',
                                     sidebarCollapsed ? 'h-10 w-10' : 'hidden sm:flex',
@@ -253,7 +260,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                 <MoveLeft className="h-4 w-4" />
                             </a>
                             <a
-                                href="https://bschoolbuzz.in/"
+                                href={buildBschoolUrl("/")}
                                 className={clsx(
                                     'flex items-center gap-3 text-lg font-semibold text-primary transition hover:text-primary/80',
                                     sidebarCollapsed && 'flex-col gap-2 text-xs',
@@ -343,10 +350,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                 ) : null}
                                 <div className={clsx('flex flex-col gap-2', sidebarCollapsed && 'w-full items-center')}>
                                     <a
-                                        href={
-                                            'https://bschoolbuzz.in/login?redirect_to=' +
-                                            encodeURIComponent(window.location.href)
-                                        }
+                                        href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                         className={clsx(
                                             'inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10',
                                             sidebarCollapsed && 'w-full px-2 py-2 text-xs',
@@ -356,10 +360,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                         {!sidebarCollapsed ? 'Login' : null}
                                     </a>
                                     <a
-                                        href={
-                                            'https://bschoolbuzz.in/signup?redirect_to=' +
-                                            encodeURIComponent(window.location.href)
-                                        }
+                                        href={buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                         className={clsx(
                                             'inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90',
                                             sidebarCollapsed && 'w-full px-2 py-2 text-xs',
@@ -390,7 +391,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             </Link>
                             {isAuthenticated && user ? (
                                 <Link
-                                    href="http://bschoolbuzz.in/profile"
+                                    href={buildBschoolUrl("/profile")}
                                     className="flex h-10 w-10 items-center justify-center rounded-full border border-border/60"
                                     aria-label="View profile"
                                 >
@@ -403,7 +404,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                 </Link>
                             ) : (
                                 <a
-                                    href={'https://bschoolbuzz.in/login?redirect_to=' + encodeURIComponent(window.location.href)}
+                                    href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                     className="text-sm font-semibold text-primary transition hover:text-primary/80"
                                 >
                                     Login
@@ -461,19 +462,13 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     ) : (
                                         <div className="flex flex-col gap-2">
                                             <a
-                                                href={
-                                                    'https://bschoolbuzz.in/login?redirect_to=' +
-                                                    encodeURIComponent(window.location.href)
-                                                }
+                                                href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                                 className="inline-flex items-center justify-center rounded-lg border border-primary/40 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10"
                                             >
                                                 Login
                                             </a>
                                             <a
-                                                href={
-                                                    'https://bschoolbuzz.in/signup?redirect_to=' +
-                                                    encodeURIComponent(window.location.href)
-                                                }
+                                                href={buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                                 className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90"
                                             >
                                                 Sign Up
@@ -498,10 +493,10 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
             <header className="sticky top-0 z-40 bg-background shadow-sm shadow-border/40">
                 <div className="flex h-20 w-full items-center justify-between px-0 sm:px-6 lg:px-8">
                     <div className="flex items-center gap-2 cursor-pointer">
-                        <a href="https://bschoolbuzz.in/" className="hidden sm:block">
+                        <a href={buildBschoolUrl("/")} className="hidden sm:block">
                             <MoveLeft />
                         </a>
-                        <a href="https://bschoolbuzz.in/" className="flex items-center gap-2">
+                        <a href={buildBschoolUrl("/")} className="flex items-center gap-2">
                             <AppLogo />
                         </a>
                     </div>
@@ -518,7 +513,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                         {isAuthenticated && user ? (
                             <DropdownMenu>
                                 {/* <DropdownMenuTrigger asChild> */}
-                                <a href="http://bschoolbuzz.in/profile">
+                                <a href={buildBschoolUrl("/profile")}>
                                     <button
                                         type="button"
                                         className="flex items-center gap-2 rounded-full text-sm font-semibold text-white transition hover:bg-transparent focus:outline-none transform-gpu duration-150 ease-out active:scale-95 hover:scale-[1.05] cursor-pointer"
@@ -543,7 +538,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                         ) : (
                             <div className="flex items-center gap-6">
                                 <a
-                                    href={"https://bschoolbuzz.in/login?redirect_to=" + encodeURIComponent(window.location.href)}
+                                    href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                     className="inline-flex items-center gap-2 text-sm font-semibold text-[#14224f] transition-colors hover:text-[#0d1740] dark:text-white dark:hover:text-yellow-300"
                                 >
                                     <svg
@@ -563,7 +558,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     Login
                                 </a>
                                 <a
-                                    href={"https://bschoolbuzz.in/signup?redirect_to=" + encodeURIComponent(window.location.href)}
+                                    href={buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                     className="inline-flex items-center gap-2 text-sm font-semibold text-[#14224f] transition-colors hover:text-[#0d1740] dark:text-white dark:hover:text-yellow-300"
                                 >
                                     <svg
@@ -624,7 +619,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             <div className="space-y-3">
                                 {isAuthenticated && user ? (
                                     <div className="space-y-3 rounded-xl border border-border/60 bg-background/80 p-3">
-                                        <a href="http://bschoolbuzz.in/">
+                                        <a href={buildBschoolUrl("/")}>
                                             <div className="flex items-center gap-3 mb-0">
                                                 <Avatar className="h-10 w-10">
                                                     <AvatarImage src={user.avatar} alt={user.name} />
@@ -670,7 +665,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                 ) : (
                                     <div className="flex flex-col gap-2">
                                         <a
-                                            href={"https://bschoolbuzz.in/login?redirect_to=" + encodeURIComponent(window.location.href)}
+                                            href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
                                             className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#14224f]/20 px-4 py-2 text-sm font-semibold text-[#14224f] transition-colors hover:border-[#0d1740]/40 hover:text-[#0d1740]"
                                             onClick={() => setMobileNavOpen(false)}
                                         >
@@ -678,8 +673,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                             Login
                                         </a>
                                         <a
-                                            href={"https://bschoolbuzz.in/signup?redirect_to=" + encodeURIComponent(window.location.href)}
-                                            className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#14224f]/20 px-4 py-2 text-sm font-semibold text-[#14224f] transition-colors hover:border-[#0d1740]/40 hover:text-[#0d1740]"
+                                            href={buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(window.location.href)}`)}
+                                            className="inline-flex w/full items-center justify-center gap-2 rounded-full border border-[#14224f]/20 px-4 py-2 text-sm font-semibold text-[#14224f] transition-colors hover:border-[#0d1740]/40 hover:text-[#0d1740]"
                                             onClick={() => setMobileNavOpen(false)}
                                         >
                                             <UserPlus className="h-4 w-4" />
@@ -706,7 +701,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             <span className="text-yellow-400">Buzz</span>
                         </h2>
 
-                        <form className="mt-6" action="https://bschoolbuzz.in/newsletter" method="post">
+                        <form className="mt-6" action={buildBschoolUrl("/newsletter")} method="post">
                             <input type="hidden" name="_token" value="" autoComplete="off" />
                         </form>
                     </div>
@@ -770,7 +765,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     <li>
                                         <a
                                             className="text-white transition hover:text-yellow-400"
-                                            href="https://bschoolbuzz.in"
+                                            href={buildBschoolUrl('/')}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -780,7 +775,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     <li>
                                         <a
                                             className="text-white transition hover:text-yellow-400"
-                                            href="https://bschoolbuzz.in/blogs"
+                                            href={buildBschoolUrl('/blogs')}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -790,7 +785,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     <li>
                                         <a
                                             className="text-white transition hover:text-yellow-400"
-                                            href="https://bschoolbuzz.in/about-us"
+                                            href={buildBschoolUrl('/about-us')}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -800,7 +795,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     <li>
                                         <a
                                             className="text-white transition hover:text-yellow-400"
-                                            href="https://bschoolbuzz.in/contact-us"
+                                            href={buildBschoolUrl('/contact-us')}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >
@@ -810,7 +805,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                     <li>
                                         <a
                                             className="text-white transition hover:text-yellow-400"
-                                            href="https://bschoolbuzz.in/terms-and-conditions"
+                                            href={buildBschoolUrl('/terms-and-conditions')}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                         >

@@ -25,7 +25,7 @@ class GenerateInterviewFeedback implements ShouldQueue
     public function handle(InterviewFeedbackService $service): void
     {
         $session = InterviewSession::query()
-            ->with(['questions' => fn ($query) => $query->orderBy('sequence')])
+            ->with(['questions' => fn($query) => $query->orderBy('sequence')])
             ->find($this->sessionId);
 
         if (!$session || $session->status !== 'completed') {

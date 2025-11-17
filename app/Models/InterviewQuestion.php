@@ -15,6 +15,7 @@ class InterviewQuestion extends Model
         'sequence',
         'question',
         'answer_notes',
+        'answer_transcript',
         'answer_recording_path',
         'answer_duration_seconds',
         'asked_at',

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import MarketingLayout from '@/layouts/marketing-layout';
 import { Head, Link, usePage } from '@inertiajs/react';
+import { buildBschoolUrl } from '@/lib/bschool';
 import {
     AlertCircle,
     BarChart3,
@@ -255,7 +256,9 @@ export default function CatScoreCalculator({
 
         if (!isLoggedIn) {
             if (typeof window !== 'undefined') {
-                window.location.assign('https://bschoolbuzz.in/login?redirect_to=' + encodeURIComponent(window.location.href));
+                window.location.assign(
+                    buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`),
+                );
             }
             return;
         }

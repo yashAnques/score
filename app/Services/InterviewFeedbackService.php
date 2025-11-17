@@ -6,7 +6,9 @@ use App\Models\InterviewQuestion;
 use App\Models\InterviewSession;
 use App\Services\Ai\AiProviderResolver;
 use App\Services\InterviewSettingService;
+use Illuminate\Container\Attributes\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Str;
 
 class InterviewFeedbackService
@@ -47,7 +49,7 @@ TEXT;
         if (!$prompt) {
             return $baseSummary;
         }
-
+        FacadesLog::info('Generating interview feedback for session ID '.$session->id);
         $compiledPrompt = Str::of($prompt)
             ->replace('{{role}}', $session->candidate_role ?? 'MBA aspirant')
             ->replace('{{qa_pairs}}', $questionSnippets ?: 'No answers were recorded.')

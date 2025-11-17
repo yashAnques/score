@@ -22,6 +22,7 @@ class SubmitInterviewAnswerRequest extends FormRequest
 
         return [
             'answer_notes' => ['nullable', 'string', 'max:2000'],
+            'answer_transcript' => ['nullable', 'string'],
             'answer_duration_seconds' => ['required', 'integer', 'min:'.$minSeconds],
             'answer_recording_path' => ['nullable', 'string', 'max:2048'],
         ];

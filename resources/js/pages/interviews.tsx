@@ -29,21 +29,13 @@ import {
     Calendar,
     UserRoundPen,
     FileText,
+    DownloadIcon,
 } from 'lucide-react';
 
-const FULL_RECORDING_TIMESLICE_MS = 2000;
-const CHUNK_UPLOAD_MAX_ATTEMPTS = 5;
-const CHUNK_UPLOAD_BASE_DELAY_MS = 1000;
-
-type BackgroundChunk = {
-    sessionId: number;
+type BackgroundRecordingResult = {
     blob: Blob;
-    index: number;
     durationSeconds: number;
-    isLast: boolean;
 };
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 type CourseOption = {
     id: number;
@@ -123,6 +115,8 @@ type InterviewSessionPreview = {
     cancelledAt: string | null;
     feedbackSummary: string | null;
     feedbackGeneratedAt?: string | null;
+    recordingPath?: string | null;
+    recordingUrl?: string | null;
 };
 
 type ToastVariant = 'success' | 'error';
@@ -154,6 +148,7 @@ type InterviewQuestionPayload = {
     sequence: number;
     question: string;
     answerNotes: string | null;
+    answerTranscript?: string | null;
     answerRecordingPath: string | null;
     answerDurationSeconds: number;
     askedAt: string | null;
@@ -204,6 +199,12 @@ const interviewFlow = [
         description: 'We stitch recordings + AI feedback for on-demand review.',
         icon: CheckCircle2,
     },
+] as const;
+
+const heroStats = [
+    { label: 'Mock sessions delivered', value: '2,450+', icon: Video },
+    { label: 'Avg. satisfaction score', value: '4.9/5', icon: ShieldCheck },
+    { label: 'AI feedback ready in', value: '< 3 mins', icon: Zap },
 ] as const;
 
 const statusStyles: Record<
@@ -305,12 +306,11 @@ export default function InterviewsPage({
     const recordingChunksRef = useRef<Blob[]>([]);
     const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
     const backgroundRecorderRef = useRef<MediaRecorder | null>(null);
-    const backgroundChunkIndexRef = useRef(0);
-    const backgroundChunkQueueRef = useRef<BackgroundChunk[]>([]);
-    const backgroundChunkUploadingRef = useRef(false);
     const backgroundRecordingSessionIdRef = useRef<number | null>(null);
-    const backgroundShouldMarkLastRef = useRef(false);
-    const backgroundLastChunkTimestampRef = useRef<number | null>(null);
+    const backgroundRecordingChunksRef = useRef<Blob[]>([]);
+    const backgroundRecordingPromiseRef = useRef<Promise<BackgroundRecordingResult | null> | null>(null);
+    const backgroundRecordingResolverRef = useRef<((result: BackgroundRecordingResult | null) => void) | null>(null);
+    const backgroundRecordingStartTimeRef = useRef<number | null>(null);
 
     const totalCredits = useMemo(
         () => credits.balances.reduce((sum, item) => sum + (item.balance ?? 0), 0),
@@ -397,115 +397,6 @@ export default function InterviewsPage({
         }
     }, [permissionState]);
 
-    const uploadRecordingChunkToServer = useCallback(async (chunk: BackgroundChunk) => {
-        const formData = new FormData();
-        formData.append('file', chunk.blob, `session-chunk-${chunk.index}.webm`);
-        formData.append('chunk_index', String(chunk.index));
-        formData.append('duration_seconds', String(Math.max(1, chunk.durationSeconds)));
-        if (chunk.isLast) {
-            formData.append('total_chunks', String(chunk.index + 1));
-            formData.append('is_last_chunk', '1');
-        } else {
-            formData.append('is_last_chunk', '0');
-        }
-
-        const response = await fetch(sessionEndpoint.uploadRecording(chunk.sessionId), {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': getCsrfToken(),
-            },
-            body: formData,
-        });
-
-        const payload = (await response.json().catch(() => ({}))) as { message?: string };
-        if (!response.ok) {
-            throw new Error(
-                payload && typeof payload === 'object' && payload.message
-                    ? payload.message
-                    : 'Unable to upload recording chunk.',
-            );
-        }
-    }, []);
-
-    const uploadChunkWithRetry = useCallback(
-        async (chunk: BackgroundChunk) => {
-            let attempt = 0;
-            let delay = CHUNK_UPLOAD_BASE_DELAY_MS;
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                try {
-                    await uploadRecordingChunkToServer(chunk);
-                    return;
-                } catch (error) {
-                    attempt += 1;
-                    if (attempt >= CHUNK_UPLOAD_MAX_ATTEMPTS) {
-                        throw error instanceof Error ? error : new Error('Unable to upload recording chunk.');
-                    }
-                    await sleep(delay);
-                    delay *= 2;
-                }
-            }
-        },
-        [uploadRecordingChunkToServer],
-    );
-
-    const flushBackgroundChunkQueue = useCallback(async () => {
-        if (backgroundChunkUploadingRef.current) {
-            return;
-        }
-        backgroundChunkUploadingRef.current = true;
-        try {
-            // eslint-disable-next-line no-constant-condition
-            while (true) {
-                const queue = backgroundChunkQueueRef.current;
-                if (!queue.length) {
-                    break;
-                }
-                const chunk = queue[0];
-                try {
-                    await uploadChunkWithRetry(chunk);
-                    queue.shift();
-                } catch (error) {
-                    showToast({
-                        title: 'Recording upload interrupted',
-                        description:
-                            error instanceof Error ? error.message : 'Unable to upload a video chunk. Will retry shortly.',
-                        variant: 'error',
-                    });
-                    setTimeout(() => {
-                        flushBackgroundChunkQueue().catch(() => {
-                            // already surfaced error
-                        });
-                    }, CHUNK_UPLOAD_BASE_DELAY_MS * 2);
-                    return;
-                }
-            }
-        } finally {
-            backgroundChunkUploadingRef.current = false;
-        }
-    }, [showToast, uploadChunkWithRetry]);
-
-    const enqueueBackgroundChunk = useCallback(
-        (chunk: BackgroundChunk) => {
-            backgroundChunkQueueRef.current.push(chunk);
-            flushBackgroundChunkQueue().catch(() => {
-                // errors handled inside flush
-            });
-        },
-        [flushBackgroundChunkQueue],
-    );
-
-    const waitForBackgroundChunkQueue = useCallback(async () => {
-        while (
-            backgroundChunkQueueRef.current.length > 0 ||
-            backgroundChunkUploadingRef.current
-        ) {
-            await sleep(300);
-        }
-    }, []);
-
     const startBackgroundRecording = useCallback(
         async (sessionId: number) => {
             if (backgroundRecordingSessionIdRef.current === sessionId && backgroundRecorderRef.current) {
@@ -529,74 +420,60 @@ export default function InterviewsPage({
                 recorder = new MediaRecorder(mediaStreamRef.current);
             }
 
-            backgroundRecorderRef.current = recorder;
             backgroundRecordingSessionIdRef.current = sessionId;
-            backgroundChunkIndexRef.current = 0;
-            backgroundLastChunkTimestampRef.current = performance.now();
-            backgroundShouldMarkLastRef.current = false;
+            backgroundRecorderRef.current = recorder;
+            backgroundRecordingChunksRef.current = [];
+            backgroundRecordingStartTimeRef.current = performance.now();
+            backgroundRecordingPromiseRef.current = new Promise<BackgroundRecordingResult | null>((resolve) => {
+                backgroundRecordingResolverRef.current = resolve;
+            });
 
             recorder.addEventListener('dataavailable', (event) => {
                 if (!event.data?.size || backgroundRecordingSessionIdRef.current === null) {
                     return;
                 }
 
-                const now = performance.now();
-                const lastTimestamp = backgroundLastChunkTimestampRef.current ?? now;
-                const durationSeconds = Math.max(1, Math.round((now - lastTimestamp) / 1000));
-                backgroundLastChunkTimestampRef.current = now;
-
-                const isLastChunk = backgroundShouldMarkLastRef.current && recorder.state === 'inactive';
-                if (isLastChunk) {
-                    backgroundShouldMarkLastRef.current = false;
-                }
-
-                enqueueBackgroundChunk({
-                    sessionId: backgroundRecordingSessionIdRef.current,
-                    blob: event.data,
-                    index: backgroundChunkIndexRef.current,
-                    durationSeconds,
-                    isLast: isLastChunk,
-                });
-
-                backgroundChunkIndexRef.current += 1;
+                backgroundRecordingChunksRef.current.push(event.data);
             });
 
-            recorder.start(FULL_RECORDING_TIMESLICE_MS);
-        },
-        [enqueueBackgroundChunk, ensureMediaPermissions],
-    );
+            recorder.addEventListener('stop', () => {
+                const durationSeconds = backgroundRecordingStartTimeRef.current
+                    ? Math.max(1, Math.round((performance.now() - backgroundRecordingStartTimeRef.current) / 1000))
+                    : 1;
+                const blob = backgroundRecordingChunksRef.current.length
+                    ? new Blob(backgroundRecordingChunksRef.current, { type: recorder.mimeType })
+                    : null;
 
-    const stopBackgroundRecording = useCallback(
-        async () => {
-            if (!backgroundRecorderRef.current) {
+                backgroundRecordingChunksRef.current = [];
+                backgroundRecordingStartTimeRef.current = null;
+                backgroundRecorderRef.current = null;
                 backgroundRecordingSessionIdRef.current = null;
-                await waitForBackgroundChunkQueue();
-                return;
-            }
 
-            backgroundShouldMarkLastRef.current = true;
-
-            await new Promise<void>((resolve) => {
-                const recorder = backgroundRecorderRef.current;
-                if (!recorder) {
-                    resolve();
-                    return;
+                if (backgroundRecordingResolverRef.current) {
+                    backgroundRecordingResolverRef.current(blob ? { blob, durationSeconds } : null);
+                    backgroundRecordingResolverRef.current = null;
                 }
-                const handleStop = () => {
-                    recorder.removeEventListener('stop', handleStop);
-                    resolve();
-                };
-                recorder.addEventListener('stop', handleStop);
-                recorder.stop();
             });
 
-            backgroundRecorderRef.current = null;
-            backgroundRecordingSessionIdRef.current = null;
-            backgroundLastChunkTimestampRef.current = null;
-            await waitForBackgroundChunkQueue();
+            recorder.start();
         },
-        [waitForBackgroundChunkQueue],
+        [ensureMediaPermissions],
     );
+
+    const stopBackgroundRecording = useCallback(async (): Promise<BackgroundRecordingResult | null> => {
+        if (!backgroundRecorderRef.current) {
+            const pending = backgroundRecordingPromiseRef.current;
+            backgroundRecordingPromiseRef.current = null;
+            return pending ? pending : null;
+        }
+
+        const pending = backgroundRecordingPromiseRef.current;
+        backgroundRecorderRef.current.stop();
+
+        const result = pending ? await pending : null;
+        backgroundRecordingPromiseRef.current = null;
+        return result;
+    }, []);
 
     const requestJson = useCallback(async <T,>(url: string, init?: RequestInit): Promise<T> => {
         const response = await fetch(url, {
@@ -794,46 +671,6 @@ export default function InterviewsPage({
         [postJson, speakQuestion, trackSessionLocally],
     );
 
-    const handleSubmitAnswer = useCallback(
-        async (durationSeconds: number, recordingPath?: string | null) => {
-            if (!roomSession || !roomQuestion) {
-                return;
-            }
-
-            if (durationSeconds < settings.minRecordingSeconds) {
-                setRoomError(`Record at least ${settings.minRecordingSeconds} seconds before saving your answer.`);
-                return;
-            }
-
-            try {
-                const shouldAutoAdvance = roomSession.questionsAsked < roomSession.questionLimit;
-                const sessionId = roomSession.id;
-                const payload = {
-                    answer_notes: answerNotes.trim() || null,
-                    answer_duration_seconds: durationSeconds,
-                    answer_recording_path: recordingPath ?? null,
-                };
-                const data = await postJson<{ question: InterviewQuestionPayload }>(
-                    sessionEndpoint.submitAnswer(roomSession.id, roomQuestion.id),
-                    payload,
-                );
-
-                setRoomQuestion(data.question);
-                setAnswerNotes('');
-                const refreshed = await refreshSessions();
-                setRoomSession((prev) =>
-                    prev ? refreshed.sessions.find((session) => session.id === prev.id) ?? prev : prev,
-                );
-                if (shouldAutoAdvance) {
-                    await requestNextQuestion(sessionId);
-                }
-            } catch (error) {
-                setRoomError(error instanceof Error ? error.message : 'Unable to save your answer.');
-            }
-        },
-        [answerNotes, postJson, refreshSessions, requestNextQuestion, roomQuestion, roomSession, settings.minRecordingSeconds],
-    );
-
     const uploadRecordingBlob = useCallback(
         async (
             sessionId: number,
@@ -884,6 +721,103 @@ export default function InterviewsPage({
             return lastPath;
         },
         [],
+    );
+
+    const uploadFullSessionRecording = useCallback(
+        async (sessionId: number, recording: BackgroundRecordingResult | null) => {
+            if (!recording) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', recording.blob, `session-${sessionId}.webm`);
+            formData.append('duration_seconds', String(Math.max(1, recording.durationSeconds)));
+            formData.append('full_recording', '1');
+
+            const response = await fetch(sessionEndpoint.uploadRecording(sessionId), {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': getCsrfToken(),
+                },
+                body: formData,
+            });
+
+            const payload = (await response.json().catch(() => ({}))) as { message?: string };
+            if (!response.ok) {
+                throw new Error(
+                    payload && typeof payload === 'object' && payload.message
+                        ? payload.message
+                        : 'Unable to upload interview recording.',
+                );
+            }
+        },
+        [],
+    );
+
+    const handleCompleteSession = useCallback(async () => {
+        if (!roomSession) {
+            return;
+        }
+
+        setFeedbackGenerating(true);
+        try {
+            const recording = await stopBackgroundRecording();
+            await uploadFullSessionRecording(roomSession.id, recording);
+            const data = await postJson<{ session: InterviewSessionPreview }>(sessionEndpoint.complete(roomSession.id));
+            trackSessionLocally(data.session);
+            await refreshSessions();
+            setTimeout(() => {
+                setFeedbackGenerating(false);
+                closeRoom();
+            }, 1500);
+        } catch (error) {
+            setFeedbackGenerating(false);
+            setRoomError(error instanceof Error ? error.message : 'Unable to complete interview right now.');
+        }
+    }, [closeRoom, postJson, refreshSessions, roomSession, stopBackgroundRecording, trackSessionLocally, uploadFullSessionRecording]);
+
+    const handleSubmitAnswer = useCallback(
+        async (durationSeconds: number, recordingPath?: string | null) => {
+            if (!roomSession || !roomQuestion) {
+                return;
+            }
+
+            if (durationSeconds < settings.minRecordingSeconds) {
+                setRoomError(`Record at least ${settings.minRecordingSeconds} seconds before saving your answer.`);
+                return;
+            }
+
+            try {
+                const shouldAutoAdvance = roomSession.questionsAsked < roomSession.questionLimit;
+                const sessionId = roomSession.id;
+                const payload = {
+                    answer_notes: answerNotes.trim() || null,
+                    answer_duration_seconds: durationSeconds,
+                    answer_recording_path: recordingPath ?? null,
+                };
+                const data = await postJson<{ question: InterviewQuestionPayload }>(
+                    sessionEndpoint.submitAnswer(roomSession.id, roomQuestion.id),
+                    payload,
+                );
+
+                setRoomQuestion(data.question);
+                setAnswerNotes('');
+                const refreshed = await refreshSessions();
+                const updatedSession = refreshed.sessions.find((session) => session.id === sessionId);
+                setRoomSession((prev) => (prev && updatedSession ? updatedSession : prev));
+
+                if (shouldAutoAdvance) {
+                    await requestNextQuestion(sessionId);
+                } else if (updatedSession && updatedSession.questionsAsked >= updatedSession.questionLimit) {
+                    await handleCompleteSession();
+                }
+            } catch (error) {
+                setRoomError(error instanceof Error ? error.message : 'Unable to save your answer.');
+            }
+        },
+        [answerNotes, handleCompleteSession, postJson, refreshSessions, requestNextQuestion, roomQuestion, roomSession, settings.minRecordingSeconds],
     );
 
     const handleRecordToggle = useCallback(async () => {
@@ -986,38 +920,21 @@ export default function InterviewsPage({
         await requestNextQuestion(roomSession.id);
     }, [requestNextQuestion, roomSession]);
 
-    const handleCompleteSession = useCallback(async () => {
-        if (!roomSession) {
-            return;
-        }
-
-        setFeedbackGenerating(true);
-        try {
-            await stopBackgroundRecording();
-            const data = await postJson<{ session: InterviewSessionPreview }>(sessionEndpoint.complete(roomSession.id));
-            trackSessionLocally(data.session);
-            await refreshSessions();
-            setTimeout(() => {
-                setFeedbackGenerating(false);
-                closeRoom();
-            }, 1500);
-        } catch (error) {
-            setFeedbackGenerating(false);
-            setRoomError(error instanceof Error ? error.message : 'Unable to complete interview right now.');
-        }
-    }, [closeRoom, postJson, refreshSessions, roomSession, stopBackgroundRecording, trackSessionLocally]);
-
     const handleCancelSession = useCallback(
         async (sessionId: number, reason = 'user_cancelled') => {
             try {
+                let recording: BackgroundRecordingResult | null = null;
                 if (roomSession?.id === sessionId) {
-                    await stopBackgroundRecording();
+                    recording = await stopBackgroundRecording();
                 }
                 const data = await postJson<{ session: InterviewSessionPreview }>(sessionEndpoint.cancel(sessionId), {
                     reason,
                 });
                 trackSessionLocally(data.session);
                 await refreshSessions();
+                if (recording) {
+                    await uploadFullSessionRecording(sessionId, recording);
+                }
                 if (roomSession?.id === sessionId) {
                     closeRoom();
                 }
@@ -1025,17 +942,16 @@ export default function InterviewsPage({
                 setRoomError(error instanceof Error ? error.message : 'Unable to cancel this interview.');
             }
         },
-        [closeRoom, postJson, refreshSessions, roomSession, stopBackgroundRecording, trackSessionLocally],
+        [closeRoom, postJson, refreshSessions, roomSession, stopBackgroundRecording, trackSessionLocally, uploadFullSessionRecording],
     );
 
 
     const handleCompleteFromList = useCallback(
         async (sessionId: number) => {
             try {
-                if (roomSession?.id === sessionId) {
-                    await stopBackgroundRecording();
-                }
+                const recording = roomSession?.id === sessionId ? await stopBackgroundRecording() : null;
                 const data = await postJson<{ session: InterviewSessionPreview }>(sessionEndpoint.complete(sessionId));
+                await uploadFullSessionRecording(sessionId, recording);
                 trackSessionLocally(data.session);
                 await refreshSessions();
             } catch (error) {
@@ -1046,7 +962,7 @@ export default function InterviewsPage({
                 });
             }
         },
-        [postJson, refreshSessions, roomSession, showToast, stopBackgroundRecording, trackSessionLocally],
+        [postJson, refreshSessions, roomSession, showToast, stopBackgroundRecording, trackSessionLocally, uploadFullSessionRecording],
     );
 
     useEffect(() => {
@@ -1324,7 +1240,10 @@ export default function InterviewsPage({
                 ))}
             </div>
             <section className="relative overflow-hidden border border-white/5 bg-[#050b22] p-6 text-white transition md:p-10">
-                <div className="mx-auto w-full max-w-6xl space-y-10 py-10 sm:px-6 lg:px-0">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(61,108,241,0.18),_transparent_65%)]" />
+                <div className="pointer-events-none absolute -top-32 -right-24 h-72 w-72 rounded-full bg-emerald-400/30 blur-3xl" />
+                <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-amber-400/25 blur-[120px]" />
+                <div className="relative mx-auto w-full max-w-6xl space-y-10 py-10 sm:px-6 lg:px-0">
                     <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="space-y-5 text-balance">
                             <Badge className="rounded-full border border-yellow-400/40 bg-gradient-to-r from-[#FFCC5F]/90 to-[#F6A602]/90 px-4 py-1 text-sm font-semibold text-slate-900 shadow-lg shadow-yellow-300/30">
@@ -1338,34 +1257,47 @@ export default function InterviewsPage({
                                 human-grade questions based on your role + SOP. Every recording and feedback loop lands
                                 in one place.
                             </p>
-                            {/* {upcomingSession ? (
-                                <div className="flex items-center gap-3 rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white shadow-xl shadow-black/20 backdrop-blur">
-                                    <CalendarClock className="h-5 w-5 text-yellow-300" />
-                                    <div>
+                            {upcomingSession ? (
+                                <div className="group flex items-center gap-4 rounded-3xl border border-white/10 bg-white/10 px-5 py-4 text-sm text-white shadow-2xl shadow-black/30 backdrop-blur transition hover:-translate-y-0.5 hover:border-white/40">
+                                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/25 text-emerald-100">
+                                        <CalendarClock className="h-5 w-5" />
+                                    </div>
+                                    <div className="flex-1 space-y-1">
                                         <p className="font-semibold">
                                             Next session · {formatDateTime(upcomingSession.slot?.startsAt)}
                                         </p>
-                                        <p className="text-xs text-slate-300">
-                                            Meet link + reminder will arrive {reminderPreview[0] ?? 15} min before start.
+                                        <p className="text-xs text-slate-200/80">
+                                            Meet link unlocks {reminderPreview[0] ?? 15} min before start · {upcomingSession.slot?.timezone ?? 'Local time'}
                                         </p>
                                     </div>
+                                    <Badge
+                                        variant="outline"
+                                        className="rounded-full border border-emerald-300/60 bg-emerald-400/20 text-xs font-semibold text-emerald-100"
+                                    >
+                                        {upcomingSession.status === 'ready' ? 'Ready to join' : 'Scheduled'}
+                                    </Badge>
                                 </div>
-                            ) : null} */}
-                            {/* <div className="flex flex-wrap gap-3 text-sm">
-                                <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-yellow-200 shadow-lg shadow-black/30 backdrop-blur">
-                                    <Sparkles className="mr-2 h-4 w-4 text-yellow-300" />
-                                    Question limit · {settings.questionLimit} per session
-                                </div>
-                                <div className="inline-flex items-center rounded-full border border-emerald-400/40 bg-emerald-400/10 px-4 py-1.5 text-emerald-100 shadow-lg shadow-black/20">
-                                    <ShieldCheck className="mr-2 h-4 w-4 text-emerald-200" />
-                                    Anti-cheat active
-                                </div>
-                            </div> */}
+                            ) : null}
+                            <div className="grid gap-3 pt-2 sm:grid-cols-3">
+                                {heroStats.map((stat) => {
+                                    const Icon = stat.icon;
+                                    return (
+                                        <div
+                                            key={stat.label}
+                                            className="group rounded-2xl border border-white/15 bg-white/10 p-4 shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:border-white/40 hover:bg-white/15"
+                                        >
+                                            <Icon className="mb-3 h-5 w-5 text-white/80 transition group-hover:text-white" />
+                                            <p className="text-2xl font-semibold tracking-tight text-white">{stat.value}</p>
+                                            <p className="text-xs text-white/70">{stat.label}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                             <div className="flex flex-wrap gap-4">
                                 <Button
                                     size="lg"
                                     variant="default"
-                                    className="h-11 rounded-xl bg-[#FFD766] px-6 font-semibold text-slate-900 shadow-yellow-300/40 transition hover:-translate-y-0.5 hover:bg-[#f4c44f] hover:scale-105 cursor-pointer"
+                                    className="h-11 rounded-xl !bg-[#FFD766] px-6 font-semibold text-slate-900 shadow-[0_12px_40px_rgba(255,214,102,0.35)] transition hover:-translate-y-1 hover:scale-105 focus-visible:ring-2 focus-visible:ring-offset-2 !hover:bg-transparent hover:ring-white cursor-pointer"
                                     onClick={() =>
                                         document.getElementById('schedule-interview')?.scrollIntoView({ behavior: 'smooth' })
                                     }
@@ -1377,7 +1309,7 @@ export default function InterviewsPage({
                                     type="button"
                                     variant="ghost"
                                     size="lg"
-                                    className="h-11 rounded-xl border border-white/30 bg-white/10 px-6 text-white backdrop-blur transition hover:scale-105 hover:text-white hover:border-white/60 hover:bg-white/15 cursor-pointer"
+                                    className="h-11 rounded-xl border border-white/40 bg-white/10 px-6 text-white shadow-[0_14px_40px_rgba(13,148,136,0.25)] backdrop-blur transition cursor-pointer"
                                     onClick={handleRefreshAll}
                                     disabled={refreshing}
                                 >
@@ -1386,7 +1318,7 @@ export default function InterviewsPage({
                                 </Button>
                             </div>
                         </div>
-                        <div className="grid w-full gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 text-white shadow-2xl backdrop-blur md:max-w-md">
+                        <div className="grid w-full gap-4 rounded-2xl border border-white/15 bg-white/10 p-4 text-white shadow-2xl shadow-black/30 backdrop-blur md:max-w-md">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-white/80">Available credits</span>
                                 <Badge variant="outline" className="rounded-full border-white/20 bg-white/10 text-xs font-semibold text-white">
@@ -1828,9 +1760,17 @@ export default function InterviewsPage({
                                                 </>
                                             ) : null}
                                             {session.status === 'completed' ? (
-                                                <Button size="sm" variant="outline" disabled>
-                                                    Recording coming soon
-                                                </Button>
+                                                session.recordingUrl ? (
+                                                    <Button size="sm" variant="outline" className="cursor-pointer" asChild>
+                                                        <a href={session.recordingUrl} target="_blank" rel="noreferrer">
+                                                            Get your recording <DownloadIcon />
+                                                        </a>
+                                                    </Button>
+                                                ) : (
+                                                    <Button size="sm" variant="outline" disabled>
+                                                        Recording processing
+                                                    </Button>
+                                                )
                                             ) : null}
                                         </div>
                                     </div>
@@ -1854,14 +1794,17 @@ export default function InterviewsPage({
                                 Every interview recording + AI feedback stays accessible under “Your sessions”.
                             </h2>
                             <p className="mt-1 text-sm text-muted-foreground">
-                                We store encrypted chunks on your configured storage (DigitalOcean or local). Switch
-                                disks anytime from the interview settings table.
+                                We ship one continuous, encrypted recording to your configured storage (DigitalOcean or local).
+                                Switch disks anytime from the interview settings table.
                             </p>
                         </div>
-                        <Button variant="outline" className="rounded-full border-primary/40 bg-white/80 backdrop-blur">
+                        {/* <Button
+                            variant="outline"
+                            className="rounded-full border-primary/40 bg-white/90 px-6 py-3 text-primary shadow-[0_16px_40px_rgba(59,130,246,0.25)] backdrop-blur transition hover:-translate-y-1 hover:shadow-[0_26px_60px_rgba(59,130,246,0.3)]"
+                        >
                             Coming soon: Watch recordings
                             <Zap className="h-4 w-4 text-primary" />
-                        </Button>
+                        </Button> */}
                     </div>
                 </section>
             </div>

@@ -7,6 +7,7 @@ use App\Http\Requests\ScheduleInterviewRequest;
 use App\Http\Requests\SubmitInterviewAnswerRequest;
 use App\Jobs\SendInterviewReminder;
 use App\Jobs\GenerateInterviewFeedback;
+use App\Jobs\FinalizeInterviewRecording;
 use App\Models\Course;
 use App\Models\InterviewQuestion;
 use App\Models\InterviewSession;
@@ -14,11 +15,13 @@ use App\Models\InterviewSlot;
 use App\Models\UserCourseInterviewCredit;
 use App\Services\InterviewCreditService;
 use App\Services\InterviewQuestionService;
+use App\Services\InterviewRecordingService;
 use App\Services\InterviewSettingService;
 use App\Services\SopValidationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
@@ -242,6 +245,7 @@ class InterviewSessionController extends Controller
 
         $question->fill([
             'answer_notes' => $request->input('answer_notes'),
+            'answer_transcript' => $request->input('answer_transcript'),
             'answer_duration_seconds' => $request->integer('answer_duration_seconds'),
             'answer_recording_path' => $request->input('answer_recording_path'),
             'answered_at' => now(),
@@ -273,6 +277,10 @@ class InterviewSessionController extends Controller
             'status' => 'completed',
             'completed_at' => now(),
         ])->save();
+
+        if (!$session->recording_manifest_path) {
+            FinalizeInterviewRecording::dispatch($session->id)->onQueue('recordings');
+        }
 
         GenerateInterviewFeedback::dispatch($session->id);
 
@@ -324,6 +332,32 @@ class InterviewSessionController extends Controller
     {
         $session->loadMissing(['course:id,name,slug', 'slot:id,starts_at,ends_at,timezone']);
 
+        $recordingUrl = null;
+        if ($session->recording_manifest_path) {
+            $recordingService = app(InterviewRecordingService::class);
+            $disk = $session->meta['recording_disk'] ?? $recordingService->getDisk();
+
+            // For local disk, prefer the signed download route so files outside public/ are reachable.
+            if ($disk === 'local') {
+                $recordingUrl = route('interviews.sessions.recordings.download', $session);
+            } else {
+                try {
+                    $storage = Storage::disk($disk);
+                    if (method_exists($storage, 'temporaryUrl')) {
+                        $recordingUrl = $storage->temporaryUrl($session->recording_manifest_path, now()->addHours(6));
+                    } else {
+                        $recordingUrl = $storage->url($session->recording_manifest_path);
+                    }
+                } catch (\Throwable $exception) {
+                    $recordingUrl = null;
+                }
+
+                if (!$recordingUrl) {
+                    $recordingUrl = route('interviews.sessions.recordings.download', $session);
+                }
+            }
+        }
+
         return [
             'id' => $session->id,
             'uuid' => $session->uuid,
@@ -349,6 +383,8 @@ class InterviewSessionController extends Controller
             'cancelledAt' => optional($session->cancelled_at)?->toIso8601String(),
             'feedbackSummary' => $session->feedback_summary,
             'feedbackGeneratedAt' => optional($session->feedback_generated_at)?->toIso8601String(),
+            'recordingPath' => $session->recording_manifest_path,
+            'recordingUrl' => $recordingUrl,
         ];
     }
 
@@ -359,6 +395,7 @@ class InterviewSessionController extends Controller
             'sequence' => $question->sequence,
             'question' => $question->question,
             'answerNotes' => $question->answer_notes,
+            'answerTranscript' => $question->answer_transcript,
             'answerRecordingPath' => $question->answer_recording_path,
             'answerDurationSeconds' => (int) $question->answer_duration_seconds,
             'askedAt' => optional($question->asked_at)?->toIso8601String(),
