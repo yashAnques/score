@@ -177,7 +177,7 @@ class CatScoreScraper
         $rightAnswer = null;
 
         foreach ($question->find('td') as $td) {
-            if (! $this->hasClass($td, 'rightAns')) {
+            if (!$this->hasClass($td, 'rightAns')) {
                 continue;
             }
 
@@ -253,7 +253,7 @@ class CatScoreScraper
     {
         $classAttr = $node->class ?? ($node->attr['class'] ?? null);
 
-        if (! is_string($classAttr) || $classAttr === '') {
+        if (!is_string($classAttr) || $classAttr === '') {
             return false;
         }
 

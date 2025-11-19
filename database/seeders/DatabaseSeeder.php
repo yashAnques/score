@@ -28,6 +28,9 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             WhatsappLinkSeeder::class,
             ContentSeeder::class,
+            CatPercentileBracketSeeder::class,
+            CutoffContentSeeder::class,
+            XatPercentileBracketSeeder::class,
         ]);
     }
 }

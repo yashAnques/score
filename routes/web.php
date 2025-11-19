@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminOverviewController;
 use App\Http\Controllers\CatScoreCalculatorController;
 use App\Http\Controllers\XatScoreCalculatorController;
+use App\Models\CutoffContent;
 use App\Http\Resources\CatScoreCalculationResource;
 use App\Http\Resources\XatScoreCalculationResource;
 use App\Models\Content;
@@ -29,9 +30,15 @@ Route::get('/cat-score-calculator', function (Request $request) {
         ->where('page', 'cat-score-calculator')
         ->value('content');
 
+    $cutoffTables = CutoffContent::query()
+        ->where('exam', 'cat')
+        ->value('payload') ?? [];
+
     return Inertia::render('cat-score-calculator', [
         'latestCalculation' => $latestCalculation,
         'pageContent' => $pageContent,
+        'resultDelayMinutes' => (int) config('services.cat_score_result_delay_minutes', 0),
+        'cutoffTables' => $cutoffTables,
     ]);
 })->name('cat.score-calculator');
 
@@ -52,9 +59,15 @@ Route::get('/xat-score-calculator', function (Request $request) {
         ->where('page', 'xat-score-calculator')
         ->value('content');
 
+    $cutoffTables = CutoffContent::query()
+        ->where('exam', 'xat')
+        ->value('payload') ?? [];
+
     return Inertia::render('xat-score-calculator', [
         'latestCalculation' => $latestCalculation,
         'pageContent' => $pageContent,
+        'resultDelayMinutes' => (int) config('services.xat_score_result_delay_minutes', 0),
+        'cutoffTables' => $cutoffTables,
     ]);
 })->name('xat.score-calculator');
 
@@ -73,5 +86,5 @@ Route::middleware(['auth'])
         Route::get('overview', AdminOverviewController::class)->name('overview');
     });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
