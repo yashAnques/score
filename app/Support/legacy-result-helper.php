@@ -3,33 +3,36 @@
 use App\Models\City;
 use App\Models\State;
 use voku\helper\HtmlDomParser;
+use App\Models\CatPercentileBracket;
+use App\Models\XatPercentileBracket;
+use Illuminate\Support\Collection;
 
 function getStudentResult($url)
 {
     $data = fetchMarks($url);
 
     $data['overallStats'] = [
-        "totalCorrect"     => 0,
-        "totalIncorrect"   => 0,
+        "totalCorrect" => 0,
+        "totalIncorrect" => 0,
         "totalUnattempted" => 0,
-        "totalScore"       => 0,
-        "totalPercentile"  => 0,
-        "percentile"       => 0,
+        "totalScore" => 0,
+        "totalPercentile" => 0,
+        "percentile" => 0,
     ];
 
     foreach ($data['sections'] as $section_key => $section_data) {
         $data['sections'][$section_key]["stats"] = [
-            "correctCount"     => 0,
-            "incorrectCount"   => 0,
+            "correctCount" => 0,
+            "incorrectCount" => 0,
             "unattemptedCount" => 0,
-            "score"            => 0,
-            "percentile"       => 0,
+            "score" => 0,
+            "percentile" => 0,
         ];
 
         foreach ($section_data['questions'] as $key => $value) {
             if ($value['result'] == "Correct") {
                 $data['sections'][$section_key]["stats"]['correctCount'] = $data['sections'][$section_key]["stats"]['correctCount'] + 1;
-                $data['sections'][$section_key]["stats"]['score']        = $data['sections'][$section_key]["stats"]['score'] + 3;
+                $data['sections'][$section_key]["stats"]['score'] = $data['sections'][$section_key]["stats"]['score'] + 3;
             } elseif ($value['result'] == "Unattempted") {
                 $data['sections'][$section_key]["stats"]['unattemptedCount'] = $data['sections'][$section_key]["stats"]['unattemptedCount'] + 1;
             } else {
@@ -41,10 +44,10 @@ function getStudentResult($url)
             }
         }
 
-        $data['overallStats']['totalCorrect']     = $data['overallStats']['totalCorrect'] + $data['sections'][$section_key]["stats"]['correctCount'];
-        $data['overallStats']['totalIncorrect']   = $data['overallStats']['totalIncorrect'] + $data['sections'][$section_key]["stats"]['incorrectCount'];
+        $data['overallStats']['totalCorrect'] = $data['overallStats']['totalCorrect'] + $data['sections'][$section_key]["stats"]['correctCount'];
+        $data['overallStats']['totalIncorrect'] = $data['overallStats']['totalIncorrect'] + $data['sections'][$section_key]["stats"]['incorrectCount'];
         $data['overallStats']['totalUnattempted'] = $data['overallStats']['totalUnattempted'] + $data['sections'][$section_key]["stats"]['unattemptedCount'];
-        $data['overallStats']['totalScore']       = $data['overallStats']['totalScore'] + $data['sections'][$section_key]["stats"]['score'];
+        $data['overallStats']['totalScore'] = $data['overallStats']['totalScore'] + $data['sections'][$section_key]["stats"]['score'];
     }
 
     $shift = 1;
@@ -64,117 +67,117 @@ function getStudentResult($url)
     @$data['details']['Shift'] = $shift;
 
     $obtain_marks = @$data['overallStats']['totalScore'] ?? 0;
-    $percentile   = @getScorePercentile($obtain_marks, $shift);
+    $percentile = @getScorePercentile($obtain_marks, $shift);
 
-    @$data['percentile']                 = @$percentile;
+    @$data['percentile'] = @$percentile;
     @$data['overallStats']['percentile'] = @$percentile;
     return $data;
 }
 
 function getCmatStudentResult($url)
 {
-    $data      = fetchMarks($url);
+    $data = fetchMarks($url);
     $cmatSlot1 = [
-        53100242  => 3,
-        53100243  => 1,
-        53100244  => 1,
-        53100245  => 4,
-        53100246  => 2,
-        53100247  => 1,
-        53100249  => 1,
-        53100250  => 3,
-        53100251  => 2,
-        53100252  => 3,
-        53100253  => 2,
-        53100254  => 4,
-        53100255  => 4,
-        53100256  => 3,
-        53100257  => 1,
-        53100258  => 1,
-        53100259  => 2,
-        53100260  => 1,
-        53100262  => 3,
-        53100263  => 1,
-        53100264  => 2,
-        53100265  => 1,
-        53100266  => 1,
-        53100267  => 2,
-        53100268  => 4,
-        53100269  => 2,
-        53100270  => 3,
-        53100271  => 4,
-        53100272  => 1,
-        53100273  => 1,
-        53100274  => 2,
-        53100275  => 3,
-        53100276  => 3,
-        53100277  => 4,
-        53100278  => 2,
-        53100279  => 3,
-        53100280  => 3,
-        53100281  => 4,
-        53100282  => 3,
-        53100283  => 3,
-        53100284  => 3,
-        53100285  => 1,
-        53100286  => 1,
-        53100287  => 3,
-        53100288  => 3,
-        53100289  => 4,
-        53100290  => 2,
-        53100291  => 3,
-        53100292  => 2,
-        53100293  => 1,
-        53100294  => 1,
-        53100295  => 3,
-        53100296  => 3,
-        53100297  => 3,
-        53100298  => 2,
-        53100299  => 1,
+        53100242 => 3,
+        53100243 => 1,
+        53100244 => 1,
+        53100245 => 4,
+        53100246 => 2,
+        53100247 => 1,
+        53100249 => 1,
+        53100250 => 3,
+        53100251 => 2,
+        53100252 => 3,
+        53100253 => 2,
+        53100254 => 4,
+        53100255 => 4,
+        53100256 => 3,
+        53100257 => 1,
+        53100258 => 1,
+        53100259 => 2,
+        53100260 => 1,
+        53100262 => 3,
+        53100263 => 1,
+        53100264 => 2,
+        53100265 => 1,
+        53100266 => 1,
+        53100267 => 2,
+        53100268 => 4,
+        53100269 => 2,
+        53100270 => 3,
+        53100271 => 4,
+        53100272 => 1,
+        53100273 => 1,
+        53100274 => 2,
+        53100275 => 3,
+        53100276 => 3,
+        53100277 => 4,
+        53100278 => 2,
+        53100279 => 3,
+        53100280 => 3,
+        53100281 => 4,
+        53100282 => 3,
+        53100283 => 3,
+        53100284 => 3,
+        53100285 => 1,
+        53100286 => 1,
+        53100287 => 3,
+        53100288 => 3,
+        53100289 => 4,
+        53100290 => 2,
+        53100291 => 3,
+        53100292 => 2,
+        53100293 => 1,
+        53100294 => 1,
+        53100295 => 3,
+        53100296 => 3,
+        53100297 => 3,
+        53100298 => 2,
+        53100299 => 1,
         531002100 => 1,
         531002101 => 3,
         531002102 => 4,
         531002103 => 2,
-        5310022   => 2,
-        5310023   => 3,
-        5310024   => 4,
-        5310025   => 2,
-        5310026   => 3,
-        5310027   => 3,
-        5310028   => 3,
-        5310029   => 2,
-        53100210  => 1,
-        53100211  => 4,
-        53100212  => 2,
-        53100213  => 1,
-        53100214  => 3,
-        53100215  => 3,
-        53100216  => 3,
-        53100217  => 3,
-        53100218  => 3,
-        53100219  => 3,
-        53100220  => 1,
-        53100221  => 2,
-        53100222  => 2,
-        53100223  => 2,
-        53100224  => 2,
-        53100225  => 4,
-        53100226  => 4,
-        53100227  => 3,
-        53100228  => 2,
-        53100229  => 2,
-        53100230  => 1,
-        53100231  => 2,
-        53100232  => 2,
-        53100233  => 4,
-        53100234  => 1,
-        53100235  => 3,
-        53100236  => 4,
-        53100237  => 3,
-        53100238  => 4,
-        53100239  => 4,
-        53100240  => 4,
-        53100241  => 4,
+        5310022 => 2,
+        5310023 => 3,
+        5310024 => 4,
+        5310025 => 2,
+        5310026 => 3,
+        5310027 => 3,
+        5310028 => 3,
+        5310029 => 2,
+        53100210 => 1,
+        53100211 => 4,
+        53100212 => 2,
+        53100213 => 1,
+        53100214 => 3,
+        53100215 => 3,
+        53100216 => 3,
+        53100217 => 3,
+        53100218 => 3,
+        53100219 => 3,
+        53100220 => 1,
+        53100221 => 2,
+        53100222 => 2,
+        53100223 => 2,
+        53100224 => 2,
+        53100225 => 4,
+        53100226 => 4,
+        53100227 => 3,
+        53100228 => 2,
+        53100229 => 2,
+        53100230 => 1,
+        53100231 => 2,
+        53100232 => 2,
+        53100233 => 4,
+        53100234 => 1,
+        53100235 => 3,
+        53100236 => 4,
+        53100237 => 3,
+        53100238 => 4,
+        53100239 => 4,
+        53100240 => 4,
+        53100241 => 4,
     ];
 
     $cmatSlot2 = [
@@ -288,7 +291,7 @@ function getCmatStudentResult($url)
                 $question['right_answer'] = $cmatSlot2[$question['question_id']] ?? '0';
             }
 
-            $right_answer  = $question['right_answer'];
+            $right_answer = $question['right_answer'];
             $chosen_option = $question['chosen_option'];
 
             if ($chosen_option == $right_answer) {
@@ -304,27 +307,27 @@ function getCmatStudentResult($url)
     }
 
     $data['overallStats'] = [
-        "totalCorrect"     => 0,
-        "totalIncorrect"   => 0,
+        "totalCorrect" => 0,
+        "totalIncorrect" => 0,
         "totalUnattempted" => 0,
-        "totalScore"       => 0,
-        "totalPercentile"  => 0,
-        "percentile"       => 0,
+        "totalScore" => 0,
+        "totalPercentile" => 0,
+        "percentile" => 0,
     ];
 
     foreach ($data['sections'] as $section_key => $section_data) {
         $data['sections'][$section_key]["stats"] = [
-            "correctCount"     => 0,
-            "incorrectCount"   => 0,
+            "correctCount" => 0,
+            "incorrectCount" => 0,
             "unattemptedCount" => 0,
-            "score"            => 0,
-            "percentile"       => 0,
+            "score" => 0,
+            "percentile" => 0,
         ];
 
         foreach ($section_data['questions'] as $key => $value) {
             if ($value['result'] == "Correct") {
                 $data['sections'][$section_key]["stats"]['correctCount'] = $data['sections'][$section_key]["stats"]['correctCount'] + 1;
-                $data['sections'][$section_key]["stats"]['score']        = $data['sections'][$section_key]["stats"]['score'] + 4;
+                $data['sections'][$section_key]["stats"]['score'] = $data['sections'][$section_key]["stats"]['score'] + 4;
             } elseif ($value['result'] == "Unattempted") {
                 $data['sections'][$section_key]["stats"]['unattemptedCount'] = $data['sections'][$section_key]["stats"]['unattemptedCount'] + 1;
             } else {
@@ -336,10 +339,10 @@ function getCmatStudentResult($url)
             }
         }
 
-        $data['overallStats']['totalCorrect']     = $data['overallStats']['totalCorrect'] + $data['sections'][$section_key]["stats"]['correctCount'];
-        $data['overallStats']['totalIncorrect']   = $data['overallStats']['totalIncorrect'] + $data['sections'][$section_key]["stats"]['incorrectCount'];
+        $data['overallStats']['totalCorrect'] = $data['overallStats']['totalCorrect'] + $data['sections'][$section_key]["stats"]['correctCount'];
+        $data['overallStats']['totalIncorrect'] = $data['overallStats']['totalIncorrect'] + $data['sections'][$section_key]["stats"]['incorrectCount'];
         $data['overallStats']['totalUnattempted'] = $data['overallStats']['totalUnattempted'] + $data['sections'][$section_key]["stats"]['unattemptedCount'];
-        $data['overallStats']['totalScore']       = $data['overallStats']['totalScore'] + $data['sections'][$section_key]["stats"]['score'];
+        $data['overallStats']['totalScore'] = $data['overallStats']['totalScore'] + $data['sections'][$section_key]["stats"]['score'];
     }
 
     $shift = 1;
@@ -370,21 +373,21 @@ function fetchMarks($url)
     $student_info = [];
 
     foreach ($html->find('div.main-info-pnl table tr') as $tr) {
-        $tds                                       = $tr->find('td');
+        $tds = $tr->find('td');
         $student_info[_t($tds[0]->plaintext, ':')] = _t($tds[1]->plaintext);
     }
 
     $sections_result = [];
-    $sections        = $html->find('div.grp-cntnr div.section-cntnr');
+    $sections = $html->find('div.grp-cntnr div.section-cntnr');
 
     foreach ($sections as $section) {
-        $section_name     = _t(str_replace('Section : ', '', _t($section->find('div.section-lbl', 0)->plaintext)));
+        $section_name = _t(str_replace('Section : ', '', _t($section->find('div.section-lbl', 0)->plaintext)));
         $questions_result = [];
         foreach ($section->find('div.question-pnl') as $K => $question) {
             $questions_result[] = parseQuestion($question);
         }
         $section_result = [
-            'name'      => $section_name,
+            'name' => $section_name,
             'questions' => $questions_result,
         ];
         $sections_result[] = $section_result;
@@ -402,7 +405,7 @@ function parseQuestion($question)
     }
 
     $right_answer = "";
-    $que_data     = [];
+    $que_data = [];
 
     foreach ($texts as $key => $value) {
 
@@ -446,7 +449,7 @@ function parseQuestion($question)
 
     if ($que_data['chosen_option'] == '0' && $right_answer == '0') {
         $que_data['result'] = "Correct";
-    } else if (! empty($que_data['chosen_option']) && $que_data['chosen_option'] == $right_answer) {
+    } else if (!empty($que_data['chosen_option']) && $que_data['chosen_option'] == $right_answer) {
         $que_data['result'] = "Correct";
     } elseif (in_array($que_data['status'], ["Not Answered", "Not Attempted and Marked For Review"])) {
         $que_data['result'] = "Unattempted";
@@ -459,8 +462,8 @@ function parseQuestion($question)
 
 function parseMCQ_Question($question)
 {
-    $texts                = [];
-    $correct_option       = 0;
+    $texts = [];
+    $correct_option = 0;
     $correct_option_index = 0;
     foreach ($question->find('td') as $tk => $td) {
         $texts[$tk] = _t($td->plaintext);
@@ -486,44 +489,44 @@ function parseMCQ_Question($question)
         }
         $rtexts = array_reverse($texts);
         return [
-            'passage_title'      => @$texts[2],
-            'passage'            => @$texts[4],
-            'parse_as'           => 'mcq',
-            'sub_type'           => 'comprehension',
-            'type'               => strtolower(@$rtexts[14]),
-            'id'                 => @$rtexts[12],
-            'number'             => @$rtexts[26],
-            'name'               => @$rtexts[25],
-            'options'            => [
+            'passage_title' => @$texts[2],
+            'passage' => @$texts[4],
+            'parse_as' => 'mcq',
+            'sub_type' => 'comprehension',
+            'type' => strtolower(@$rtexts[14]),
+            'id' => @$rtexts[12],
+            'number' => @$rtexts[26],
+            'name' => @$rtexts[25],
+            'options' => [
                 1 => @$rtexts[10],
                 2 => @$rtexts[8],
                 3 => @$rtexts[6],
                 4 => @$rtexts[4],
             ],
-            'attempted'          => isQuestionAttempted(@$rtexts[2]),
-            'correct_option'     => $correct_option,
-            'selected_option'    => @$rtexts[0],
+            'attempted' => isQuestionAttempted(@$rtexts[2]),
+            'correct_option' => $correct_option,
+            'selected_option' => @$rtexts[0],
             'answered_correctly' => $correct_option == @$rtexts[0],
         ];
     } else {
         $correct_option = explode('.', @$texts[$correct_option_index])[0];
 
         return [
-            'parse_as'           => 'mcq',
-            'sub_type'           => 'alternate',
-            'type'               => strtolower(@$texts[13]),
-            'id'                 => @$texts[15],
-            'number'             => @$texts[1],
-            'name'               => @$texts[2],
-            'options'            => [
+            'parse_as' => 'mcq',
+            'sub_type' => 'alternate',
+            'type' => strtolower(@$texts[13]),
+            'id' => @$texts[15],
+            'number' => @$texts[1],
+            'name' => @$texts[2],
+            'options' => [
                 1 => @$texts[5],
                 2 => @$texts[7],
                 3 => @$texts[9],
                 4 => @$texts[11],
             ],
-            'attempted'          => isQuestionAttempted(@$texts[25]),
-            'correct_option'     => $correct_option,
-            'selected_option'    => @$texts[27],
+            'attempted' => isQuestionAttempted(@$texts[25]),
+            'correct_option' => $correct_option,
+            'selected_option' => @$texts[27],
             'answered_correctly' => $correct_option == @$texts[27],
         ];
     }
@@ -536,36 +539,36 @@ function parseSA_Question($question)
         $texts[$tk] = _t($td->plaintext);
     }
     if (strpos(strtolower(@$texts[2]), 'comprehension') !== false) {
-        $rtexts         = array_reverse($texts);
+        $rtexts = array_reverse($texts);
         $correct_answer = _t(str_replace('possible answer:', '', strtolower(@$rtexts[8])));
         return [
-            'passage_title'      => @$texts[2],
-            'passage'            => @$texts[4],
-            'parse_as'           => 'sa',
-            'sub_type'           => 'comprehension',
-            'type'               => strtolower(@$rtexts[4]),
-            'cs'                 => _t(str_replace('case sensitivity:', '', strtolower(@$rtexts[12]))),
-            'id'                 => @$rtexts[2],
-            'number'             => @$rtexts[16],
-            'name'               => @$rtexts[15],
-            'attempted'          => isQuestionAttempted(@$rtexts[0]),
-            'correct_answer'     => $correct_answer,
-            'given_answer'       => @$rtexts[6],
+            'passage_title' => @$texts[2],
+            'passage' => @$texts[4],
+            'parse_as' => 'sa',
+            'sub_type' => 'comprehension',
+            'type' => strtolower(@$rtexts[4]),
+            'cs' => _t(str_replace('case sensitivity:', '', strtolower(@$rtexts[12]))),
+            'id' => @$rtexts[2],
+            'number' => @$rtexts[16],
+            'name' => @$rtexts[15],
+            'attempted' => isQuestionAttempted(@$rtexts[0]),
+            'correct_answer' => $correct_answer,
+            'given_answer' => @$rtexts[6],
             'answered_correctly' => $correct_answer == @$rtexts[6],
         ];
     } else {
         $correct_answer = _t(str_replace('possible answer:', '', strtolower(@$texts[9])));
         return [
-            'parse_as'           => 'sa',
-            'sub_type'           => 'jumbled',
-            'type'               => strtolower(@$texts[13]),
-            'cs'                 => _t(str_replace('case sensitivity:', '', strtolower(@$texts[5]))),
-            'id'                 => @$texts[15],
-            'number'             => @$texts[1],
-            'name'               => @$texts[2],
-            'attempted'          => isQuestionAttempted(@$texts[17]),
-            'correct_answer'     => $correct_answer,
-            'given_answer'       => @$texts[11],
+            'parse_as' => 'sa',
+            'sub_type' => 'jumbled',
+            'type' => strtolower(@$texts[13]),
+            'cs' => _t(str_replace('case sensitivity:', '', strtolower(@$texts[5]))),
+            'id' => @$texts[15],
+            'number' => @$texts[1],
+            'name' => @$texts[2],
+            'attempted' => isQuestionAttempted(@$texts[17]),
+            'correct_answer' => $correct_answer,
+            'given_answer' => @$texts[11],
             'answered_correctly' => $correct_answer == @$texts[11],
         ];
     }
@@ -578,6 +581,13 @@ function isQuestionAttempted($status)
 
 function getScorePercentile($score, $shift)
 {
+    $pp = get_db_score_percentile($score, $shift);
+
+    if ($pp !== null) {
+        return $pp;
+    }
+
+    // Fallback to legacy hardcoded values if DB is empty.
     $pp = "0%tile - 10%tile";
     if ($shift == 1) {
         if ($score >= 116) {
@@ -751,6 +761,58 @@ function getScorePercentile($score, $shift)
     return $pp;
 }
 
+function get_db_score_percentile($score, $shift)
+{
+    static $bracketsByShift = [];
+
+    $shiftKey = (int) $shift;
+
+    if (!array_key_exists($shiftKey, $bracketsByShift)) {
+        $bracketsByShift[$shiftKey] = CatPercentileBracket::query()
+            ->where('shift', $shiftKey)
+            ->orderByDesc('min_score')
+            ->get();
+    }
+
+    /** @var Collection<int, CatPercentileBracket> $brackets */
+    $brackets = $bracketsByShift[$shiftKey];
+
+    if ($brackets->isEmpty()) {
+        return null;
+    }
+
+    foreach ($brackets as $bracket) {
+        if ($score >= $bracket->min_score) {
+            return $bracket->label;
+        }
+    }
+
+    return $brackets->last()?->label;
+}
+
+function get_xat_db_score_percentile($score)
+{
+    static $brackets = null;
+
+    if ($brackets === null) {
+        $brackets = XatPercentileBracket::query()
+            ->orderByDesc('min_score')
+            ->get();
+    }
+
+    if ($brackets->isEmpty()) {
+        return null;
+    }
+
+    foreach ($brackets as $bracket) {
+        if ($score >= $bracket->min_score) {
+            return $bracket->label;
+        }
+    }
+
+    return $brackets->last()?->label;
+}
+
 function sendJson($data, $http_code = 200)
 {
     header('Content-type: application/json');
@@ -777,12 +839,12 @@ function xlirfetchMarks($url)
 
     $student_info = [];
     foreach ($html->find('div.main-info-pnl table tr') as $tr) {
-        $tds                                       = $tr->find('td');
+        $tds = $tr->find('td');
         $student_info[_t($tds[0]->plaintext, ':')] = _t($tds[1]->plaintext);
     }
 
     $sections_result = [];
-    $sections        = $html->find('div.grp-cntnr div.section-cntnr');
+    $sections = $html->find('div.grp-cntnr div.section-cntnr');
 
     foreach ($sections as $section) {
         $name = _t(str_replace('Section : ', '', _t($section->find('div.section-lbl', 0)->plaintext)));
@@ -792,7 +854,7 @@ function xlirfetchMarks($url)
                 $questions_result[] = parseQuestion($question);
             }
             $section_result = [
-                'name'      => $name,
+                'name' => $name,
                 'questions' => $questions_result,
             ];
             $sections_result[] = $section_result;
@@ -806,7 +868,7 @@ function getDomainFromUrl($url)
 {
     $parsed = @parse_url($url);
 
-    if (! is_array($parsed) || empty($parsed['host'])) {
+    if (!is_array($parsed) || empty($parsed['host'])) {
         return $url;
     }
 
@@ -828,26 +890,26 @@ function getDomainFromUrl($url)
 function xatgetStudentResult($url)
 {
     $data = xatfetchMarks($url);
-    if (! $data) {
+    if (!$data) {
         return false;
     }
-    $sections_marks                = [];
-    $obtain_marks                  = 0;
-    $total_marks                   = 0;
-    $unattempted_questions         = 0;
-    $unattempted_negative_marks    = 0;
+    $sections_marks = [];
+    $obtain_marks = 0;
+    $total_marks = 0;
+    $unattempted_questions = 0;
+    $unattempted_negative_marks = 0;
     $excluded_section_obtain_marks = 0;
-    $excluded_section_total_marks  = 0;
-    $special_ids                   = ['41569977', '41569989', '41569991'];
+    $excluded_section_total_marks = 0;
+    $special_ids = ['41569977', '41569989', '41569991'];
 
     foreach (@$data['sections'] as $section) {
         $is_excluded_section = in_array(strtoupper($section['name']), ['MOCK KEYBOARD TESTING', 'GENERAL KNOWLEDGE']);
-        $attempt_questions   = 0;
+        $attempt_questions = 0;
         $unattempt_questions = 0;
-        $correct_answers     = 0;
-        $wrong_answers       = 0;
-        $_total_marks        = 0;
-        $_obtain_marks       = 0;
+        $correct_answers = 0;
+        $wrong_answers = 0;
+        $_total_marks = 0;
+        $_obtain_marks = 0;
         foreach ($section['questions'] as $question) {
             $_total_marks += 1;
             if (@$question['attempted']) {
@@ -857,12 +919,12 @@ function xatgetStudentResult($url)
                     $_obtain_marks += 1;
                 } else {
                     $wrong_answers++;
-                    if (! $is_excluded_section) {
+                    if (!$is_excluded_section) {
                         $_obtain_marks -= 0.25;
                     }
                 }
             } else {
-                if (! $is_excluded_section) {
+                if (!$is_excluded_section) {
                     if (in_array(@$question['id'], $special_ids)) {
                         $attempt_questions++;
                         $correct_answers++;
@@ -881,15 +943,15 @@ function xatgetStudentResult($url)
         }
 
         $sections_marks[] = [
-            'name'                => @$section['name'],
-            'total_questions'     => count(@$section['questions']),
-            'attempt_questions'   => $attempt_questions,
+            'name' => @$section['name'],
+            'total_questions' => count(@$section['questions']),
+            'attempt_questions' => $attempt_questions,
             'unattempt_questions' => $unattempt_questions,
-            'correct_answers'     => $correct_answers,
-            'wrong_answers'       => $wrong_answers,
-            'obtain_marks_org'    => $_obtain_marks,
-            'obtain_marks'        => $_obtain_marks,
-            'total_marks'         => $_total_marks,
+            'correct_answers' => $correct_answers,
+            'wrong_answers' => $wrong_answers,
+            'obtain_marks_org' => $_obtain_marks,
+            'obtain_marks' => $_obtain_marks,
+            'total_marks' => $_total_marks,
         ];
 
         if ($is_excluded_section) {
@@ -900,7 +962,7 @@ function xatgetStudentResult($url)
             $total_marks += $_total_marks;
         }
     }
-    $de          = 0;
+    $de = 0;
     $total_score = 0;
     foreach ($sections_marks as $k => $section) {
         if (in_array(strtoupper($section['name']), ['MOCK KEYBOARD TESTING', 'GENERAL KNOWLEDGE'])) {
@@ -927,12 +989,12 @@ function xatgetStudentResult($url)
     $percentile = xatgetScorePercentile($score);
 
     return [
-        'percentile'                 => $percentile,
-        'details'                    => @$data['details'],
-        'sections_marks'             => $sections_marks,
-        'obtain_marks'               => round($obtain_marks - $unattempted_negative_marks, 2),
-        'total_marks'                => $total_marks,
-        'unattempted_questions'      => $unattempted_questions,
+        'percentile' => $percentile,
+        'details' => @$data['details'],
+        'sections_marks' => $sections_marks,
+        'obtain_marks' => round($obtain_marks - $unattempted_negative_marks, 2),
+        'total_marks' => $total_marks,
+        'unattempted_questions' => $unattempted_questions,
         'unattempted_negative_marks' => $unattempted_negative_marks,
     ];
 }
@@ -943,12 +1005,12 @@ function xatfetchMarks($url)
 
     $student_info = [];
     foreach ($html->find('div.main-info-pnl table tr') as $tr) {
-        $tds                                       = $tr->find('td');
+        $tds = $tr->find('td');
         $student_info[_t($tds[0]->plaintext, ':')] = _t($tds[1]->plaintext);
     }
 
     $sections_result = [];
-    $sections        = $html->find('div.grp-cntnr div.section-cntnr');
+    $sections = $html->find('div.grp-cntnr div.section-cntnr');
 
     foreach ($sections as $section) {
         $name = _t(str_replace('Section : ', '', _t($section->find('div.section-lbl', 0)->plaintext)));
@@ -958,7 +1020,7 @@ function xatfetchMarks($url)
                 $questions_result[] = xatparseQuestion($question);
             }
             $section_result = [
-                'name'      => $name,
+                'name' => $name,
                 'questions' => $questions_result,
             ];
             $sections_result[] = $section_result;
@@ -973,9 +1035,9 @@ function xatfetchMarks($url)
 
 function xatparseQuestion($question)
 {
-    $texts                = [];
-    $options_as_images    = false;
-    $correct_option       = "";
+    $texts = [];
+    $options_as_images = false;
+    $correct_option = "";
     $correct_option_index = 0;
     foreach ($question->find('td') as $tk => $td) {
         $texts[$tk] = _t($td->plaintext);
@@ -1065,21 +1127,21 @@ function xatparseQuestion($question)
         }
 
         return [
-            'passage_title'         => @$texts[2],
-            'passage'               => @$texts[4],
-            'sub_type'              => 'comprehension',
-            'type'                  => 'mcq',
-            'id'                    => @$rtexts[4],
-            'number'                => @$rtexts[18],
-            'name'                  => @$rtexts[17],
-            'options'               => $options,
-            'attempted'             => isQuestionAttempted(@$rtexts[2]),
-            'selected_option'       => $selected_option,
+            'passage_title' => @$texts[2],
+            'passage' => @$texts[4],
+            'sub_type' => 'comprehension',
+            'type' => 'mcq',
+            'id' => @$rtexts[4],
+            'number' => @$rtexts[18],
+            'name' => @$rtexts[17],
+            'options' => $options,
+            'attempted' => isQuestionAttempted(@$rtexts[2]),
+            'selected_option' => $selected_option,
             'selected_option_value' => @$options[@$rtexts[0]],
-            'correct_option'        => $correct_option,
-            'correct_option_value'  => @$options[$correct_option],
-            'options_as_images'     => $options_as_images,
-            'answered_correctly'    => $selected_option == $correct_option,
+            'correct_option' => $correct_option,
+            'correct_option_value' => @$options[$correct_option],
+            'options_as_images' => $options_as_images,
+            'answered_correctly' => $selected_option == $correct_option,
         ];
     } else {
         switch ($correct_option_index) {
@@ -1133,19 +1195,19 @@ function xatparseQuestion($question)
         }
 
         return [
-            'sub_type'              => 'alternate',
-            'type'                  => 'mcq',
-            'id'                    => @$texts[15],
-            'number'                => @$texts[1],
-            'name'                  => @$texts[2],
-            'options'               => $options,
-            'attempted'             => isQuestionAttempted(@$texts[17]),
-            'selected_option'       => $selected_option,
+            'sub_type' => 'alternate',
+            'type' => 'mcq',
+            'id' => @$texts[15],
+            'number' => @$texts[1],
+            'name' => @$texts[2],
+            'options' => $options,
+            'attempted' => isQuestionAttempted(@$texts[17]),
+            'selected_option' => $selected_option,
             'selected_option_value' => @$options[@$texts[19]],
-            'correct_option'        => $correct_option,
-            'correct_option_value'  => @$options[$correct_option],
-            'options_as_images'     => $options_as_images,
-            'answered_correctly'    => $selected_option == $correct_option,
+            'correct_option' => $correct_option,
+            'correct_option_value' => @$options[$correct_option],
+            'options_as_images' => $options_as_images,
+            'answered_correctly' => $selected_option == $correct_option,
         ];
     }
 }
@@ -1166,6 +1228,13 @@ function xatisQuestionAttempted($status)
 
 function xatgetScorePercentile($score)
 {
+    $pp = get_xat_db_score_percentile($score);
+
+    if ($pp !== null) {
+        return $pp;
+    }
+
+    // Fallback to legacy hardcoded thresholds if DB is empty.
     if ($score >= 45 && $score <= 75) {
         return "99%tile - 100%tile";
     } elseif ($score >= 36 && $score <= 44) {
@@ -1226,9 +1295,9 @@ function xatgetScorePercentile($score)
         return "10%tile - 15%tile";
     } elseif ($score >= 0.25) {
         return "5%tile - 10%tile";
-    } else {
-        return "0%tile - 5%tile";
     }
+
+    return "0%tile - 5%tile";
 }
 
 function xat_t($str, $remove_extra = '', $remove_extra_by = '')
@@ -1247,7 +1316,7 @@ function iiftgetDomainFromUrl($url)
 {
     $parsed = @parse_url($url);
 
-    if (! is_array($parsed) || empty($parsed['host'])) {
+    if (!is_array($parsed) || empty($parsed['host'])) {
         return $url;
     }
 
@@ -1269,17 +1338,17 @@ function iiftgetDomainFromUrl($url)
 
 function iiftgetStudentResult($url)
 {
-    $data           = iiftfetchMarks($url);
+    $data = iiftfetchMarks($url);
     $sections_marks = [];
-    $obtain_marks   = 0;
-    $total_marks    = 0;
+    $obtain_marks = 0;
+    $total_marks = 0;
     foreach (@$data['sections'] as $section) {
-        $is_ga_section     = strtoupper($section['name']) == 'GA';
+        $is_ga_section = strtoupper($section['name']) == 'GA';
         $attempt_questions = 0;
-        $correct_answers   = 0;
-        $wrong_answers     = 0;
-        $_total_marks      = 0;
-        $_obtain_marks     = 0;
+        $correct_answers = 0;
+        $wrong_answers = 0;
+        $_total_marks = 0;
+        $_obtain_marks = 0;
         foreach ($section['questions'] as $question) {
             if ($is_ga_section) {
                 $_total_marks += 1.5;
@@ -1306,23 +1375,23 @@ function iiftgetStudentResult($url)
             }
         }
         $sections_marks[] = [
-            'name'              => @$section['name'],
-            'total_questions'   => count(@$section['questions']),
+            'name' => @$section['name'],
+            'total_questions' => count(@$section['questions']),
             'attempt_questions' => $attempt_questions,
-            'correct_answers'   => $correct_answers,
-            'wrong_answers'     => $wrong_answers,
-            'obtain_marks'      => $_obtain_marks,
-            'total_marks'       => $_total_marks,
+            'correct_answers' => $correct_answers,
+            'wrong_answers' => $wrong_answers,
+            'obtain_marks' => $_obtain_marks,
+            'total_marks' => $_total_marks,
         ];
         $obtain_marks += $_obtain_marks;
         $total_marks += $_total_marks;
     }
 
     return [
-        'details'        => @$data['details'],
+        'details' => @$data['details'],
         'sections_marks' => $sections_marks,
-        'obtain_marks'   => round($obtain_marks, 2),
-        'total_marks'    => $total_marks,
+        'obtain_marks' => round($obtain_marks, 2),
+        'total_marks' => $total_marks,
     ];
 }
 
@@ -1347,7 +1416,7 @@ function iiftfetchMarks($url)
         }
     }
     $answer_sheet_name = @$student_info['Exam Date'];
-    $questions         = [];
+    $questions = [];
     foreach ($html->find('table tr td table') as $question) {
         $q = iiftparseQuestion($question, $answer_sheet_name);
         if (@$q['selected_option']) {
@@ -1357,24 +1426,24 @@ function iiftfetchMarks($url)
 
     $sections = [];
     foreach ($questions as $question) {
-        $sections[$question['section']]['name']        = $question['section'];
+        $sections[$question['section']]['name'] = $question['section'];
         $sections[$question['section']]['questions'][] = $question;
     }
 
     return [
-        'details'  => $student_info,
+        'details' => $student_info,
         'sections' => $sections,
     ];
 }
 
 function iiftparseQuestion($question, $answer_sheet_name)
 {
-    $data      = [];
+    $data = [];
     $tmp_texts = [];
     foreach ($question->find('td') as $tk => $td) {
         $txt = _t($td->plaintext);
-        if (! in_array(strtoupper($txt), ["A", "B", "C", "D", ""]) && ! in_array($txt, $tmp_texts)) {
-            $data[]      = $txt;
+        if (!in_array(strtoupper($txt), ["A", "B", "C", "D", ""]) && !in_array($txt, $tmp_texts)) {
+            $data[] = $txt;
             $tmp_texts[] = $txt;
         }
 
@@ -1385,12 +1454,12 @@ function iiftparseQuestion($question, $answer_sheet_name)
                 $td->previousSibling()->hasAttribute('width')
             ) {
                 $img_path = explode('/', $img->getAttribute('src'));
-                $data[]   = end($img_path);
+                $data[] = end($img_path);
             }
         }
 
         foreach ($td->find('b') as $b) {
-            if (! dom_node_has_children($b)) {
+            if (!dom_node_has_children($b)) {
                 $data[] = _t($b->plaintext);
             } else {
                 foreach ($b->find('font') as $font) {
@@ -1400,18 +1469,18 @@ function iiftparseQuestion($question, $answer_sheet_name)
         }
     }
 
-    $rdata   = array_reverse($data);
-    $qid     = @$data[1];
+    $rdata = array_reverse($data);
+    $qid = @$data[1];
     $options = [
         "A" => @$rdata[8],
         "B" => @$rdata[6],
         "C" => @$rdata[4],
         "D" => @$rdata[2],
     ];
-    $section       = "";
-    $answer        = "";
-    $given_option  = @$rdata[0];
-    $given_answer  = @$options[@$rdata[0]];
+    $section = "";
+    $answer = "";
+    $given_option = @$rdata[0];
+    $given_answer = @$options[@$rdata[0]];
     $question_name = _t(@$data[0], 'Question ID:' . $qid);
 
     global $XLSX;
@@ -1428,23 +1497,23 @@ function iiftparseQuestion($question, $answer_sheet_name)
         }
         if (@$row[1] == $qid) {
             $section = @$row[0];
-            $answer  = _t(@$row[2], '`');
+            $answer = _t(@$row[2], '`');
         }
     }
 
     return [
-        'sub_type'              => strtolower(_t(@$data[2], ':')) == 'passage' ? 'passage' : 'alternate',
-        'type'                  => 'mcq',
-        'id'                    => $qid,
-        'name'                  => $question_name,
-        'options'               => $options,
-        'attempted'             => iiftisQuestionAttempted($given_option),
-        'selected_option'       => $given_option,
+        'sub_type' => strtolower(_t(@$data[2], ':')) == 'passage' ? 'passage' : 'alternate',
+        'type' => 'mcq',
+        'id' => $qid,
+        'name' => $question_name,
+        'options' => $options,
+        'attempted' => iiftisQuestionAttempted($given_option),
+        'selected_option' => $given_option,
         'selected_option_value' => $given_answer,
-        'correct_option'        => iiftgetAnswerOption($options, $answer),
-        'correct_option_value'  => $answer,
-        'answered_correctly'    => $answer == $given_answer,
-        'section'               => $section ?: '-',
+        'correct_option' => iiftgetAnswerOption($options, $answer),
+        'correct_option_value' => $answer,
+        'answered_correctly' => $answer == $given_answer,
+        'section' => $section ?: '-',
     ];
 }
 
@@ -1520,11 +1589,11 @@ function js_update_user_updated_date($user)
 function abbreviate($string)
 {
     $ignore_words = ['and', 'or', 'the', 'in', 'to', 'for', 'with', '&'];
-    $words        = explode(' ', $string);
+    $words = explode(' ', $string);
     $abbreviation = '';
 
     foreach ($words as $word) {
-        if (! in_array(strtolower($word), $ignore_words)) {
+        if (!in_array(strtolower($word), $ignore_words)) {
             $abbreviation .= strtoupper($word[0]);
         }
     }
@@ -1532,7 +1601,7 @@ function abbreviate($string)
     return $abbreviation;
 }
 
-if (! function_exists('file_get_html')) {
+if (!function_exists('file_get_html')) {
     /**
      * Lightweight shim that mirrors the helper signature expected by the legacy scraper.
      */
@@ -1561,7 +1630,7 @@ if (! function_exists('file_get_html')) {
             $contents = @file_get_contents($url, $use_include_path, $context, $offset);
         }
 
-        if (! is_string($contents) || $contents === '' || strlen($contents) > $maxLen) {
+        if (!is_string($contents) || $contents === '' || strlen($contents) > $maxLen) {
             return false;
         }
 
@@ -1577,7 +1646,7 @@ if (! function_exists('file_get_html')) {
     }
 }
 
-if (! function_exists('str_get_html')) {
+if (!function_exists('str_get_html')) {
     function str_get_html(
         string $str,
         bool $lowercase = true,
@@ -1605,10 +1674,10 @@ if (! function_exists('str_get_html')) {
     }
 }
 
-if (! function_exists('curl_get_contents')) {
+if (!function_exists('curl_get_contents')) {
     function curl_get_contents(string $url, int $maxLen)
     {
-        if (! function_exists('curl_init')) {
+        if (!function_exists('curl_init')) {
             return @file_get_contents($url);
         }
 
@@ -1624,7 +1693,7 @@ if (! function_exists('curl_get_contents')) {
         $contents = curl_exec($handle);
         curl_close($handle);
 
-        if (! is_string($contents) || $contents === '' || strlen($contents) > $maxLen) {
+        if (!is_string($contents) || $contents === '' || strlen($contents) > $maxLen) {
             return false;
         }
 
@@ -1632,16 +1701,16 @@ if (! function_exists('curl_get_contents')) {
     }
 }
 
-if (! function_exists('dom_node_has_class')) {
+if (!function_exists('dom_node_has_class')) {
     function dom_node_has_class($node, string $class): bool
     {
-        if (! is_object($node)) {
+        if (!is_object($node)) {
             return false;
         }
 
         $classAttr = $node->class ?? ($node->attr['class'] ?? null);
 
-        if (! is_string($classAttr) || $classAttr === '') {
+        if (!is_string($classAttr) || $classAttr === '') {
             return false;
         }
 
@@ -1651,10 +1720,10 @@ if (! function_exists('dom_node_has_class')) {
     }
 }
 
-if (! function_exists('dom_node_has_children')) {
+if (!function_exists('dom_node_has_children')) {
     function dom_node_has_children($node): bool
     {
-        if (! is_object($node) || ! method_exists($node, 'childNodes')) {
+        if (!is_object($node) || !method_exists($node, 'childNodes')) {
             return false;
         }
 

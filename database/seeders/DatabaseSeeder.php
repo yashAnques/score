@@ -31,6 +31,9 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             PdfSeeder::class,
             InterviewSetupSeeder::class,
+            CatPercentileBracketSeeder::class,
+            CutoffContentSeeder::class,
+            XatPercentileBracketSeeder::class,
         ]);
     }
 }

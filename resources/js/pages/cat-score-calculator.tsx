@@ -1,4 +1,5 @@
 import defaultContent from '@/content/cat-score-calculator.json';
+import type { CutoffTable } from '@/data/cat-cutoffs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,6 +13,7 @@ import {
     Bot,
     CheckCircle2,
     Cpu,
+    Clock3,
     ListChecks,
     Loader2,
     RefreshCcw,
@@ -29,6 +31,7 @@ import {
     useState,
 } from 'react';
 import type { SharedData } from '@/types';
+import { cn } from '@/lib/utils';
 
 type CalculationSection = {
     name: string;
@@ -75,6 +78,7 @@ type CalculationPayload = {
     sections: CalculationSection[];
     overall: CalculationOverall;
     whatsapp_link?: WhatsappInvite | null;
+    created_at?: string | null;
 };
 
 type CatPageContent = {
@@ -156,9 +160,25 @@ type CatPageContent = {
 type PageProps = {
     latestCalculation: CalculationPayload | null;
     pageContent?: Partial<CatPageContent> | null;
+    resultDelayMinutes?: number | null;
+    cutoffTables?: CutoffTable[] | null;
 };
 
 const DEFAULT_CONTENT = defaultContent as CatPageContent;
+const RESPONSE_LINK_STORAGE_KEY = 'cat_response_link';
+const persistResponseLink = (value: string) => {
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    const trimmed = value.trim();
+    if (trimmed) {
+        window.localStorage.setItem(RESPONSE_LINK_STORAGE_KEY, trimmed);
+        return;
+    }
+
+    window.localStorage.removeItem(RESPONSE_LINK_STORAGE_KEY);
+};
 
 const HERO_ICON_MAP: Record<string, ComponentType<{ className?: string }>> = {
     sparkles: Sparkles,
@@ -208,6 +228,8 @@ const mergeContent = (
 export default function CatScoreCalculator({
     latestCalculation,
     pageContent,
+    resultDelayMinutes,
+    cutoffTables,
 }: PageProps) {
     const {
         props: { auth },
@@ -228,6 +250,12 @@ export default function CatScoreCalculator({
     const responseInputRef = useRef<HTMLInputElement | null>(null);
 
     const isLoggedIn = Boolean(auth.user);
+    const delayMinutes = Number(resultDelayMinutes ?? 0);
+    const [now, setNow] = useState(() => Date.now());
+    const tables = useMemo(() => cutoffTables ?? [], [cutoffTables]);
+    const [selectedCutoff, setSelectedCutoff] = useState<string>(
+        tables[0]?.id ?? 'one',
+    );
 
     const focusResponseInput = () => {
         const input = responseInputRef.current;
@@ -248,6 +276,7 @@ export default function CatScoreCalculator({
 
     const handleRecalculate = () => {
         setResponseLink('');
+        persistResponseLink('');
         focusResponseInput();
     };
 
@@ -255,6 +284,7 @@ export default function CatScoreCalculator({
         event.preventDefault();
 
         if (!isLoggedIn) {
+            persistResponseLink(responseLink);
             if (typeof window !== 'undefined') {
                 window.location.assign(
                     buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`),
@@ -299,6 +329,8 @@ export default function CatScoreCalculator({
                 message?: string;
             };
 
+            persistResponseLink(responseLink);
+
             setCalculation(body.calculation);
         } catch (requestError) {
             setError(
@@ -333,6 +365,115 @@ export default function CatScoreCalculator({
             });
         }
     }, [calculation]);
+
+    const resultReadyAt = useMemo(() => {
+        if (!calculation?.created_at || Number.isNaN(delayMinutes) || delayMinutes <= 0) {
+            return null;
+        }
+
+        const created = new Date(calculation.created_at).getTime();
+
+        if (Number.isNaN(created)) {
+            return null;
+        }
+
+        return created + delayMinutes * 60 * 1000;
+    }, [calculation?.created_at, delayMinutes]);
+
+    const isAwaitingResult =
+        resultReadyAt !== null && resultReadyAt > now;
+
+    const remainingMs = useMemo(() => {
+        if (!isAwaitingResult || resultReadyAt === null) {
+            return null;
+        }
+
+        const diffMs = resultReadyAt - now;
+        if (diffMs <= 0) {
+            return 0;
+        }
+
+        return diffMs;
+    }, [isAwaitingResult, now, resultReadyAt]);
+
+    const formatDuration = (ms: number) => {
+        const totalMinutes = Math.ceil(ms / 60000);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        if (hours && minutes) {
+            return `${hours}h ${minutes}m`;
+        }
+
+        if (hours) {
+            return `${hours}h`;
+        }
+
+        return `${minutes}m`;
+    };
+
+    const remainingLabel = useMemo(() => {
+        if (remainingMs !== null) {
+            return formatDuration(remainingMs);
+        }
+
+        if (!Number.isNaN(delayMinutes) && delayMinutes > 0) {
+            return formatDuration(delayMinutes * 60 * 1000);
+        }
+
+        return null;
+    }, [delayMinutes, remainingMs]);
+
+    const selectedCutoffTable = useMemo<CutoffTable | undefined>(
+        () => tables.find((table) => table.id === selectedCutoff),
+        [selectedCutoff, tables],
+    );
+
+    useEffect(() => {
+        if (!tables.length) {
+            return;
+        }
+
+        const exists = tables.find((table) => table.id === selectedCutoff);
+
+        if (!exists) {
+            setSelectedCutoff(tables[0]?.id ?? 'one');
+        }
+    }, [selectedCutoff, tables]);
+
+    useEffect(() => {
+        if (!isAwaitingResult) {
+            return;
+        }
+
+        const interval = window.setInterval(() => {
+            setNow(Date.now());
+        }, 60_000);
+
+        return () => window.clearInterval(interval);
+    }, [isAwaitingResult]);
+
+    useEffect(() => {
+        setNow(Date.now());
+    }, [calculation?.id]);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const savedResponseLink = window.localStorage.getItem(
+            RESPONSE_LINK_STORAGE_KEY,
+        );
+
+        if (savedResponseLink && !responseLink) {
+            setResponseLink(savedResponseLink);
+        }
+    }, []);
+
+    useEffect(() => {
+        persistResponseLink(responseLink);
+    }, [responseLink]);
 
 
     return (
@@ -430,7 +571,71 @@ export default function CatScoreCalculator({
                 className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8"
             >
                 {calculation ? (
-                    <Scorecard calculation={calculation} headline={headline} onRecalculate={handleRecalculate} />
+                    <div className="space-y-6">
+                        {isAwaitingResult && (
+                            <div className="relative overflow-hidden rounded-3xl border border-yellow-200/60 bg-gradient-to-br from-yellow-50 via-white to-amber-100 p-10 shadow-xl dark:border-yellow-400/40 dark:from-yellow-900/30 dark:via-yellow-950/40 dark:to-amber-900/20">
+                                <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-yellow-200/50 blur-3xl dark:bg-yellow-500/20" />
+                                <div className="pointer-events-none absolute -left-10 bottom-0 h-32 w-32 rounded-full bg-amber-200/50 blur-3xl dark:bg-amber-500/20" />
+
+                                <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-yellow-500/10 text-yellow-700 shadow-inner ring-1 ring-yellow-400/40 dark:bg-yellow-400/20 dark:text-yellow-100">
+                                            <Clock3 className="h-8 w-8" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-yellow-800 dark:text-yellow-200/80">
+                                                Processing
+                                            </p>
+                                            <h2 className="text-2xl font-semibold text-slate-900 dark:text-yellow-50">
+                                                Calculating your percentile
+                                            </h2>
+                                            <p className="mt-1 text-sm text-slate-700 dark:text-yellow-100/80">
+                                                You will get your scorecard percentile in <b>{remainingLabel ?? 'a moment'}.</b>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-start gap-2 text-left sm:items-end sm:text-right">
+                                        <span className="rounded-full bg-yellow-500/10 px-4 py-2 text-xs font-semibold text-yellow-800 ring-1 ring-yellow-400/50 dark:bg-yellow-400/10 dark:text-yellow-100">
+                                            Estimated wait: {remainingLabel ?? '—'}
+                                        </span>
+                                        <span className="text-xs text-yellow-800/80 dark:text-yellow-100/70">
+                                            We’ll refresh automatically when ready.
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 flex flex-wrap items-center gap-4">
+                                    <div className="relative h-2 flex-1 min-w-[12rem] overflow-hidden rounded-full bg-yellow-200/60 dark:bg-yellow-500/20">
+                                        <div className="absolute inset-0 animate-[pulse_2s_ease-in-out_infinite] bg-gradient-to-r from-yellow-400/70 via-yellow-300/70 to-yellow-500/70" />
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs font-semibold text-yellow-900 dark:text-yellow-100">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        Securely processing…
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                                    {[
+                                        'Verifying your response sheet',
+                                        'Ensuring accurate percentile mapping',
+                                        'Preparing your detailed breakdown',
+                                    ].map((item) => (
+                                        <div key={item} className="flex items-start gap-2 rounded-2xl bg-white/60 p-3 text-sm text-slate-800 shadow-inner ring-1 ring-yellow-100/80 dark:bg-yellow-900/30 dark:text-yellow-50 dark:ring-yellow-500/30">
+                                            <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-500" />
+                                            <span>{item}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        <Scorecard
+                            calculation={calculation}
+                            headline={headline}
+                            onRecalculate={handleRecalculate}
+                            isAwaitingResult={isAwaitingResult}
+                            delayLabel={remainingLabel}
+                        />
+                    </div>
                 ) : (
                     <div className="rounded-3xl border border-dashed border-slate-200 bg-white/60 p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/60">
                         <h2 className="text-2xl font-semibold text-slate-900 dark:text-white">
@@ -442,6 +647,80 @@ export default function CatScoreCalculator({
                     </div>
                 )}
             </section>
+
+            {selectedCutoffTable && (
+                <section className="bg-background">
+                    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 pb-6 pt-2 sm:px-6 lg:px-8">
+                        <div className="flex flex-col gap-5">
+                            <div>
+                                <p className="text-sm font-semibold uppercase tracking-wide text-primary">
+                                    Explore B-Schools
+                                </p>
+                                <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                                    CAT-based cut-offs
+                                </h2>
+                                <p className="text-sm text-muted-foreground sm:text-base">
+                                    Switch between percentile ranges to explore colleges and packages.
+                                </p>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                                {tables.map((table) => (
+                                    <button
+                                        key={table.id}
+                                        type="button"
+                                        onClick={() => setSelectedCutoff(table.id)}
+                                        className={cn(
+                                            'rounded-full border px-4 py-2 text-xs font-semibold transition',
+                                            selectedCutoff === table.id
+                                                ? 'border-yellow-400 bg-yellow-300 text-yellow-900 shadow-sm dark:border-yellow-300 dark:bg-yellow-900/50 dark:text-yellow-50'
+                                                : 'border-border bg-card text-muted-foreground hover:bg-muted'
+                                        )}
+                                    >
+                                        {table.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-md">
+                            <div className="border-b border-border/70 bg-muted/40 px-4 py-3 sm:px-6">
+                                <h3 className="text-lg font-semibold text-foreground">
+                                    {selectedCutoffTable.title}
+                                </h3>
+                            </div>
+                            <div className="overflow-auto">
+                                <table className="min-w-full divide-y divide-border/60 text-left text-sm">
+                                    <thead className="bg-muted/50 text-xs uppercase tracking-wide text-muted-foreground">
+                                        <tr>
+                                            {selectedCutoffTable.columns.map((column) => (
+                                                <th key={column.key} scope="col" className="px-4 py-3 font-semibold sm:px-6">
+                                                    {column.label}
+                                                </th>
+                                            ))}
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border/60 bg-background/60">
+                                        {selectedCutoffTable.rows.map((row) => (
+                                            <tr key={`${selectedCutoffTable.id}-${row.college}`} className="hover:bg-muted/30">
+                                                {selectedCutoffTable.columns.map((column) => (
+                                                    <td key={column.key} className="px-4 py-3 align-top text-sm text-foreground sm:px-6">
+                                                        {row[column.key] ?? '—'}
+                                                    </td>
+                                                ))}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {selectedCutoffTable.note && (
+                                <div className="border-t border-border/70 bg-muted/30 px-4 py-3 text-xs text-muted-foreground sm:px-6">
+                                    {selectedCutoffTable.note}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             <section className="bg-muted/40 py-16 dark:bg-muted/20">
                 <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -530,7 +809,7 @@ export default function CatScoreCalculator({
                                 </ol>
                             </CardContent>
                         </Card>
-                        <Card className="border border-primary/20 bg-primary/5 shadow-none dark:border-primary/40 dark:bg-primary/10">
+                        <Card className="border border-primary/20 bg-white shadow-none dark:border-primary/40 dark:bg-primary/10">
                             <CardHeader>
                                 <CardTitle className="text-lg font-semibold text-foreground">
                                     {content.guide.highlight_card.title}
@@ -712,6 +991,8 @@ type ScorecardProps = {
     calculation: CalculationPayload;
     headline: string | null;
     onRecalculate: () => void;
+    isAwaitingResult: boolean;
+    delayLabel?: string | null;
 };
 
 function DetailItem({ label, value, isLink = false }: DetailItemProps) {
@@ -755,7 +1036,13 @@ function DetailItem({ label, value, isLink = false }: DetailItemProps) {
 }
 
 
-function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
+function Scorecard({
+    calculation,
+    headline,
+    onRecalculate,
+    isAwaitingResult,
+    delayLabel,
+}: ScorecardProps) {
     const scoreSummary = calculation.overall;
     const details = calculation.details ?? null;
     const derivedSlot =
@@ -855,6 +1142,13 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
         return 'Join peers preparing with the same momentum.';
     })();
 
+    const percentileDelayLabel = delayLabel ?? 'a moment';
+    const awaitingPercentileMessage = `You'll get a percentile within ${percentileDelayLabel}`;
+    const overallPercentileText = isAwaitingResult
+        ? awaitingPercentileMessage
+        : scoreSummary.percentile;
+    const formattedTotalPercentile = totalPercentile;
+
     return (
         <Card className="border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
             <CardHeader className="space-y-6">
@@ -928,8 +1222,18 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
                     <SummaryTile
                         icon={BarChart3}
                         label="Overall Percentile"
-                        value={typeof totalPercentile === 'string' ? totalPercentile : formatValue(totalPercentile)}
-                        helper="Based on slot normalisation"
+                        value={
+                            isAwaitingResult ? (
+                                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                            ) : (
+                                formattedTotalPercentile
+                            )
+                        }
+                        helper={
+                            isAwaitingResult
+                                ? awaitingPercentileMessage
+                                : 'Based on slot normalisation'
+                        }
                     />
                     <SummaryTile
                         icon={ListChecks}
@@ -955,7 +1259,7 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
                                 <th className="px-4 py-3 text-left font-semibold">Correct</th>
                                 <th className="px-4 py-3 text-left font-semibold">Incorrect</th>
                                 <th className="px-4 py-3 text-left font-semibold">Score</th>
-                                <th className="px-4 py-3 text-left font-semibold">Percentile</th>
+                                {/* <th className="px-4 py-3 text-left font-semibold">Percentile</th> */}
                             </tr>
                         </thead>
                         <tbody className="bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-200">
@@ -965,7 +1269,7 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
                                     <td className="px-4 py-3">{formatValue(section.correct)}</td>
                                     <td className="px-4 py-3">{formatValue(section.incorrect)}</td>
                                     <td className="px-4 py-3">{formatValue(section.score)}</td>
-                                    <td className="px-4 py-3">{formatValue(section.percentile)}</td>
+                                    {/* <td className="px-4 py-3">{formatValue(section.percentile)}</td> */}
                                 </tr>
                             ))}
                             <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold dark:border-slate-700 dark:bg-slate-900/70">
@@ -973,7 +1277,7 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
                                 <td className="px-4 py-3">{formatValue(scoreSummary.total_correct)}</td>
                                 <td className="px-4 py-3">{formatValue(scoreSummary.total_incorrect)}</td>
                                 <td className="px-4 py-3">{formatValue(scoreSummary.total_score)}</td>
-                                <td className="px-4 py-3">{formatValue(scoreSummary.percentile)}</td>
+                                {/* <td className="px-4 py-3">{scoreSummary.percentile}</td> */}
                             </tr>
                         </tbody>
                     </table>
@@ -992,8 +1296,8 @@ function Scorecard({ calculation, headline, onRecalculate }: ScorecardProps) {
 type SummaryTileProps = {
     icon: ComponentType<{ className?: string }>;
     label: string;
-    value: string;
-    helper?: string;
+    value: ReactNode;
+    helper?: ReactNode;
 };
 
 function SummaryTile({ icon: Icon, label, value, helper }: SummaryTileProps) {
@@ -1006,8 +1310,8 @@ function SummaryTile({ icon: Icon, label, value, helper }: SummaryTileProps) {
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     {label}
                 </p>
-                <p className="text-xl font-semibold text-foreground sm:text-2xl">{value}</p>
-                {helper && <p className="text-xs text-muted-foreground">{helper}</p>}
+                <div className="text-xl font-semibold text-foreground sm:text-2xl">{value}</div>
+                {helper && <div className="text-xs text-muted-foreground">{helper}</div>}
             </div>
         </div>
     );

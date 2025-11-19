@@ -39,5 +39,7 @@ return [
         'key_id' => env('RAZORPAY_KEY_ID'),
         'key_secret' => env('RAZORPAY_KEY_SECRET'),
     ],
+    'cat_score_result_delay_minutes' => env('CAT_SCORE_RESULT_DELAY_MINUTES', 0),
+    'xat_score_result_delay_minutes' => env('XAT_SCORE_RESULT_DELAY_MINUTES', 0),
 
 ];
