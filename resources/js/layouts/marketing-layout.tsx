@@ -27,13 +27,13 @@ import {
     GraduationCap,
     FileText,
     LayoutDashboard,
-    PanelLeftClose,
-    PanelLeftOpen,
     Video,
+    ChevronDown,
 } from 'lucide-react';
 import { ScrollProgressBar } from '@/components/scroll-progress-bar';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 type MarketingLayoutProps = {
     children: ReactNode;
@@ -53,7 +53,6 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
     } = usePage<SharedData>();
     const normalizedUrl = useMemo(() => url.replace(/[#?].*$/, ''), [url]);
     const [mobileNavOpen, setMobileNavOpen] = useState(false);
-    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     const isAuthenticated = Boolean(auth?.user);
     const user = auth?.user ?? null;
@@ -63,6 +62,15 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
     const navLinks = marketingLinksPayload?.nav ?? [];
     const navigationLayout = marketingLinksPayload?.navigationLayout ?? 'horizontal';
     const isVerticalLayout = navigationLayout === 'vertical';
+    const browserUrl = useMemo(() => {
+        if (typeof window === 'undefined') {
+            return url;
+        }
+
+        return window.location.href;
+    }, [url]);
+    const loginHref = buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(browserUrl)}`);
+    const signupHref = buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(browserUrl)}`);
     const resolveNavIcon = useCallback((label: string, href: string): LucideIcon | null => {
         const normalized = `${label} ${href}`.toLowerCase();
 
@@ -103,10 +111,10 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
 
         const source = navLinks.length
             ? navLinks.filter((link) => !!link?.url).map((link) => ({
-                  label: link?.label ?? link?.text ?? 'Explore',
-                  href: link?.url ?? '#',
-                  external: link?.url ? link.url.startsWith('http://') || link.url.startsWith('https://') : false,
-              }))
+                label: link?.label ?? link?.text ?? 'Explore',
+                href: link?.url ?? '#',
+                external: link?.url ? link.url.startsWith('http://') || link.url.startsWith('https://') : false,
+            }))
             : fallback;
 
         return source.map((item) => ({
@@ -176,7 +184,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
         );
 
         const verticalCollapsedClasses = clsx(
-            'flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-colors',
+            'group/sidebar-link flex h-11 w-11 items-center justify-center rounded-lg text-muted-foreground transition-all duration-200',
+            'lg:group-hover/sidebar:w-full lg:group-hover/sidebar:justify-start lg:group-hover/sidebar:px-3',
             isActive ? 'bg-primary/10 text-primary shadow-sm shadow-primary/20' : 'hover:bg-primary/10 hover:text-primary',
         );
 
@@ -184,11 +193,15 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
             variant === 'horizontal'
                 ? horizontalClasses
                 : variant === 'vertical'
-                  ? verticalClasses
-                  : verticalCollapsedClasses;
+                    ? verticalClasses
+                    : verticalCollapsedClasses;
 
         const labelMarkup =
-            variant === 'vertical-collapsed' ? <span className="sr-only">{item.label}</span> : <span>{item.label}</span>;
+            variant === 'vertical-collapsed' ? (
+                <span className="hidden lg:group-hover/sidebar:inline">{item.label}</span>
+            ) : (
+                <span>{item.label}</span>
+            );
 
         const isExternal = needsLogin || item.external || computedHref.startsWith('http');
 
@@ -203,7 +216,14 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                     onClick={onClick}
                     aria-label={variant === 'vertical-collapsed' ? item.label : undefined}
                 >
-                    {Icon ? <Icon className={clsx('h-4 w-4', variant === 'vertical-collapsed' && 'h-5 w-5')} /> : null}
+                    {Icon ? (
+                        <Icon
+                            className={clsx(
+                                'h-4 w-4',
+                                variant === 'vertical-collapsed' && 'h-5 w-5 lg:group-hover/sidebar:mr-2',
+                            )}
+                        />
+                    ) : null}
                     {labelMarkup}
                 </a>
             );
@@ -217,14 +237,21 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                 onClick={onClick}
                 aria-label={variant === 'vertical-collapsed' ? item.label : undefined}
             >
-                {Icon ? <Icon className={clsx('h-4 w-4', variant === 'vertical-collapsed' && 'h-5 w-5')} /> : null}
+                {Icon ? (
+                    <Icon
+                        className={clsx(
+                            'h-4 w-4',
+                            variant === 'vertical-collapsed' && 'h-5 w-5 lg:group-hover/sidebar:mr-2',
+                        )}
+                    />
+                ) : null}
                 {labelMarkup}
             </Link>
         );
     };
 
     if (isVerticalLayout) {
-        const verticalVariant = sidebarCollapsed ? 'vertical-collapsed' : 'vertical';
+        const verticalVariant = 'vertical';
 
         return (
             <div className="flex min-h-screen bg-background text-foreground">
@@ -233,141 +260,84 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
 
                 <aside
                     className={clsx(
-                        'relative hidden shrink-0 flex-col border-r border-border/60 bg-background/95 py-8 shadow-sm shadow-border/40 transition-all duration-200 lg:flex',
-                        sidebarCollapsed ? 'w-20 px-3' : 'w-72 px-6',
+                        'relative hidden h-screen shrink-0 flex-col border-r border-border/60 bg-background/95 py-8 shadow-sm shadow-border/40 lg:flex',
+                        'sticky top-0 w-72 overflow-y-auto overflow-x-hidden px-4',
                     )}
                 >
-                    <div
-                        className={clsx(
-                            'flex items-start justify-between gap-2 relative',
-                            sidebarCollapsed ? 'flex-col items-center gap-4' : 'items-center',
-                        )}
-                    >
-                        <div
-                            className={clsx(
-                                'flex items-center gap-3',
-                                sidebarCollapsed ? 'flex-col gap-2 text-center' : 'justify-start',
-                            )}
-                        >
-                            <a
+                    <div className="flex items-center justify-between gap-2 relative">
+                        <div className="flex items-center gap-3 justify-start">
+                            {/* <a
                                 href={buildBschoolUrl("/")}
                                 className={clsx(
                                     'inline-flex items-center justify-center rounded-lg border border-border/60 p-2 text-muted-foreground transition hover:border-primary hover:text-primary',
-                                    sidebarCollapsed ? 'h-10 w-10' : 'hidden sm:flex',
+                                    'hidden sm:flex',
                                 )}
                                 aria-label="Back to BschoolBuzz"
                             >
                                 <MoveLeft className="h-4 w-4" />
-                            </a>
+                            </a> */}
                             <a
                                 href={buildBschoolUrl("/")}
-                                className={clsx(
-                                    'flex items-center gap-3 text-lg font-semibold text-primary transition hover:text-primary/80',
-                                    sidebarCollapsed && 'flex-col gap-2 text-xs',
-                                )}
+                                className="flex items-center gap-3 text-lg font-semibold text-primary transition hover:text-primary/80"
                             >
-                                <AppLogoIcon className={clsx('h-10 w-10', sidebarCollapsed && 'h-9 w-9')} />
-                                {!sidebarCollapsed ? (
-                                    <span className="tracking-wide text-primary">BschoolBuzz</span>
-                                ) : (
-                                    <span className="text-[10px] font-semibold uppercase tracking-[0.4em] text-primary/80">
-                                        BB
-                                    </span>
-                                )}
+                                <AppLogo className="h-9 w-auto" />
                             </a>
                         </div>
-                        <button
-                            type="button"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 text-muted-foreground transition hover:border-primary hover:text-primary absolute -right-10 -top-5 z-1000 bg-yellow-400"
-                            onClick={() => setSidebarCollapsed((prev) => !prev)}
-                            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-                        >
-                            {sidebarCollapsed ? (
-                                <PanelLeftOpen className="h-4 w-4 text-white" />
-                            ) : (
-                                <PanelLeftClose className="h-4 w-4 text-white" />
-                            )}
-                        </button>
                     </div>
 
-                    {/* {!sidebarCollapsed ? (
-                        <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
-                            Unlock score calculators, premium courses, and mentor-crafted resources.
-                        </p>
-                    ) : null} */}
+                    {/* <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+                        Unlock score calculators, premium courses, and mentor-crafted resources.
+                    </p> */}
 
-                    <nav className={clsx('mt-8 flex flex-1 flex-col gap-1', sidebarCollapsed && 'items-center')}>
-                        {navItems.map((item) => renderNavLink(item, undefined, verticalVariant))}
+                    <nav className="mt-8 flex flex-1 flex-col gap-1">
+                        {navItems.map((item) => renderNavLink(item, undefined, 'vertical'))}
                     </nav>
 
-                    <div
-                        className={clsx(
-                            'mt-10 border-t border-border/60 pt-6',
-                            sidebarCollapsed && 'mt-auto flex flex-col items-center gap-3 border-none pt-3',
-                        )}
-                    >
+                    <div className="mt-10 border-t border-border/60 pt-6">
                         {isAuthenticated && user ? (
-                            <div
-                                className={clsx(
-                                    'flex items-center gap-3 rounded-lg border border-border/60 bg-primary/5 px-3 py-3',
-                                    sidebarCollapsed && 'flex-col gap-2 px-2 py-2 text-center',
-                                )}
-                            >
-                                <Avatar className={clsx('h-10 w-10', sidebarCollapsed && 'h-9 w-9')}>
+                            <div className="flex items-center gap-3 rounded-lg border border-border/60 bg-primary/5 px-3 py-3">
+                                <Avatar className="h-10 w-10">
                                     <AvatarImage src={user.avatar} alt={user.name} />
                                     <AvatarFallback className="bg-primary/10 text-primary">
                                         {getInitials(user.name)}
                                     </AvatarFallback>
                                 </Avatar>
-                                {!sidebarCollapsed ? (
-                                    <div className="flex flex-1 flex-col">
-                                        <span className="text-sm font-semibold text-primary">{user.name}</span>
-                                        <span className="text-xs text-muted-foreground">{user.email}</span>
-                                    </div>
-                                ) : null}
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    className={clsx('h-8 w-8', sidebarCollapsed && 'h-7 w-7')}
-                                    onClick={() => router.post(logout.url())}
-                                    aria-label="Logout"
-                                >
-                                    <MoveLeft className={clsx('h-4 w-4', sidebarCollapsed && 'h-3.5 w-3.5')} />
-                                </Button>
+                                <div className="flex flex-1 flex-col">
+                                    <span className="text-sm font-semibold text-primary">{user.name}</span>
+                                    <span className="text-xs text-muted-foreground">{user.email}</span>
+                                </div>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <a
+                                            href={buildBschoolUrl("/")}
+                                            className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-border/60 text-muted-foreground transition hover:border-primary hover:text-primary"
+                                            aria-label="Back to BschoolBuzz"
+                                        >
+                                            <MoveLeft className="h-4 w-4" />
+                                        </a>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="right">Back to BschoolBuzz</TooltipContent>
+                                </Tooltip>
                             </div>
                         ) : (
-                            <div
-                                className={clsx(
-                                    'flex flex-col gap-3',
-                                    sidebarCollapsed && 'items-center text-center text-xs',
-                                )}
-                            >
-                                {!sidebarCollapsed ? (
-                                    <p className="text-sm text-muted-foreground">
-                                        Sign in to save your scores, resume purchases, and unlock premium PDFs.
-                                    </p>
-                                ) : null}
-                                <div className={clsx('flex flex-col gap-2', sidebarCollapsed && 'w-full items-center')}>
+                            <div className="flex flex-col gap-3">
+                                <p className="text-sm text-muted-foreground">
+                                    Sign in to save your scores, resume purchases, and unlock premium PDFs.
+                                </p>
+                                <div className="flex flex-col gap-2">
                                     <a
-                                        href={buildBschoolUrl(`/login?redirect_to=${encodeURIComponent(window.location.href)}`)}
-                                        className={clsx(
-                                            'inline-flex items-center justify-center gap-2 rounded-lg border border-primary/40 px-3 py-2 text-sm font-semibold text-primary transition hover:border-primary hover:bg-primary/10',
-                                            sidebarCollapsed && 'w-full px-2 py-2 text-xs',
-                                        )}
+                                        href={loginHref}
+                                        className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-primary transition hover:text-primary/80"
                                     >
                                         <CircleUserRound className="h-4 w-4" />
-                                        {!sidebarCollapsed ? 'Login' : null}
+                                        Login
                                     </a>
                                     <a
-                                        href={buildBschoolUrl(`/signup?redirect_to=${encodeURIComponent(window.location.href)}`)}
-                                        className={clsx(
-                                            'inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90',
-                                            sidebarCollapsed && 'w-full px-2 py-2 text-xs',
-                                        )}
+                                        href={signupHref}
+                                        className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-primary transition hover:text-primary/80"
                                     >
                                         <UserPlus className="h-4 w-4" />
-                                        {!sidebarCollapsed ? 'Create Account' : null}
+                                        Signup
                                     </a>
                                 </div>
                             </div>
@@ -451,6 +421,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                                             <button
                                                 type="button"
                                                 className="inline-flex h-9 items-center rounded-lg border border-border/60 px-3 text-sm font-semibold text-muted-foreground transition hover:border-primary hover:text-primary"
+                                                title="Logout"
                                                 onClick={() => {
                                                     setMobileNavOpen(false);
                                                     router.post(logout.url());
@@ -479,6 +450,62 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                             </div>
                         </div>
                     ) : null}
+
+                    <div className="hidden items-center justify-between border-b border-border/60 bg-background/95 px-8 py-4 lg:flex">
+                        <div className="text-sm font-medium text-muted-foreground">
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <AppearanceToggleDropdown />
+                            {isAuthenticated && user ? (
+                                <div>
+                                    {/* <DropdownMenu> */}
+                                    {/* <DropdownMenuTrigger asChild> */}
+                                    <a href={buildBschoolUrl("/profile")}>
+                                        <button
+                                            type="button"
+                                            className="flex items-center gap-3 rounded-full px-3 py-2 text-left transition hover:border-primary cursor-pointer"
+                                        >
+                                            <Avatar className="h-9 w-9">
+                                                <AvatarImage src={user.avatar} alt={user.name} />
+                                                <AvatarFallback className="bg-primary/10 text-primary">
+                                                    {getInitials(user.name)}
+                                                </AvatarFallback>
+                                            </Avatar>
+                                            <div className="hidden flex-col text-left xl:flex">
+                                                <span className="text-sm font-semibold text-foreground">
+                                                    {user.name}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">{user.email}</span>
+                                            </div>
+                                            {/* <ChevronDown className="h-4 w-4 text-muted-foreground" /> */}
+                                        </button>
+                                    </a>
+                                    {/* </DropdownMenuTrigger> */}
+                                    {/* <DropdownMenuContent align="end" className="w-64">
+                                        <UserMenuContent user={user} />
+                                    </DropdownMenuContent> */}
+                                    {/* </DropdownMenu> */}
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-4">
+                                    <a
+                                        href={loginHref}
+                                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary/80"
+                                    >
+                                        <CircleUserRound className="h-4 w-4" />
+                                        Login
+                                    </a>
+                                    <a
+                                        href={signupHref}
+                                        className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:text-primary/80"
+                                    >
+                                        <UserPlus className="h-4 w-4" />
+                                        Signup
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     <main className="flex-1">{children}</main>
                 </div>

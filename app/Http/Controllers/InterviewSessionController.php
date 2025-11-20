@@ -146,6 +146,38 @@ class InterviewSessionController extends Controller
         ], 201);
     }
 
+    public function validateSop(Request $request, SopValidationService $sopValidationService): JsonResponse
+    {
+        $validated = $request->validate([
+            'sop_file' => ['required', 'file', 'mimetypes:application/pdf', 'max:20480'],
+            'college_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $file = $request->file('sop_file');
+
+        if (!$file) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'Please upload a valid SOP file.',
+            ], 422);
+        }
+
+        try {
+            $collegeName = $validated['college_name'] ?? null;
+            $sopValidationService->assertValid($file, $collegeName ? (string) $collegeName : null);
+        } catch (RuntimeException $exception) {
+            return response()->json([
+                'valid' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'message' => 'SOP looks good.',
+        ]);
+    }
+
     public function start(
         Request $request,
         InterviewSession $session,

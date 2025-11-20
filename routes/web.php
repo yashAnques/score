@@ -103,6 +103,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/interviews/sessions/{session}/cancel', [\App\Http\Controllers\InterviewSessionController::class, 'cancel'])->name('interviews.sessions.cancel');
     Route::post('/interviews/sessions/{session}/recordings/chunks', [\App\Http\Controllers\InterviewRecordingController::class, 'store'])->name('interviews.sessions.recordings.store');
     Route::get('/interviews/sessions/{session}/recordings/download', [\App\Http\Controllers\InterviewRecordingController::class, 'download'])->name('interviews.sessions.recordings.download');
+    Route::post('/interviews/sop/validate', [\App\Http\Controllers\InterviewSessionController::class, 'validateSop'])->name('interviews.sop.validate');
 
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');

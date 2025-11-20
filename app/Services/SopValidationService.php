@@ -6,6 +6,7 @@ use App\Services\Ai\AiClientInterface;
 use App\Services\Ai\AiProviderResolver;
 use Illuminate\Http\UploadedFile;
 use RuntimeException;
+use Throwable;
 
 class SopValidationService
 {
@@ -19,10 +20,15 @@ class SopValidationService
      *
      * @throws RuntimeException
      */
-    public function assertValid(UploadedFile $file): void
+    public function assertValid(UploadedFile $file, ?string $collegeName = null): void
     {
         if ($file->getSize() < 15_000) {
             throw new RuntimeException('Your SOP PDF appears too small. Upload the full document.');
+        }
+
+        $text = $this->extractPdfText($file);
+        if (mb_strlen(trim($text)) < 100) {
+            throw new RuntimeException('Uploaded file is empty or invalid.');
         }
 
         $resolved = $this->aiProviders->resolve();
@@ -30,107 +36,107 @@ class SopValidationService
         $model = $resolved['model'];
         $provider = $resolved['provider'] ?? null;
 
-        if ($provider === 'gemini') {
-            $this->validateUsingGemini($client, $model, $file);
-
-            return;
-        }
-
-        if ($provider === 'openai') {
-            $this->validateUsingOpenAi($client, $model, $file);
-
-            return;
-        }
-
-        throw new RuntimeException('SOP validation requires Gemini or OpenAI provider. Please contact support.');
-    }
-
-    protected function validateUsingGemini(AiClientInterface $client, ?string $model, UploadedFile $file): void
-    {
-        $contents = @file_get_contents($file->getRealPath());
-        if ($contents === false) {
-            throw new RuntimeException('Unable to read the uploaded SOP file.');
-        }
-
+        $collegeLine = $collegeName ? "College: {$collegeName}\n\n" : '';
         $prompt = <<<PROMPT
-You are an MBA admissions reviewer. The candidate's SOP PDF is attached.
-Return ONLY JSON with keys:
-- valid (boolean)
-- reason (string)
-Mark invalid if the attachment is not a detailed personal statement outlining goals, achievements, motivators, and fit for the MBA journey.
-PROMPT;
+Niche wale text analyze kar aur bata ki yeh SOP hai ya nahi jyada check karne ki koi need nahi hai but simple sop honi chahiye yeh bs uska answer niche wale format me de.
+Respond only with JSON like: {"valid": true|false, "reason": "short reason"}.
 
-        $response = $client->generate($prompt, [
-            'system' => 'You validate whether documents are authentic Statements of Purpose for MBA candidates.',
-            'model' => $model,
-            'inline_data' => [
-                'mime_type' => $file->getMimeType() ?? 'application/pdf',
-                'data' => base64_encode($contents),
-            ],
-            'temperature' => 0.1,
-            'max_tokens' => 200,
-        ]);
-
-        if (!$response) {
-            throw new RuntimeException('Unable to validate SOP right now. Please try again.');
-        }
-
-        $data = json_decode($response, true);
-        if (is_array($data) && array_key_exists('valid', $data)) {
-            if (filter_var($data['valid'], FILTER_VALIDATE_BOOLEAN)) {
-                return;
-            }
-
-            throw new RuntimeException(
-                $data['reason'] ?? 'Uploaded SOP does not look valid. Please upload the complete statement of purpose.',
-            );
-        }
-
-        throw new RuntimeException('Unable to validate SOP right now. Please try again.');
-    }
-
-    protected function validateUsingOpenAi(AiClientInterface $client, ?string $model, UploadedFile $file): void
-    {
-        $contents = @file_get_contents($file->getRealPath());
-        if ($contents === false) {
-            throw new RuntimeException('Unable to read the uploaded SOP file.');
-        }
-
-        $base64 = base64_encode($contents);
-
-        $prompt = <<<PROMPT
-You are an MBA admissions reviewer. The candidate's SOP PDF is provided below as a base64 encoded string. Decode it and determine if it is a legitimate Statement of Purpose (SOP) for MBA or Masters admissions.
-Return ONLY JSON with keys:
-- valid (boolean)
-- reason (string)
-Mark invalid if the attachment is not a detailed personal statement outlining goals, achievements, motivators, and fit for the MBA journey.
-
-BASE64 PDF:
-{$base64}
+{$collegeLine}Text:
+{$this->truncateText($text, 3000)}
 PROMPT;
 
         $response = $client->generate($prompt, [
             'system' => 'You validate whether documents are authentic Statements of Purpose for MBA candidates.',
             'model' => $model,
             'temperature' => 0.1,
-            'max_tokens' => 200,
+            'max_tokens' => 300,
         ]);
 
         if (!$response) {
             throw new RuntimeException('Unable to validate SOP right now. Please try again.');
         }
 
-        $data = json_decode($response, true);
+        $data = $this->decodeJsonResponse($response);
         if (is_array($data) && array_key_exists('valid', $data)) {
             if (filter_var($data['valid'], FILTER_VALIDATE_BOOLEAN)) {
                 return;
             }
 
-            throw new RuntimeException(
-                $data['reason'] ?? 'Uploaded SOP does not look valid. Please upload the complete statement of purpose.',
-            );
+            throw new RuntimeException('Uploaded SOP does not look valid. Please upload the complete statement of purpose.');
         }
 
         throw new RuntimeException('Unable to validate SOP right now. Please try again.');
+    }
+
+    /**
+     * Attempt to decode JSON responses even when wrapped inside extra text/code fences.
+     */
+    protected function decodeJsonResponse(?string $response): ?array
+    {
+        if (!$response) {
+            return null;
+        }
+
+        $decoded = json_decode(trim($response), true);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            return $decoded;
+        }
+
+        if (preg_match('/\{.*\}/s', $response, $matches)) {
+            $decoded = json_decode($matches[0], true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                return $decoded;
+            }
+        }
+
+        return null;
+    }
+
+    protected function extractPdfText(UploadedFile $file): string
+    {
+        $path = $file->getRealPath();
+        if (!$path || !is_readable($path)) {
+            return '';
+        }
+
+        if (class_exists(\Smalot\PdfParser\Parser::class)) {
+            try {
+                $parser = new \Smalot\PdfParser\Parser();
+                $pdf = $parser->parseFile($path);
+                $text = $pdf->getText();
+                if (trim($text) !== '') {
+                    return $text;
+                }
+            } catch (Throwable) {
+                // Ignore and fallback to other strategies
+            }
+        }
+
+        if (function_exists('shell_exec')) {
+            $binary = trim((string) shell_exec('command -v pdftotext'));
+            if ($binary) {
+                $tmp = tempnam(sys_get_temp_dir(), 'sop_txt_');
+                if ($tmp !== false) {
+                    $command = escapeshellcmd($binary) . ' -layout ' . escapeshellarg($path) . ' ' . escapeshellarg($tmp) . ' 2>&1';
+                    shell_exec($command);
+                    $text = @file_get_contents($tmp) ?: '';
+                    @unlink($tmp);
+                    if (trim($text) !== '') {
+                        return $text;
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    protected function truncateText(string $text, int $limit): string
+    {
+        if (mb_strlen($text) <= $limit) {
+            return $text;
+        }
+
+        return mb_substr($text, 0, $limit);
     }
 }

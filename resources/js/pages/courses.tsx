@@ -441,7 +441,7 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                 </section>
 
                 <section className="mx-auto w-full max-w-6xl px-4">
-                    <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                         {courses.map((course) => {
                             const hasDiscount =
                                 course.salePrice !== null &&
@@ -491,15 +491,15 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                                     <CardContent className="flex flex-1 flex-col gap-6 pb-6">
                                         <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
                                             {course.descriptionPoints.map((point, index) => (
-                                                <li key={`${course.slug}-${index}`} className="flex items-start gap-2">
+                                                <li key={`${course.slug}-${index}`} className="flex items-center gap-2">
                                                     <span className="mt-1 inline-flex h-2 w-2 shrink-0 rounded-full bg-primary" />
-                                                    <span>{point}</span>
+                                                    <span className='font-bold text-[#000000] dark:text-[#ffffff]'>{point}</span>
                                                 </li>
                                             ))}
                                         </ul>
                                         <Button
                                             type="button"
-                                            className="w-full bg-gradient-to-r from-primary via-primary to-primary/90 shadow-primary/30 transition hover:shadow-lg hover:shadow-primary/40"
+                                            className="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-sky-500 bg-[length:220%_220%] py-6 text-base font-semibold tracking-wide text-white shadow-[0_20px_45px_rgba(251,191,36,0.35)] transition-all duration-500 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-400 disabled:opacity-70 cursor-pointer"
                                             size="lg"
                                             onClick={() => handleBuyNow(course)}
                                             disabled={!razorpayReady}
@@ -537,14 +537,30 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                     }
                 }}
             >
-                <DialogContent className="max-w-lg">
-                    <DialogHeader>
-                        <DialogTitle>Complete your purchase</DialogTitle>
-                        <DialogDescription>
+                <DialogContent className="max-w-xl rounded-3xl border border-slate-100 bg-white/95 p-0 shadow-[0_30px_120px_rgba(15,23,42,0.18)]">
+                    <div className="relative overflow-hidden rounded-t-3xl bg-gradient-to-br from-[#4f46e5] via-[#7c3aed] to-[#e11d48] px-6 py-5 text-white">
+                        <div className="absolute -right-6 top-3 h-20 w-20 rounded-full bg-white/10 blur-3xl" />
+                        <div className="flex items-center justify-between mt-4">
+                            <div>
+                                <p className="text-sm uppercase tracking-[0.3em] text-white/70">Secure checkout</p>
+                                <h3 className="text-2xl font-semibold leading-tight">Complete your purchase</h3>
+                            </div>
+                            {selectedCourse ? (
+                                <div className="rounded-2xl bg-white/15 px-3 py-2 text-sm font-semibold text-white backdrop-blur">
+                                    {formatter.format(selectedCourse.salePrice ?? selectedCourse.originalPrice ?? 0)}
+                                </div>
+                            ) : null}
+                        </div>
+                        <p className="mt-2 text-sm text-white/80">
                             Secure your access to <strong>{selectedCourse?.name}</strong>. You can use Razorpay test
                             cards to try the flow.
-                        </DialogDescription>
-                    </DialogHeader>
+                        </p>
+                    </div>
+                    
+                    {/* <DialogHeader>
+                        <DialogTitle className="sr-only">Complete your purchase</DialogTitle>
+                        <DialogDescription className="sr-only">Fill your payment details</DialogDescription>
+                    </DialogHeader> */}
 
                     {error ? (
                         <Alert variant="destructive">
@@ -553,19 +569,24 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                         </Alert>
                     ) : null}
 
-                    <form className="flex flex-col gap-4" onSubmit={handleCheckout}>
+                    <form className="flex flex-col gap-5 px-6 pb-3 pt-4" onSubmit={handleCheckout}>
                         <div className="space-y-2">
-                            <Label htmlFor="buyer-name">Full name</Label>
+                            <Label htmlFor="buyer-name" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Full name
+                            </Label>
                             <Input
                                 id="buyer-name"
                                 placeholder="Jane Doe"
                                 value={formData.name}
                                 onChange={handleFieldChange('name')}
                                 autoComplete="name"
+                                className="p-5 border border-slate-300"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="buyer-email">Email address</Label>
+                            <Label htmlFor="buyer-email" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Email address
+                            </Label>
                             <Input
                                 id="buyer-email"
                                 type="email"
@@ -574,10 +595,13 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                                 onChange={handleFieldChange('email')}
                                 autoComplete="email"
                                 required
+                                className="p-5 border border-slate-300"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="buyer-phone">Contact number (optional)</Label>
+                            <Label htmlFor="buyer-phone" className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Contact number (optional)
+                            </Label>
                             <Input
                                 id="buyer-phone"
                                 type="tel"
@@ -586,17 +610,24 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                                 onChange={handleFieldChange('phone')}
                                 autoComplete="tel"
                                 aria-invalid={phoneError ? 'true' : 'false'}
+                                className="p-5 border border-slate-300"
                             />
                             {phoneError ? <p className="text-xs font-medium text-destructive">{phoneError}</p> : null}
                         </div>
 
-                        <DialogFooter className="pt-2">
-                            <Button type="button" variant="ghost" onClick={() => closeDialog()} disabled={loading}>
+                        <DialogFooter className="flex flex-col gap-3 pt-2 sm:flex-row">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className="w-full border border-slate-500 cursor-pointer text-base font-semibold text-slate-600 transition py-5 px-6 hover:border-slate-300 hover:bg-slate-50 sm:w-auto"
+                                onClick={() => closeDialog()}
+                                disabled={loading}
+                            >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
-                                className="bg-gradient-to-r from-primary via-primary to-primary/90 shadow-primary/30 transition hover:shadow-lg hover:shadow-primary/40"
+                                className="w-full bg-gradient-to-r cursor-pointer from-amber-600 via-yellow-500 to-sky-500 bg-[length:200%_200%] py-5 px-6 text-base font-semibold tracking-wide text-white transition focus-visible:ring-2 focus-visible:ring-sky-400 disabled:opacity-70 sm:w-auto"
                                 disabled={
                                     loading ||
                                     !formData.email.trim() ||
@@ -617,7 +648,7 @@ export default function CoursesPage({ courses: rawCourses }: CoursesPageProps) {
                         </DialogFooter>
                     </form>
 
-                    <p className="text-[13px] text-muted-foreground">
+                    <p className="px-6 pb-6 text-[13px] text-muted-foreground">
                         Payments are securely processed by Razorpay. By continuing you agree to our terms and privacy
                         policy.
                     </p>

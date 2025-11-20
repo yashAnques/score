@@ -207,6 +207,8 @@ const heroStats = [
     { label: 'AI feedback ready in', value: '< 3 mins', icon: Zap },
 ] as const;
 
+const SOP_VALIDATION_ENDPOINT = '/interviews/sop/validate';
+
 const statusStyles: Record<
     string,
     { label: string; className: string }
@@ -285,6 +287,8 @@ export default function InterviewsPage({
     const [formErrors, setFormErrors] = useState<Record<string, string[]>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [slotLoading, setSlotLoading] = useState(false);
+    const [sopValidationStatus, setSopValidationStatus] = useState<'idle' | 'validating' | 'success' | 'error'>('idle');
+    const [sopValidationMessage, setSopValidationMessage] = useState<string | null>(null);
     const [historyOpen, setHistoryOpen] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [roomOpen, setRoomOpen] = useState(false);
@@ -311,6 +315,7 @@ export default function InterviewsPage({
     const backgroundRecordingPromiseRef = useRef<Promise<BackgroundRecordingResult | null> | null>(null);
     const backgroundRecordingResolverRef = useRef<((result: BackgroundRecordingResult | null) => void) | null>(null);
     const backgroundRecordingStartTimeRef = useRef<number | null>(null);
+    const sopValidationAbortRef = useRef<AbortController | null>(null);
 
     const totalCredits = useMemo(
         () => credits.balances.reduce((sum, item) => sum + (item.balance ?? 0), 0),
@@ -1081,9 +1086,24 @@ export default function InterviewsPage({
         };
     }, [handleCancelSession, restrictions.cancelOnTabSwitch, roomOpen, roomSession]);
 
+    useEffect(() => {
+        return () => {
+            sopValidationAbortRef.current?.abort();
+        };
+    }, []);
+
     const upcomingSession = useMemo(() => {
+        const now = Date.now();
         const futureSessions = sessions
-            .filter((session) => !session.cancelledAt && session.slot?.startsAt)
+            .filter((session) => {
+                if (session.cancelledAt || !session.slot?.startsAt) {
+                    return false;
+                }
+
+                const startTime = new Date(session.slot.startsAt).getTime();
+
+                return Number.isFinite(startTime) && startTime > now;
+            })
             .sort((a, b) => {
                 const left = new Date(a.slot?.startsAt ?? 0).getTime();
                 const right = new Date(b.slot?.startsAt ?? 0).getTime();
@@ -1094,6 +1114,89 @@ export default function InterviewsPage({
         return futureSessions[0] ?? null;
     }, [sessions]);
 
+    const validateSopFile = useCallback(
+        async (file: File) => {
+            if (!file) {
+                return;
+            }
+
+            sopValidationAbortRef.current?.abort();
+            const controller = new AbortController();
+            sopValidationAbortRef.current = controller;
+            setSopValidationStatus('validating');
+            setSopValidationMessage('Validating SOP…');
+
+            try {
+                const payload = new FormData();
+                payload.append('sop_file', file);
+
+                const response = await fetch(SOP_VALIDATION_ENDPOINT, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken(),
+                    },
+                    body: payload,
+                    signal: controller.signal,
+                });
+
+                const result = (await response.json().catch(() => ({}))) as Partial<{ valid: boolean; message?: string }>;
+                const isValid = Boolean(result?.valid);
+
+                if (!response.ok || !isValid) {
+                    const message = result?.message ?? 'Please upload a valid SOP file.';
+                    setSopValidationStatus('error');
+                    setSopValidationMessage(message);
+                    setFormErrors((prev) => ({
+                        ...prev,
+                        sop_validation: [message],
+                    }));
+                    showToast({
+                        title: 'Invalid SOP',
+                        description: message,
+                        variant: 'error',
+                    });
+                    setSopFile(null);
+
+                    return;
+                }
+
+                const successMessage = result?.message ?? 'SOP looks good.';
+                setSopValidationStatus('success');
+                setSopValidationMessage(successMessage);
+                setFormErrors((prev) => {
+                    const next = { ...prev };
+                    delete next.sop_validation;
+                    delete next.sop_file;
+                    delete next.sop_document;
+                    delete next.sop;
+                    return next;
+                });
+            } catch (error) {
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    return;
+                }
+
+                const message = error instanceof Error ? error.message : 'Please upload a valid SOP file.';
+                setSopValidationStatus('error');
+                setSopValidationMessage(message);
+                setFormErrors((prev) => ({
+                    ...prev,
+                    sop_validation: [message],
+                }));
+                showToast({
+                    title: 'Unable to validate SOP',
+                    description: message,
+                    variant: 'error',
+                });
+                setSopFile(null);
+            } finally {
+                sopValidationAbortRef.current = null;
+            }
+        },
+        [showToast],
+    );
+
     const handleSchedule = useCallback(
         async (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
@@ -1103,6 +1206,26 @@ export default function InterviewsPage({
                 showToast({
                     title: 'Select a slot',
                     description: 'Please select a slot to continue.',
+                    variant: 'error',
+                });
+
+                return;
+            }
+
+            if (sopValidationStatus === 'validating') {
+                showToast({
+                    title: 'Please wait',
+                    description: 'We are still validating your SOP. Try again in a moment.',
+                    variant: 'error',
+                });
+
+                return;
+            }
+
+            if (sopValidationStatus === 'error') {
+                showToast({
+                    title: 'Invalid SOP',
+                    description: sopValidationMessage ?? 'Please upload a valid SOP file.',
                     variant: 'error',
                 });
 
@@ -1145,6 +1268,8 @@ export default function InterviewsPage({
                 setFormData({ candidate_role: '' });
                 setSelectedSlotId(null);
                 setSopFile(null);
+                setSopValidationStatus('idle');
+                setSopValidationMessage(null);
                 showToast({
                     title: 'Interview locked in',
                     description: 'We emailed the confirmation and will nudge you before it begins.',
@@ -1175,6 +1300,8 @@ export default function InterviewsPage({
             selectedSlotId,
             sopFile,
             showToast,
+            sopValidationMessage,
+            sopValidationStatus,
         ],
     );
 
@@ -1202,6 +1329,22 @@ export default function InterviewsPage({
     }, [refreshCredits, refreshSessions, refreshSlots, showToast]);
 
     const slotUnavailable = filteredSlots.length === 0;
+    const sopErrorKeys = ['sop_file', 'sop_validation', 'sop_document', 'sop'] as const;
+    const sopSpecificError =
+        formErrors['sop_file']?.[0] ??
+        formErrors['sop_validation']?.[0] ??
+        formErrors['sop_document']?.[0] ??
+        formErrors['sop']?.[0];
+    const showGenericSopError =
+        !sopSpecificError &&
+        sopErrorKeys.some((key) => {
+            const errors = formErrors[key];
+            return Array.isArray(errors) && errors.length > 0;
+        });
+    const resolvedSopError =
+        sopValidationStatus === 'error'
+            ? sopValidationMessage ?? 'Please upload a valid SOP file.'
+            : sopSpecificError ?? (showGenericSopError ? 'Please upload a valid SOP file.' : undefined);
     return (
         <MarketingLayout>
             <Head title="AI Interview Studio" />
@@ -1500,7 +1643,7 @@ export default function InterviewsPage({
                                                     candidate_role: event.target.value,
                                                 }))
                                             }
-                                            className="rounded-xl"
+                                            className="rounded-xl p-5"
                                         />
                                         <InputError message={formErrors.candidate_role?.[0]} />
                                     </div>
@@ -1515,7 +1658,7 @@ export default function InterviewsPage({
                                             id="sop-file"
                                             type="file"
                                             accept="application/pdf"
-                                            className="block w-full cursor-pointer rounded-xl border border-muted bg-background/80 px-4 py-2 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-primary"
+                                            className="block w-full cursor-pointer rounded-xl border bg-background/80 px-4 py-2 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:px-4 file:py-2 file:text-primary"
                                             onChange={(event) => {
                                                 const file = event.target.files?.[0] ?? null;
                                                 if (file && file.type !== 'application/pdf') {
@@ -1527,7 +1670,15 @@ export default function InterviewsPage({
                                                     event.target.value = '';
                                                     return;
                                                 }
-                                                setSopFile(file ?? null);
+                                                if (!file) {
+                                                    setSopFile(null);
+                                                    setSopValidationStatus('idle');
+                                                    setSopValidationMessage(null);
+                                                    return;
+                                                }
+
+                                                setSopFile(file);
+                                                validateSopFile(file);
                                             }}
                                         />
                                         {sopFile ? (
@@ -1537,6 +1688,16 @@ export default function InterviewsPage({
                                                 Upload your SOP PDF if you want the panel to read the full version.
                                             </p>
                                         )}
+                                        {sopValidationStatus === 'validating' && (
+                                            <p className="flex items-center gap-2 text-xs font-medium text-primary">
+                                                <Loader2 className="h-3 w-3 animate-spin" />
+                                                {sopValidationMessage ?? 'Validating SOP…'}
+                                            </p>
+                                        )}
+                                        {sopValidationStatus === 'success' && sopValidationMessage && (
+                                            <p className="text-xs font-medium text-emerald-600">{sopValidationMessage}</p>
+                                        )}
+                                        <InputError message={resolvedSopError} />
                                     </div>
 
                                     <div className="space-y-3">
@@ -1637,7 +1798,9 @@ export default function InterviewsPage({
                                         disabled={
                                             isSubmitting ||
                                             !selectedSlotId ||
-                                            !formData.candidate_role.trim()
+                                            !formData.candidate_role.trim() ||
+                                            sopValidationStatus === 'validating' ||
+                                            sopValidationStatus === 'error'
                                         }
                                     >
                                         {isSubmitting ? (
