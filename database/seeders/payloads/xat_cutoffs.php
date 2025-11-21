@@ -21,6 +21,7 @@ return [
                 'highest' => '30 LPA',
                 'average' => '19.53 LPA',
                 'companies' => 'Air India, DE Shaw, Accenture, IDBI Bank, IBM, EY.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'XLRI Delhi',
@@ -29,6 +30,7 @@ return [
                 'highest' => '75 LPA',
                 'average' => '29.89 LPA',
                 'companies' => 'Accenture Strategy, Amazon, Asian Paints, Bajaj Auto, HCL, HUL, Ola, PwC, etc.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'XLRI Jamshedpur',
@@ -37,6 +39,7 @@ return [
                 'highest' => '75 LPA',
                 'average' => '29.89 LPA',
                 'companies' => 'Accenture Strategy, Amazon, Asian Paints, Bajaj Auto, HCL, HUL, Ola, PwC, etc.',
+                'apply_now' => '#',
             ],
         ],
     ],
@@ -60,6 +63,7 @@ return [
                 'highest' => '20.5 LPA',
                 'average' => '12.4 LPA',
                 'companies' => 'Barclays, Infosys, City Union Bank, ICICI Prudential, Ford',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Xavier Institute of Social Services, Ranchi (XISS)',
@@ -68,6 +72,7 @@ return [
                 'highest' => '20.50 LPA',
                 'average' => '9.40 LPA',
                 'companies' => 'HDFC, ICICI Bank, Deloitte India, EY, Emami, MTR Foods.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'FORE School of Management, New Delhi (Core)',
@@ -76,6 +81,7 @@ return [
                 'highest' => '29 LPA',
                 'average' => '16.8 LPA',
                 'companies' => 'ITC, Nestlé, Asian Paints, HUL, Bacardi, Café Coffee Day, United Breweries, Nivea, Suzuki, Tata Motors, Mahindra, Hero, Hyundai, JK Tyre, Godfrey Phillips, Whirlpool, Vivo',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Goa Institute of Management (GIM)',
@@ -84,6 +90,7 @@ return [
                 'highest' => '32.2 LPA',
                 'average' => '15.13 LPA',
                 'companies' => 'Accenture, Asian Paints, Deloitte, Capgemini, J.P. Morgan, Vedanta.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Institute of Rural Management, Anand (IRMA)',
@@ -92,6 +99,7 @@ return [
                 'highest' => '31.16 LPA',
                 'average' => '14.14 LPA',
                 'companies' => 'Amul, Deloitte, ICICI Bank, KPMG, Big Basket, Dabur.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'K J Somaiya Institute of Management',
@@ -100,6 +108,7 @@ return [
                 'highest' => '28.5 LPA',
                 'average' => 'Top 100-17.34 LPA | Top 200-15.8 LPA',
                 'companies' => 'Capgemini, TCS, Wipro, Accenture, Infosys',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Lal Bahadur Shastri Institute of Management, New Delhi',
@@ -108,6 +117,7 @@ return [
                 'highest' => '16.67 LPA',
                 'average' => '12.24 LPA',
                 'companies' => 'Deloitte, Bain & Co, EY GDS, KPMG.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'MICA, Ahmedabad',
@@ -116,6 +126,7 @@ return [
                 'highest' => '36 LPA',
                 'average' => '20.09 LPA',
                 'companies' => 'Cognizant, Deloitte, Dalmia Group, Flipkart, Google.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'National Insurance Academy Pune',
@@ -124,6 +135,7 @@ return [
                 'highest' => '22 LPA',
                 'average' => '12.3 LPA',
                 'companies' => 'Bajaj Allianz, HDFC, TATA AIA, SBI General Insurance',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Welingkar Institute of Management, Mumbai',
@@ -132,6 +144,7 @@ return [
                 'highest' => '40 LPA',
                 'average' => '12.02 LPA',
                 'companies' => 'EY, Accenture, Amazon, Barclays, Deloitte USI.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Xavier Institute of Management and Entrepreneurship (XIME)',
@@ -140,6 +153,7 @@ return [
                 'highest' => '16 LPA',
                 'average' => '10.85 LPA',
                 'companies' => 'EY, Infosys, Cognizant, Dell, Wipro, Deloitte, Accenture, Gartner.',
+                'apply_now' => '#',
             ],
         ],
     ],
@@ -163,6 +177,7 @@ return [
                 'highest' => '22 LPA',
                 'average' => '12.3 LPA',
                 'companies' => 'TATA AIA, Accenture, Kotak Bank, HDFC Ergo, Bajaj Allianz',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Alliance School of Business, Bangalore',
@@ -171,6 +186,7 @@ return [
                 'highest' => '38.05 LPA',
                 'average' => '8.5 LPA',
                 'companies' => 'Amazon, American Express, Biocon, Bosch.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'BIM Trichy',
@@ -179,6 +195,7 @@ return [
                 'highest' => '16 LPA',
                 'average' => '10.5 LPA (Mean)',
                 'companies' => 'Capgemini, HDFC Bank, Cognizant, Accenture.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'IBA Bangalore',
@@ -187,6 +204,7 @@ return [
                 'highest' => '22.26 LPA',
                 'average' => '7.96 LPA',
                 'companies' => 'Reliance, Colgate, Deloitte, Reckitt, KPMG, Berger Paints, etc.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'IIEBM',
@@ -195,6 +213,7 @@ return [
                 'highest' => '30 LPA',
                 'average' => '7.5 LPA',
                 'companies' => 'Deloitte, Aditya Birla Capital, IDFC, Federal Bank, Godrej, OYO, Swiggy.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'ISBR Bangalore',
@@ -203,6 +222,7 @@ return [
                 'highest' => '16.42 LPA',
                 'average' => '8 LPA',
                 'companies' => 'Reliance, Colgate, Deloitte, Reckitt, KPMG, Berger Paints, etc.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'ISME Bangalore',
@@ -211,6 +231,7 @@ return [
                 'highest' => '14 LPA',
                 'average' => '8 LPA',
                 'companies' => 'EY, Deloitte, KPMG, Grant Thornton, TCS, Tata Elxsi, Mondelez, Acuity',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'SOIL Institute of Management',
@@ -219,6 +240,7 @@ return [
                 'highest' => 'PGPM 22 Lakhs; PGPM-HR 15 Lakhs; PGDM 27 LPA',
                 'average' => 'PGPM 11.7 LPA; PGDM 10.7 LPA',
                 'companies' => 'ABB, Aditya Birla Capital, Airtel, Canon, Desmania, EIL, HDFC Bank.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Woxsen Business School, Hyderabad',
@@ -227,6 +249,7 @@ return [
                 'highest' => '19 LPA',
                 'average' => '9.04 LPA',
                 'companies' => 'Deloitte, TCS, Berger Paints, Hexaware, Federal Bank, TVS.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'T.A. Pai Management Institute, Manipal (TAPMI)',
@@ -235,6 +258,7 @@ return [
                 'highest' => '32.02 LPA',
                 'average' => '13.84 LPA',
                 'companies' => 'AB InBev, Accenture, Deloitte, Gartner, Cognizant.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Welingkar Institute of Management Development and Research, Bangalore',
@@ -243,6 +267,7 @@ return [
                 'highest' => '17.63 LPA',
                 'average' => '11.11 LPA',
                 'companies' => 'Infosys, Wipro, Deloitte, Wells Fargo.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'ABBS (Acharya, Bangalore)',
@@ -251,6 +276,7 @@ return [
                 'highest' => '22.5 LPA',
                 'average' => '7.5 LPA',
                 'companies' => 'Amazon, American Express, Biocon, Bosch.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'BIMTECH Greater Noida',
@@ -259,6 +285,7 @@ return [
                 'highest' => '22 LPA',
                 'average' => '10.90 LPA',
                 'companies' => '-',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'FORE School of Management, New Delhi (Non-Core)',
@@ -267,6 +294,7 @@ return [
                 'highest' => '29 LPA',
                 'average' => '16.8 LPA',
                 'companies' => 'ITC, Nestlé, Asian Paints, HUL, Bacardi, Café Coffee Day, United Breweries, Nivea, Suzuki, Tata Motors, Mahindra, Hero, Hyundai, JK Tyre, Godfrey Phillips, Whirlpool, Vivo',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Fortune Institute of International Business (FIIB) New Delhi',
@@ -275,6 +303,7 @@ return [
                 'highest' => '22 LPA',
                 'average' => '10.90 LPA',
                 'companies' => '',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'K J Somaiya Institute of Management (Non-Core)',
@@ -283,6 +312,7 @@ return [
                 'highest' => '28.5 LPA',
                 'average' => 'Top 100-17.34 LPA | Top 200-15.8 LPA',
                 'companies' => 'Capgemini, TCS, Wipro, Accenture, Infosys',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Lal Bahadur Shastri Institute of Management, New Delhi (Non-core)',
@@ -291,6 +321,7 @@ return [
                 'highest' => '16.67 LPA',
                 'average' => '12.24 LPA',
                 'companies' => 'Deloitte, Bain & Co, EY GDS, KPMG.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Aditya School of Business Management',
@@ -299,6 +330,7 @@ return [
                 'highest' => '25 LPA',
                 'average' => '8.64 LPA',
                 'companies' => 'Britannia (internship), Marico (live projects), Nomura, Anchor, Bajaj, DTDC, SBI, IndusInd Bank, Shadowfax, 99acres.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'BML Munjal',
@@ -307,6 +339,7 @@ return [
                 'highest' => '14.86 LPA',
                 'average' => '9.2 LPA',
                 'companies' => 'Capgemini, Amazon, PwC, HP, Cognizant, Accenture, Goldman Sachs, TCS, Deloitte',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'IILM',
@@ -315,6 +348,7 @@ return [
                 'highest' => '24 LPA',
                 'average' => '8.6 LPA',
                 'companies' => 'TCS, HP, Accenture, Goldman Sachs, Capgemini, Deloitte, Amazon, Cognizant, PwC',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'RCM Bangalore',
@@ -323,6 +357,7 @@ return [
                 'highest' => '44 LPA',
                 'average' => '8.5 LPA',
                 'companies' => 'Deloitte, KPMG, Amazon, Accenture, HDFC Bank, ICICI Bank, Flipkart, Infosys, TCS, HCL, HP, Volvo, Zomato, EY, Capgemini, Tech Mahindra, Federal Bank, Decathlon.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'KJ Somaiya',
@@ -331,6 +366,7 @@ return [
                 'highest' => '28.5 LPA',
                 'average' => '17.34 LPA',
                 'companies' => 'Deloitte, PWC, ICICI Bank, EY, J.P. Morgan, Capgemini, Accenture.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'MYRA School of Business',
@@ -339,6 +375,7 @@ return [
                 'highest' => '16 LPA',
                 'average' => '8.64 LPA',
                 'companies' => 'Deloitte, Wipro, Federal Bank, Toyota, L&T, TCS, etc.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'UPES Dehradun',
@@ -347,6 +384,7 @@ return [
                 'highest' => '29 LPA',
                 'average' => '17.1 LPA',
                 'companies' => 'Amazon, Accenture, Genpact, HCL, HUL, EY.',
+                'apply_now' => '#',
             ],
         ],
     ],
@@ -370,6 +408,7 @@ return [
                 'highest' => '44 LPA',
                 'average' => '8.5 LPA',
                 'companies' => 'Deloitte, KPMG, Amazon, Accenture, HDFC Bank, ICICI Bank, Flipkart, Infosys, TCS, HCL, HP, Volvo, Zomato, EY, Capgemini, Tech Mahindra, Federal Bank, Decathlon.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Birla Institute of Technology, Mesra',
@@ -378,6 +417,7 @@ return [
                 'highest' => '51 LPA',
                 'average' => '11.57 LPA',
                 'companies' => 'Aditya Birla, Indian Oil, Mahindra, Accenture.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Balaji Institute of Modern Management, Pune',
@@ -386,6 +426,7 @@ return [
                 'highest' => '19 LPA',
                 'average' => '7.25 LPA',
                 'companies' => 'Accenture, AGS Technologies, Oracle, Cognizant, Credence Analytics Pvt.',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Vedica Scholars Programme for Women',
@@ -394,6 +435,7 @@ return [
                 'highest' => '22 LPA',
                 'average' => '10 LPA',
                 'companies' => 'Nestle, Zomato, Aditya Birla, Decathlon, KPMG, Gartner, MakeMyTrip, TATA Trust',
+                'apply_now' => '#',
             ],
             [
                 'college' => 'Institute of Public Enterprise, Hyderabad',
@@ -402,6 +444,7 @@ return [
                 'highest' => '24.75 LPA',
                 'average' => '7.10 LPA',
                 'companies' => 'Genpact, Deloitte, TCS, Amazon, Accenture.',
+                'apply_now' => '#',
             ],
         ],
     ],

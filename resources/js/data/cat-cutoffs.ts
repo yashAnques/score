@@ -5,6 +5,7 @@ export type CutoffRow = {
     highest: string;
     average: string;
     companies?: string;
+    apply_now?: string;
 };
 
 export type CutoffTable = {
@@ -38,6 +39,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '25.00 Lakhs',
                 highest: '1.46 CPA',
                 average: '36.14 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Bangalore',
@@ -45,6 +47,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '24.05 Lakhs',
                 highest: '1.10 CPA',
                 average: '35.92 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Calcutta',
@@ -52,6 +55,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '27.00 Lakhs',
                 highest: '1.20 CPA',
                 average: '35.07 LPA',
+                apply_now: '#',
             },
             {
                 college: 'JBIMS - Jamnalal Bajaj Institute of Management Studies',
@@ -59,6 +63,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '6.01 Lakhs',
                 highest: '35.75 LPA',
                 average: '28.02 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Faculty of Management Studies, Delhi',
@@ -66,6 +71,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '2.00 Lakhs',
                 highest: '1.23 CPA',
                 average: '34.2 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Mumbai (NITIE)',
@@ -73,6 +79,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.00 Lakhs',
                 highest: '49.00 LPA',
                 average: '29.44 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Technology (IIT), Bombay (Shailesh J Mehta)',
@@ -80,6 +87,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.00 Lakhs',
                 highest: '49.00 LPA',
                 average: '29.44 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute Of Management Rohtak',
@@ -87,6 +95,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '8.95 Lakhs',
                 highest: '48.25 LPA',
                 average: '19.27 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Technology (IIT), Delhi',
@@ -94,6 +103,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11.02 Lakhs',
                 highest: '41.83 LPA',
                 average: '25.82 LPA',
+                apply_now: '#',
             },
         ],
     },
@@ -115,6 +125,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '21.9 Lakhs',
                 highest: '85.4 LPA',
                 average: '27.3 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Kozhikode',
@@ -122,6 +133,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.05 Lakhs',
                 highest: '72.02 LPA',
                 average: '29.20 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Lucknow',
@@ -129,6 +141,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.07 Lakhs',
                 highest: '65.00 LPA',
                 average: '30.00 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Management Development Institute (MDI), Gurgaon',
@@ -136,6 +149,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '24.99 Lakhs',
                 highest: '60 LPA',
                 average: '28 LPA',
+                apply_now: '#',
             },
             {
                 college: "Masters' Union",
@@ -143,6 +157,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '32.75 Lakhs',
                 highest: '36 LPA',
                 average: '23.59 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SP. Jain Institute of Management and Research (SPJIMR)',
@@ -150,6 +165,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '22.5 Lakhs',
                 highest: '81 LPA',
                 average: '33 LPA',
+                apply_now: '#',
             },
         ],
     },
@@ -171,6 +187,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '17.96 Lakhs',
                 highest: '48.54 LPA',
                 average: '13.09 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Jammu',
@@ -178,6 +195,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '17.15 Lakhs',
                 highest: '64.00 LPA',
                 average: '15.48 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Nagpur',
@@ -185,6 +203,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '18.90 Lakhs',
                 highest: '64.00 LPA',
                 average: '16.74 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Sambalpur',
@@ -192,6 +211,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '21.00 Lakhs',
                 highest: '64.61 LPA',
                 average: '14.21 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Sirmaur',
@@ -199,6 +219,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '17.05 Lakhs',
                 highest: '64.12 LPA',
                 average: '14.48 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Xavier Institute of Management (XIMB)',
@@ -206,6 +227,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.25 Lakhs (MBA BM)',
                 highest: '37.00 LPA',
                 average: '20.00 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Technology (IIT), Roorkee',
@@ -213,6 +235,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '9.68 Lakhs',
                 highest: '27.94 LPA',
                 average: '18.34 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Goa Institute of Management (GIM)',
@@ -220,6 +243,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.04 Lakhs',
                 highest: '32.2 LPA',
                 average: '15.13 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIFT',
@@ -227,6 +251,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '21.9 Lakhs',
                 highest: '85.4 LPA',
                 average: '27.3 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Indore',
@@ -234,6 +259,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '21.17 Lakhs',
                 highest: '1.00 CPA',
                 average: '25.68 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Lucknow',
@@ -241,6 +267,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.07 Lakhs',
                 highest: '65.00 LPA',
                 average: '30.00 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Technology (IIT), Kanpur',
@@ -248,6 +275,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '4.35 Lakhs',
                 highest: '24.00 LPA',
                 average: '18.14 LPA',
+                apply_now: '#',
             },
             {
                 college: "Masters' Union",
@@ -255,6 +283,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '32.75 Lakhs',
                 highest: '36 LPA',
                 average: '23.59 LPA',
+                apply_now: '#',
             },
             {
                 college: 'TISS',
@@ -262,6 +291,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '24.59 Lakhs',
                 highest: '35.05 LPA',
                 average: '26.77 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Amritsar',
@@ -269,6 +299,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '21.00 Lakhs',
                 highest: '36.25 LPA',
                 average: '16.51 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Visakhapatnam',
@@ -276,6 +307,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '17.82 Lakhs',
                 highest: '32.65 LPA',
                 average: '15.61 LPA',
+                apply_now: '#',
             },
         ],
     },
@@ -297,6 +329,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '18 Lakhs',
                 highest: '20.5 LPA',
                 average: '12.4 LPA',
+                apply_now: '#',
             },
             {
                 college: 'FORE School of Management, New Delhi (Core)',
@@ -304,6 +337,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '22.24 Lakhs',
                 highest: '29 LPA',
                 average: '16.8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indian Institute of Management, Kozhikode',
@@ -311,6 +345,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.05 Lakhs',
                 highest: '72.02 LPA',
                 average: '29.20 LPA',
+                apply_now: '#',
             },
             {
                 college: 'K J Somaiya Institute of Management',
@@ -318,6 +353,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.87 Lakhs',
                 highest: '28.5 LPA',
                 average: 'Top 100-17.34 LPA | Top 200-15.8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIBM, Pune',
@@ -325,6 +361,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16 Lakhs',
                 highest: '26.51 LPA',
                 average: '14.23 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIT, Trichy',
@@ -332,6 +369,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '1.4 Lakhs',
                 highest: '52.89 LPA',
                 average: '-',
+                apply_now: '#',
             },
             {
                 college: 'SDA Bocconi Asia Center',
@@ -339,6 +377,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.75 Lakhs + GST',
                 highest: '36.5 LPA',
                 average: '15.01 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Welingkar Institute of Management, Mumbai',
@@ -346,6 +385,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14 Lakhs',
                 highest: '40 LPA',
                 average: '11.67 LPA',
+                apply_now: '#',
             },
             {
                 college: 'XISS, Ranchi',
@@ -353,6 +393,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '8 - 8.9 Lakhs',
                 highest: '20.50 LPA',
                 average: '9.40 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Lal Bahadur Shastri Institute of Management, New Delhi',
@@ -360,6 +401,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16.5 Lakhs',
                 highest: '16.67 LPA',
                 average: '12.24 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ISME Bangalore',
@@ -367,6 +409,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.95 Lakhs',
                 highest: '14.75 LPA',
                 average: '8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Fortune Institute of International Business (FIIB) New Delhi',
@@ -374,6 +417,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '25 LPA',
                 average: '10.4 LPA',
+                apply_now: '#',
             },
             {
                 college: 'BIMTECH Greater Noida',
@@ -381,6 +425,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14 Lakhs',
                 highest: '22 LPA',
                 average: '10.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IBA Bangalore',
@@ -388,6 +433,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '22.6 LPA',
                 average: '7.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'LIBA, Chennai',
@@ -395,6 +441,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '3.5 L - 14.47 Lakhs',
                 highest: '21 LPA',
                 average: '-',
+                apply_now: '#',
             },
             {
                 college: 'National Insurance Academy Pune',
@@ -402,6 +449,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '22 LPA',
                 average: '12.3 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIRMA',
@@ -409,6 +457,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.39 Lakhs + Hostel',
                 highest: '70 LPA',
                 average: '11.2 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SOIL Institute of Management',
@@ -416,6 +465,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: 'PGPM 15.3 Lakhs | PGDM 15.8 Lakhs',
                 highest: 'PGPM 22 LPA | PGDM 27 LPA',
                 average: 'PGPM 11.3 LPA | PGDM 11.34 LPA',
+                apply_now: '#',
             },
             {
                 college: 'XIME Bangalore',
@@ -423,6 +473,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '12.5 Lakhs',
                 highest: '16 LPA',
                 average: '10.75 LPA',
+                apply_now: '#',
             },
         ],
     },
@@ -447,6 +498,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 average: '16.8 LPA',
                 companies:
                     'ITC Limited, Nestlé, Asian Paints, HUL, Bacardi, Café Coffee Day, United Breweries, Nivea, Suzuki, Tata Motors, Mahindra, Hero, Hyundai, JK Tyre, Godfrey Phillips, Whirlpool, Vivo',
+                apply_now: '#',
             },
             {
                 college: 'K J Somaiya Institute of Management',
@@ -455,6 +507,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '28.5 LPA',
                 average: 'Top 100-17.34 LPA | Top 200-15.8 LPA',
                 companies: 'Capgemini, TCS, Wipro, Accenture, Infosys',
+                apply_now: '#',
             },
             {
                 college: 'BIMTECH Greater Noida',
@@ -463,6 +516,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22 LPA',
                 average: '10.90 LPA',
                 companies: '',
+                apply_now: '#',
             },
             {
                 college: 'Alliance University, Bangalore',
@@ -471,6 +525,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '38.05 LPA',
                 average: '8.5 LPA',
                 companies: 'Amazon, American Express, Biocon, Bosch',
+                apply_now: '#',
             },
             {
                 college: 'IIEBM Pune',
@@ -479,6 +534,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '30 LPA',
                 average: '10 LPA',
                 companies: 'Nestle, TCS, Amazon, Federal Bank, Gabriel, Tech Mahindra',
+                apply_now: '#',
             },
             {
                 college: 'ISBR Bangalore',
@@ -487,6 +543,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16.42 LPA',
                 average: '8 LPA',
                 companies: 'Reliance Industries, Colgate, Deloitte, Reckitt, KPMG, Berger Paints',
+                apply_now: '#',
             },
             {
                 college: 'SDMIMD Mysore',
@@ -495,6 +552,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '14.00 LPA',
                 average: '10.00 LPA',
                 companies: 'Infosys, Capgemini, Deloitte, ICICI Bank, Oracle, Morgan Stanley',
+                apply_now: '#',
             },
             {
                 college: 'Woxsen University, Hyderabad',
@@ -503,6 +561,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '19 LPA',
                 average: '9.05 LPA',
                 companies: 'Morgan Stanley, Deloitte, Tech Mahindra, KPMG, HDFC',
+                apply_now: '#',
             },
             {
                 college: 'Lal Bahadur Shastri Institute of Management, New Delhi',
@@ -511,6 +570,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16.67 LPA',
                 average: '12.24 LPA',
                 companies: 'Deloitte, Bain & Co, EY GDS, KPMG',
+                apply_now: '#',
             },
             {
                 college: 'SOIL Institute of Management',
@@ -519,6 +579,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'PGPM 22 LPA | PGDM 27 LPA',
                 average: 'PGPM 11.3 LPA | PGDM 11.34 LPA',
                 companies: 'ABB, Aditya Birla Capital, Airtel, Canon, EIL, HDFC Bank',
+                apply_now: '#',
             },
             {
                 college: 'Welingkar Bangalore',
@@ -527,6 +588,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '17.63 LPA',
                 average: '11.11 LPA',
                 companies: 'Accenture, Amazon, Barclays, Deloitte USI, EY',
+                apply_now: '#',
             },
             {
                 college: 'RCM Bangalore',
@@ -535,6 +597,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '44 LPA',
                 average: '8.5 LPA',
                 companies: '',
+                apply_now: '#',
             },
             {
                 college: 'Fortune Institute of International Business (FIIB) New Delhi',
@@ -543,6 +606,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '25 LPA',
                 average: '10.4 LPA',
                 companies: '',
+                apply_now: '#',
             },
             {
                 college: 'Aditya School of Business Management',
@@ -551,6 +615,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '25 LPA',
                 average: '8.64 LPA',
                 companies: 'Britannia (internship), Marico (live projects), Nomura, Anchor, Bajaj, DTDC, SBI, IndusInd Bank, Shadowfax, 99acres',
+                apply_now: '#',
             },
             {
                 college: 'Birla Institute of Technology & Science (BITS) Pilani',
@@ -559,6 +624,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22 LPA',
                 average: '15.9 LPA',
                 companies: 'Google, Microsoft, Nestle, Adobe, Deloitte, Dell',
+                apply_now: '#',
             },
             {
                 college: 'National Insurance Academy Pune',
@@ -567,6 +633,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22 LPA',
                 average: '12.3 LPA',
                 companies: 'Marsh & McLennan, ICICI Lombard, HDFC Ergo, TATA AIG, Bajaj Allianz, Care Health',
+                apply_now: '#',
             },
             {
                 college: 'UPES Dehradun',
@@ -575,6 +642,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '27.83 LPA',
                 average: '18 LPA',
                 companies: 'Amazon, AB InBev, BYJU\'s, Autodesk, Providence, Stryker',
+                apply_now: '#',
             },
             {
                 college: 'ABBS (Acharya, Bangalore)',
@@ -583,6 +651,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22.5 LPA',
                 average: '7.5 LPA',
                 companies: 'Amazon, American Express, Biocon, Bosch',
+                apply_now: '#',
             },
             {
                 college: 'BML Munjal',
@@ -591,6 +660,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '14.86 LPA',
                 average: '9.2 LPA',
                 companies: 'Capgemini, Amazon, PwC, HP, Cognizant, Accenture, Goldman Sachs, TCS, Deloitte',
+                apply_now: '#',
             },
             {
                 college: 'IILM',
@@ -599,6 +669,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '24 LPA',
                 average: '8.6 LPA',
                 companies: 'TCS, HP, Accenture, Goldman Sachs, Capgemini, Deloitte, Amazon, Cognizant, PwC',
+                apply_now: '#',
             },
             {
                 college: 'MYRA School of Business',
@@ -607,6 +678,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16 LPA',
                 average: '8.64 LPA',
                 companies: 'Deloitte, Wipro, Federal Bank, Toyota, L&T, TCS, Nestle',
+                apply_now: '#',
             },
         ],
     },
@@ -630,6 +702,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22.5 LPA',
                 average: '7.5 LPA',
                 companies: 'Amazon, American Express, Biocon, Bosch',
+                apply_now: '#',
             },
             {
                 college: 'MYRA School of Business',
@@ -638,6 +711,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16 LPA',
                 average: '8.64 LPA',
                 companies: 'Deloitte, Wipro, Federal Bank, L&T, TCS, Nestle',
+                apply_now: '#',
             },
             {
                 college: 'RCM Bangalore',
@@ -646,6 +720,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '44 LPA',
                 average: '8.5 LPA',
                 companies: '',
+                apply_now: '#',
             },
             {
                 college: 'Vedica Scholars Programme for Women',
@@ -654,6 +729,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '22 LPA',
                 average: '10 LPA',
                 companies: 'Nestle, Zomato, Aditya Birla, KPMG, Gartner, Decathlon, MakeMyTrip, TATA Trust',
+                apply_now: '#',
             },
             {
                 college: 'GITAM Hyderabad Business School (GHBS)',
@@ -662,6 +738,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '13.59 LPA',
                 average: '4.34 LPA',
                 companies: 'Deloitte, MRF, EY, Bluestone',
+                apply_now: '#',
             },
             {
                 college: 'International Institute of Management Studies (IIMS) Pune',
@@ -670,6 +747,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '26.10 LPA',
                 average: '7.50 LPA',
                 companies: 'Deloitte, Mondelez, Storia Foods, WeikField',
+                apply_now: '#',
             },
             {
                 college: 'Lexicon Management Institute of Leadership and Excellence (MILE) Pune',
@@ -678,6 +756,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'Not Available',
                 average: '8.27 LPA',
                 companies: 'Accenture, Sony, Wipro, KPMG, Amazon',
+                apply_now: '#',
             },
             {
                 college: 'Siva Sivani Institute of Management (SSIM) Secunderabad',
@@ -686,6 +765,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '13 LPA',
                 average: '7.44 LPA',
                 companies: 'Berkadia, Asian Paints, Accenture',
+                apply_now: '#',
             },
             {
                 college: 'St. Joseph Institute of Management, Bangalore',
@@ -694,6 +774,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'Not Available',
                 average: '8 LPA',
                 companies: 'Amazon, Amul, NASSCOM, FICO, FIICC',
+                apply_now: '#',
             },
             {
                 college: 'Vishwa Vishwani Institute of Systems and Management Hyderabad',
@@ -702,6 +783,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'Not Available',
                 average: '6 LPA',
                 companies: 'Tech Mahindra, ITC Limited, Accenture, Paytm, BMW',
+                apply_now: '#',
             },
             {
                 college: "Bharatiya Vidya Bhavan's Usha & Lakshmi Mittal Institute of Management (BULMIM)",
@@ -710,6 +792,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '15.20 LPA',
                 average: '4.50 LPA',
                 companies: '',
+                apply_now: '#',
             },
             {
                 college: 'Gitam School of International Business (GSIB) Visakhapatnam',
@@ -718,6 +801,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '14 LPA',
                 average: '6.5 LPA',
                 companies: 'Amazon, HDFC Bank, Accenture, ICICI Bank',
+                apply_now: '#',
             },
             {
                 college: 'J K Business School Gurgaon',
@@ -726,6 +810,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'Not Available',
                 average: '7 LPA',
                 companies: 'Quintica Group Dubai, Berger Paint, HDFC Bank, Daikin, Nestle',
+                apply_now: '#',
             },
         ],
     },
@@ -749,6 +834,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: 'Not Available',
                 average: 'Not Available',
                 companies: 'Thomson Reuters, Ninjacart, Accenture, Aparna Constructions',
+                apply_now: '#',
             },
             {
                 college: 'Apeejay School of Management (ASM) New Delhi',
@@ -757,6 +843,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '12.43 LPA',
                 average: 'Not Available',
                 companies: 'ICICI Prudential, Deloitte, Aditya Birla Group, Tata Power',
+                apply_now: '#',
             },
             {
                 college: 'CII School of Logistics, Amity University, Noida',
@@ -765,6 +852,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16.50 LPA',
                 average: '8.50 LPA',
                 companies: 'McKinsey & Company, Reliance, DHL',
+                apply_now: '#',
             },
             {
                 college: 'EMPI Business school New Delhi',
@@ -773,6 +861,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '20 LPA',
                 average: '8.50 LPA',
                 companies: 'EY, Accenture, Deloitte',
+                apply_now: '#',
             },
             {
                 college: 'GIBS Business School Bangalore',
@@ -781,6 +870,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '16.15 LPA',
                 average: '7.40 LPA',
                 companies: 'HDFC Bank, Wipro, TCS',
+                apply_now: '#',
             },
             {
                 college: 'IIBS Bangalore',
@@ -789,6 +879,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '51 LPA',
                 average: '8.60 LPA',
                 companies: 'Accenture, Amazon, Axis Bank, Berger Paints',
+                apply_now: '#',
             },
             {
                 college: 'Jaypee Business School, Noida',
@@ -797,6 +888,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '10.5 LPA',
                 average: '7.5 LPA',
                 companies: 'Jaypee Group, TCS, HCL Technologies',
+                apply_now: '#',
             },
             {
                 college: 'MITCON Institute of Management Pune',
@@ -805,6 +897,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '18 LPA',
                 average: '7.50 LPA',
                 companies: 'Nestle, ICICI Direct, Axis Bank, Zydus Cadila',
+                apply_now: '#',
             },
             {
                 college: 'RSB Chennai: Rajalakshmi School of Business',
@@ -813,6 +906,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 highest: '10 LPA',
                 average: '5 LPA',
                 companies: 'ITC, Decathlon, Amazon',
+                apply_now: '#',
             },
         ],
         note: 'We recommend you to start preparing for other examinations. Check our Non-CAT exam courses.',
@@ -835,6 +929,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '1.26 - 17 Lakhs',
                 highest: '29.65 LPA',
                 average: '16.93 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIT Delhi, Department of Management Studies (DMS, IITD)',
@@ -842,6 +937,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11.2 Lakhs',
                 highest: '41.13 LPA',
                 average: '25.82 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIT Roorkee, Department of Management Studies (DoMS, IITR)',
@@ -849,6 +945,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '8 Lakhs',
                 highest: '26 LPA',
                 average: '18.30 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Delhi School of Economics (DSE), University of Delhi',
@@ -856,6 +953,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '2 Lakhs',
                 highest: '26.50 LPA',
                 average: '14 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIT Kanpur, Industrial and Management Engineering (IME, IITK)',
@@ -863,6 +961,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '9.68 Lakhs',
                 highest: '27.94 LPA',
                 average: '18.34 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIT Kharagpur, Vinod Gupta School of Management (VGSOM)',
@@ -870,6 +969,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '9 - 25 Lakhs',
                 highest: '43.37 LPA',
                 average: '22.23 LPA',
+                apply_now: '#',
             },
             {
                 college: "Masters' Union",
@@ -877,6 +977,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '32.75 Lakhs',
                 highest: '36 LPA',
                 average: '23.59 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SDA Bocconi Asia Center',
@@ -884,6 +985,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.75 Lakhs + GST',
                 highest: '36.5 LPA',
                 average: '15.01 LPA',
+                apply_now: '#',
             },
             {
                 college: 'FORE School of Management, New Delhi (Core)',
@@ -891,6 +993,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '22.24 Lakhs',
                 highest: '29 LPA',
                 average: '16.8 LPA (ITC, Nestlé, Asian Paints, HUL and more)',
+                apply_now: '#',
             },
             {
                 college: 'Goa Institute of Management (GIM)',
@@ -898,6 +1001,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.04 Lakhs',
                 highest: '32.2 LPA',
                 average: '15.13 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Institute of Rural Management, Anand (IRMA)',
@@ -905,6 +1009,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '13.6 Lakhs',
                 highest: '31.16 LPA',
                 average: '14.14 LPA',
+                apply_now: '#',
             },
             {
                 college: 'K J Somaiya Institute of Management',
@@ -912,6 +1017,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.87 Lakhs',
                 highest: '28.5 LPA',
                 average: 'Top 100-17.34 LPA | Top 200-15.8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Mudra Institute of Communications, Ahmedabad (MICA)',
@@ -919,6 +1025,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '26 Lakhs',
                 highest: '36 LPA',
                 average: '20.09 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIBM, Pune',
@@ -926,6 +1033,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16 Lakhs',
                 highest: '26.51 LPA',
                 average: '14.23 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Welingkar Institute of Management, Mumbai',
@@ -933,6 +1041,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.00 Lakhs',
                 highest: '40 LPA',
                 average: '11.67 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIRMA',
@@ -940,6 +1049,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.39 Lakhs + Hostel',
                 highest: '70 LPA',
                 average: '11.2 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Lal Bahadur Shastri Institute of Management, New Delhi',
@@ -947,6 +1057,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16.5 Lakhs',
                 highest: '16.67 LPA',
                 average: '12.24 LPA',
+                apply_now: '#',
             },
             {
                 college: 'BIMTECH Greater Noida',
@@ -954,6 +1065,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14 Lakhs',
                 highest: '22 LPA',
                 average: '10.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ISME Bangalore',
@@ -961,6 +1073,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.95 Lakhs',
                 highest: '14.75 LPA',
                 average: '8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SOIL Institute of Management',
@@ -968,6 +1081,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: 'PGPM 15.3 Lakhs | PGDM 15.8 Lakhs',
                 highest: 'PGPM 22 LPA | PGDM 27 LPA',
                 average: 'PGPM 11.3 LPA | PGDM 11.34 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Alliance University, Bangalore',
@@ -975,6 +1089,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '15 Lakhs',
                 highest: '38.05 LPA',
                 average: '8.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ISBR Bangalore',
@@ -982,6 +1097,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '16.42 LPA',
                 average: '8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indus Business Academy (IBA) Bangalore',
@@ -989,6 +1105,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '22.6 LPA',
                 average: '7.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ABBS (Acharya, Bangalore)',
@@ -996,6 +1113,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '8.9 Lakhs',
                 highest: '22.5 LPA',
                 average: '7.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'BIM Trichy: Bharathidasan Institute of Management',
@@ -1003,6 +1121,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '18 Lakhs',
                 highest: '20.5 LPA',
                 average: '12.4 LPA',
+                apply_now: '#',
             },
             {
                 college: 'National Insurance Academy Pune',
@@ -1010,6 +1129,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11.00 Lakhs',
                 highest: '22 LPA',
                 average: '12.3 LPA',
+                apply_now: '#',
             },
             {
                 college: 'MYRA School of Business',
@@ -1017,6 +1137,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '16 LPA',
                 average: '8.64 LPA',
+                apply_now: '#',
             },
             {
                 college: 'RCM Bangalore',
@@ -1024,6 +1145,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: 'MBA: 9.64 lakhs | PGDM: 8.80 lakhs',
                 highest: '44 LPA',
                 average: '8.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIEBM Pune',
@@ -1031,6 +1153,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '12.9 Lakhs',
                 highest: '30 LPA',
                 average: '10 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Woxsen University, Hyderabad',
@@ -1038,6 +1161,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.14 Lakhs',
                 highest: '19 LPA',
                 average: '9.05 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Fortune Institute of International Business (FIIB) New Delhi',
@@ -1045,6 +1169,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '25 LPA',
                 average: '10.4 LPA',
+                apply_now: '#',
             },
         ],
     },
@@ -1066,6 +1191,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '25.00 Lakhs',
                 highest: 'International $1.37 LPA | Domestic 1.46 CPA',
                 average: '32.14 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SP. Jain Institute of Management and Research (SPJIMR)',
@@ -1073,6 +1199,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '22.5 Lakhs',
                 highest: '81 LPA',
                 average: '33 LPA',
+                apply_now: '#',
             },
             {
                 college: "Masters' Union",
@@ -1080,6 +1207,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '32.75 Lakhs',
                 highest: '36 LPA',
                 average: '23.59 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SDA Bocconi Asia Center',
@@ -1087,6 +1215,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.75 Lakhs + GST',
                 highest: '36.5 LPA',
                 average: '15.01 LPA',
+                apply_now: '#',
             },
             {
                 college: 'FORE School of Management, New Delhi (Core)',
@@ -1094,6 +1223,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '22.24 Lakhs',
                 highest: '29 LPA',
                 average: '16.8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Goa Institute of Management (GIM)',
@@ -1101,6 +1231,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.04 Lakhs',
                 highest: '32.2 LPA',
                 average: '15.13 LPA',
+                apply_now: '#',
             },
             {
                 college: 'K J Somaiya Institute of Management',
@@ -1108,6 +1239,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.87 Lakhs',
                 highest: '28.5 LPA',
                 average: 'Top 100-17.34 LPA | Top 200-15.8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'MICA - The School of Ideas',
@@ -1115,6 +1247,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '26 Lakhs',
                 highest: '36 LPA',
                 average: '20.09 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIBM, Pune',
@@ -1122,6 +1255,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16 Lakhs',
                 highest: '26.51 LPA',
                 average: '14.23 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Welingkar Institute of Management, Mumbai',
@@ -1129,6 +1263,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.00 Lakhs',
                 highest: '40 LPA',
                 average: '11.67 LPA',
+                apply_now: '#',
             },
             {
                 college: 'NIRMA',
@@ -1136,6 +1271,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14.39 Lakhs + Hostel',
                 highest: '70 LPA',
                 average: '11.2 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Lal Bahadur Shastri Institute of Management, New Delhi',
@@ -1143,6 +1279,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '16.5 Lakhs',
                 highest: '16.67 LPA',
                 average: '12.24 LPA',
+                apply_now: '#',
             },
             {
                 college: 'BIMTECH Greater Noida',
@@ -1150,6 +1287,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '14 Lakhs',
                 highest: '22 LPA',
                 average: '10.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ISME Bangalore',
@@ -1157,6 +1295,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.95 Lakhs',
                 highest: '14.75 LPA',
                 average: '8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'SOIL Institute of Management',
@@ -1164,6 +1303,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: 'PGPM 15.3 Lakhs | PGDM 15.8 Lakhs',
                 highest: 'PGPM 22 LPA | PGDM 27 LPA',
                 average: 'PGPM 11.3 LPA | PGDM 11.34 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Alliance University, Bangalore',
@@ -1171,6 +1311,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '15 Lakhs',
                 highest: '38.05 LPA',
                 average: '8.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ISBR Bangalore',
@@ -1178,6 +1319,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '16.42 LPA',
                 average: '8 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Indus Business Academy (IBA) Bangalore',
@@ -1185,6 +1327,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '22.6 LPA',
                 average: '7.90 LPA',
+                apply_now: '#',
             },
             {
                 college: 'ABBS (Acharya, Bangalore)',
@@ -1192,6 +1335,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '8.9 Lakhs',
                 highest: '22.5 LPA',
                 average: '7.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'BIM Trichy: Bharathidasan Institute of Management',
@@ -1199,6 +1343,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '18 Lakhs',
                 highest: '20.5 LPA',
                 average: '12.4 LPA',
+                apply_now: '#',
             },
             {
                 college: 'National Insurance Academy Pune',
@@ -1206,6 +1351,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '22 LPA',
                 average: '12.3 LPA',
+                apply_now: '#',
             },
             {
                 college: 'MYRA School of Business',
@@ -1213,6 +1359,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '11 Lakhs',
                 highest: '16 LPA',
                 average: '8.64 LPA',
+                apply_now: '#',
             },
             {
                 college: 'RCM Bangalore',
@@ -1220,6 +1367,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: 'MBA: 9.64 lakhs | PGDM: 8.80 lakhs',
                 highest: '44 LPA',
                 average: '8.5 LPA',
+                apply_now: '#',
             },
             {
                 college: 'IIEBM Pune',
@@ -1227,6 +1375,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '12.9 Lakhs',
                 highest: '30 LPA',
                 average: '10 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Woxsen University, Hyderabad',
@@ -1234,6 +1383,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '20.14 Lakhs',
                 highest: '19 LPA',
                 average: '9.05 LPA',
+                apply_now: '#',
             },
             {
                 college: 'Fortune Institute of International Business (FIIB) New Delhi',
@@ -1241,6 +1391,7 @@ export const CAT_CUTOFF_TABLES: CutoffTable[] = [
                 fees: '10.3 Lakhs',
                 highest: '25 LPA',
                 average: '10.4 LPA',
+                apply_now: '#',
             },
         ],
     },
