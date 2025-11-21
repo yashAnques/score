@@ -20,6 +20,7 @@ import {
     Sparkles,
     Cpu,
     Bot,
+    LinkIcon,
 } from 'lucide-react';
 import {
     ComponentType,
@@ -701,11 +702,32 @@ export default function XatScoreCalculator({
                                     <tbody className="divide-y divide-border/60 bg-background/60">
                                         {selectedCutoffTable.rows.map((row) => (
                                             <tr key={`${selectedCutoffTable.id}-${row.college}`} className="hover:bg-muted/30">
-                                                {selectedCutoffTable.columns.map((column) => (
-                                                    <td key={column.key} className="px-4 py-3 align-top text-sm text-foreground sm:px-6">
-                                                        {row[column.key as keyof typeof row] ?? '—'}
-                                                    </td>
-                                                ))}
+                                                {selectedCutoffTable.columns.map((column) => {
+                                                    const cellValue = row[column.key as keyof typeof row];
+                                                    const isApplyNowColumn = column.key === 'apply_now';
+                                                    const applyUrl =
+                                                        isApplyNowColumn && typeof cellValue === 'string'
+                                                            ? cellValue.trim()
+                                                            : '';
+
+                                                    return (
+                                                        <td key={column.key} className="px-4 py-3 align-top text-sm text-foreground sm:px-6">
+                                                            {isApplyNowColumn ? (
+                                                                applyUrl ? (
+                                                                    <Button asChild size="sm" variant="secondary" className='bg-yellow-400 text-white hover:bg-yellow-500 hover:text-white hover:scale-105 hover:transition-transform'>
+                                                                        <a href={applyUrl} target="_blank" rel="noopener noreferrer">
+                                                                            {column.label || 'Apply Now'} <LinkIcon></LinkIcon>
+                                                                        </a>
+                                                                    </Button>
+                                                                ) : (
+                                                                    '—'
+                                                                )
+                                                            ) : (
+                                                                cellValue ?? '—'
+                                                            )}
+                                                        </td>
+                                                    );
+                                                })}
                                             </tr>
                                         ))}
                                     </tbody>
