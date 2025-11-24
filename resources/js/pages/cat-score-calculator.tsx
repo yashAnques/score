@@ -707,21 +707,45 @@ export default function CatScoreCalculator({
                                                         isApplyNowColumn && typeof cellValue === 'string'
                                                             ? cellValue.trim()
                                                             : '';
+                                                    const collegeUrl =
+                                                        column.key === 'college' &&
+                                                        typeof row.college_link === 'string'
+                                                            ? row.college_link.trim()
+                                                            : '';
 
                                                     return (
                                                         <td key={column.key} className="px-4 py-3 align-top text-sm text-foreground sm:px-6">
                                                             {isApplyNowColumn ? (
                                                                 applyUrl ? (
-                                                                    <Button asChild size="sm" variant="secondary" className='bg-yellow-400 text-white hover:bg-yellow-500 hover:text-white hover:scale-105 hover:transition-transform'>
+                                                                    <Button
+                                                                        asChild
+                                                                        size="sm"
+                                                                        variant="secondary"
+                                                                        className="bg-yellow-400 text-white hover:bg-yellow-500 hover:text-white hover:scale-105 hover:transition-transform"
+                                                                    >
                                                                         <a href={applyUrl} target="_blank" rel="noopener noreferrer">
-                                                                            {column.label || 'Apply Now'} <LinkIcon></LinkIcon>
+                                                                            {column.label || 'Apply Now'} <LinkIcon />
                                                                         </a>
                                                                     </Button>
                                                                 ) : (
                                                                     '—'
                                                                 )
                                                             ) : (
-                                                                cellValue ?? '—'
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span>{cellValue ?? '—'}</span>
+                                                                    {collegeUrl && (
+                                                                        <Button
+                                                                            asChild
+                                                                            variant="link"
+                                                                            size="sm"
+                                                                            className="h-auto px-0 text-yellow-600 hover:text-yellow-500"
+                                                                        >
+                                                                            <a href={collegeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-start justify-start !p-0 gap-1 text-xs font-semibold">
+                                                                                Visit college site <LinkIcon className="h-3 w-3" />
+                                                                            </a>
+                                                                        </Button>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </td>
                                                     );
