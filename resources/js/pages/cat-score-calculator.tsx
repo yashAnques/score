@@ -20,6 +20,7 @@ import {
     Target,
     XCircle,
     LinkIcon,
+    Crown,
 } from 'lucide-react';
 import {
     type ComponentType,
@@ -738,10 +739,16 @@ export default function CatScoreCalculator({
                                                                             asChild
                                                                             variant="link"
                                                                             size="sm"
-                                                                            className="h-auto px-0 text-yellow-600 hover:text-yellow-500"
+                                                                            className="h-auto px-0 text-amber-600 hover:text-amber-500"
                                                                         >
-                                                                            <a href={collegeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-start justify-start !p-0 gap-1 text-xs font-semibold">
-                                                                                Visit college site <LinkIcon className="h-3 w-3" />
+                                                                            <a
+                                                                                href={collegeUrl}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="inline-flex justify-start items-center gap-1.5 !p-0 text-xs font-semibold uppercase tracking-wide"
+                                                                            >
+                                                                                <Crown className="h-3 w-3 text-amber-500" />
+                                                                                Visit college site
                                                                             </a>
                                                                         </Button>
                                                                     )}
